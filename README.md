@@ -1,14 +1,20 @@
 # Atlas
 
-A dependency-free, HTML-driven directory engine for JCink.
+A dependency-free, HTML-driven directory engine.
 
-## Goals
+Atlas is a modular JavaScript framework for building searchable, filterable, sortable directories from semantic HTML.
+
+## Features
 
 - Zero dependencies
 - HTML-first configuration
-- Accessible
-- Responsive
-- Fast with ~1000 member cards
-- Generic and extensible
+- Responsive layouts
+- Accessible by default
+- Client-side searching
+- Faceted filtering
+- Generic field mapping
+- Framework agnostic
 
-Status: Early development.
+## Status
+
+Atlas is currently in early development.
