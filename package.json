@@ -1,9 +1,9 @@
 {
-  "name": "jcink-directory",
+  "name": "atlas",
   "version": "0.1.0",
-  "description": "A dependency-free, HTML-driven directory engine for JCink.",
+  "description": "A dependency-free, HTML-driven directory engine.",
   "type": "module",
-  "license": "MIT",
+  "license": "GNU Affero General Public License v3.0",
   "author": "",
   "private": false
 }
