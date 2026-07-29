@@ -1,1 +1,9 @@
-
+{
+  "name": "jcink-directory",
+  "version": "0.1.0",
+  "description": "A dependency-free, HTML-driven directory engine for JCink.",
+  "type": "module",
+  "license": "MIT",
+  "author": "",
+  "private": false
+}
