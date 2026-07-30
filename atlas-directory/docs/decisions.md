@@ -95,3 +95,51 @@ Atlas defines a small, consistent HTML vocabulary including:
 ### Reason
 
 A consistent vocabulary makes Atlas easier to learn and allows the documentation to focus on HTML rather than JavaScript.
+
+---
+
+## ADR-006 — Constructors Coordinate, They Don't Work
+
+**Status:** Accepted
+
+Constructors should remain small and describe the application's lifecycle.
+
+Complex behaviour should be delegated to clearly named private methods.
+
+### Example
+
+```javascript
+constructor(options = {}) {
+    this.options = this.#createOptions(options);
+    this.root = this.#findRoot();
+    this.#initialise();
+}
+```
+
+### Reason
+
+This makes the code self-documenting, easier to test, and easier to extend as Atlas grows.
+
+---
+
+## ADR-007 — Prefer Fewer Concepts
+
+**Status:** Accepted
+
+Atlas should introduce as few concepts as possible. If a responsibility can be expressed as a private method instead of a new public abstraction, prefer the simpler design.
+
+### Reason
+
+A smaller mental model makes Atlas easier to learn, easier to contribute to, and easier to maintain.
+
+---
+
+## ADR-008 — Discovery Before Interpretation
+
+**Status:** Accepted
+
+The Registry is responsible only for discovering Atlas elements and exposing them. It must not interpret member data, understand roleplay concepts, or implement application behaviour.
+
+### Reason
+
+Separating discovery from interpretation keeps the Registry simple, reusable, and easy to test. Other classes are free to build richer behaviour on top of the discovered structure.
