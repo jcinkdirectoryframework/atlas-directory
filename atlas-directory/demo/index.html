@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
+    <meta charset="UTF-8">
+
+    <title>Atlas Demo</title>
+
+</head>
+<body>
+
+    <div data-atlas>
+
+        <h1>Atlas Demo</h1>
+
+        <p>If you can see this, Atlas found its root.</p>
+
+    </div>
+
+    <script type="module">
+
+        import Atlas from '../src/index.js';
+
+        const atlas = new Atlas({
+            debug: true
+        });
+
+        console.log(atlas);
+
+    </script>
+
+</body>
+</html>
