@@ -16,7 +16,7 @@ A dependency-free, HTML-driven directory engine.
 
 ## Current Milestone
 
-Project foundation
+Registry implementation
 
 ---
 
@@ -29,6 +29,10 @@ Project foundation
 * One public `Atlas` class agreed.
 * JCink selected as the first supported adapter.
 * Documentation structure established.
+* Registry responsibilities defined.
+* Registry public API agreed.
+* Discovery lifecycle agreed.
+* Constructors coordinate rather than perform work.
 
 ---
 
@@ -66,15 +70,14 @@ tests/
 
 ## Next Milestone
 
-Implement the `Atlas` core class.
+Implement Registry.js
 
 Goals:
 
-* Discover the Atlas root.
-* Validate configuration.
-* Prepare the application lifecycle.
-
-No searching, filtering or rendering yet.
+* Discover the Atlas directory.
+* Discover members.
+* Discover controls.
+* Expose a read-only API.
 
 ---
 

@@ -138,8 +138,20 @@ A smaller mental model makes Atlas easier to learn, easier to contribute to, and
 
 **Status:** Accepted
 
-The Registry is responsible only for discovering Atlas elements and exposing them. It must not interpret member data, understand roleplay concepts, or implement application behaviour.
+The Registry is responsible only for discovering Atlas elements and exposing them. It does not interpret member data or implement behaviour.
 
 ### Reason
 
-Separating discovery from interpretation keeps the Registry simple, reusable, and easy to test. Other classes are free to build richer behaviour on top of the discovered structure.
+Separating discovery from interpretation keeps the Registry focused, reusable and easy to test.
+
+---
+
+## ADR-009 — Group Controls by Responsibility
+
+**Status:** Accepted
+
+The Registry stores discovered controls in a single `controls` collection, grouped by type.
+
+### Reason
+
+This avoids unnecessary private fields, makes the Registry easier to extend, and provides a consistent API.

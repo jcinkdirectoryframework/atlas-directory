@@ -3,17 +3,19 @@
 ## High-Level Flow
 
 ```text
-HTML
-    ↓
-Field Discovery
+Atlas
     ↓
 Registry
     ↓
-Internal Data Model
+MemberCollection
+    ↓
+Store
+    ↓
+Renderer
     ↓
 Modules
     ↓
-Renderer
+Ready
 ```
 
 ---
@@ -37,6 +39,12 @@ Discovers:
 * controls
 
 Builds an internal registry describing the page.
+
+* Receives the Atlas root from Atlas.
+* Performs a single discovery pass.
+* Discovers the directory, members and controls.
+* Stores DOM references only.
+* Exposes a read-only API.
 
 ---
 

@@ -2,13 +2,21 @@
 
 ## Version 0.1
 
-Project foundation.
+Project foundation
 
-* Documentation
-* Core architecture
-* Atlas class
+✓ Documentation
+✓ Architecture
+✓ Atlas class
+
+In Progress
+
 * Registry
+
+Upcoming
+
+* MemberCollection
 * Store
+* Renderer
 * Events
 
 ---
