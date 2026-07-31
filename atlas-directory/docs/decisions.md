@@ -155,3 +155,17 @@ The Registry stores discovered controls in a single `controls` collection, group
 ### Reason
 
 This avoids unnecessary private fields, makes the Registry easier to extend, and provides a consistent API.
+
+---
+
+## ADR-010 — Core Classes Use Private Fields
+
+**Status:** Accepted
+
+Atlas uses JavaScript private class fields (`#`) for internal state.
+
+Public access is provided through explicit getters where appropriate.
+
+### Reason
+
+This keeps the public API intentional, prevents accidental coupling between classes, and aligns with Atlas's goal of exposing as few concepts as possible.
