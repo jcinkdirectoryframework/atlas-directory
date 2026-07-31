@@ -7,6 +7,7 @@ Project foundation
 ✓ Documentation
 ✓ Architecture
 ✓ Atlas class
+✓ Development environment
 
 In Progress
 

@@ -16,7 +16,7 @@ A dependency-free, HTML-driven directory engine.
 
 ## Current Milestone
 
-Registry implementation
+Development environment established
 
 ---
 
@@ -33,6 +33,10 @@ Registry implementation
 * Registry public API agreed.
 * Discovery lifecycle agreed.
 * Constructors coordinate rather than perform work.
+* Repository structure established.
+* Documentation structure established.
+* GitHub Pages selected as the development preview.
+* Demo application created.
 
 ---
 

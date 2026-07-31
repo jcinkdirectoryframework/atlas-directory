@@ -4,9 +4,10 @@
 
 ### Added
 
-- Initial project architecture.
+- Initial project structure.
 - Documentation.
-- Atlas class.
+- Development environment.
+- Demo application.
 
 ### Changed
 
