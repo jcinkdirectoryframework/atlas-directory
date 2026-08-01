@@ -64,15 +64,19 @@
 </div>
 
 <script type="module">
-import Atlas from "./src/index.js";
+(async () => {
+    console.log("Starting Atlas...");
 
-console.log("Atlas imported");
+    const { default: Atlas } = await import("./src/index.js");
 
-new Atlas({
-    debug: true
-});
+    console.log("Atlas loaded");
 
-console.log("Atlas created");
+    new Atlas({
+        debug: true
+    });
+
+    console.log("Atlas created");
+})();
 </script>
 
 </body>
