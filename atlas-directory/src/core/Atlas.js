@@ -18,7 +18,11 @@
  * Those responsibilities belong to specialised classes.
  */
 
+import Registry from "./Registry.js";
+
 export default class Atlas {
+
+    #registry = null;
 
     /**
      * Create a new Atlas instance.
@@ -74,11 +78,49 @@ export default class Atlas {
      */
     #initialise() {
 
-        if (this.options.debug) {
+        this.#createRegistry();
 
-            console.info('Atlas initialised.');
+        this.#ready();
 
+    }
+
+    /**
+     * Create the Registry.
+     */
+    #createRegistry() {
+
+        this.#registry = new Registry(this.root);
+
+    }
+
+    /**
+     * Atlas is ready.
+     */
+    #ready() {
+
+        if (!this.options.debug) {
+            return;
         }
+
+        console.group("Atlas");
+
+        console.info(
+            `Members: ${this.#registry.members.length}`
+        );
+
+        console.info(
+            `Search controls: ${this.#registry.controls.search.length}`
+        );
+
+        console.info(
+            `Filters: ${this.#registry.controls.filters.length}`
+        );
+
+        console.info(
+            `Layouts: ${this.#registry.controls.layouts.length}`
+        );
+
+        console.groupEnd();
 
     }
 
