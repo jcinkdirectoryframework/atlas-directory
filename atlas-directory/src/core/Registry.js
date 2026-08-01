@@ -75,7 +75,7 @@ export default class Registry {
      */
     get controls() {
 
-        return {
+        return Object.freeze({
 
             search: [...this.#controls.search],
 
@@ -91,7 +91,7 @@ export default class Registry {
 
             results: [...this.#controls.results]
 
-        };
+        });
 
     }
 
@@ -113,8 +113,25 @@ export default class Registry {
      */
     #discoverDirectory() {
 
-        this.#directory =
-            this.#root.querySelector("[data-directory]");
+        const directories = this.#root.querySelectorAll("[data-directory]");
+
+        if (directories.length === 0) {
+
+            throw new Error(
+                "Atlas requires one [data-directory] element."
+            );
+
+        }
+
+        if (directories.length > 1) {
+
+            throw new Error(
+                "Atlas found multiple [data-directory] elements."
+            );
+
+        }
+
+        this.#directory = directories[0];
 
     }
 
@@ -133,31 +150,28 @@ export default class Registry {
 
     }
 
+    #controlSelectors = {
+        search: "[data-search]",
+        filters: "[data-filter]",
+        sorts: "[data-sort]",
+        layouts: "[data-layout]",
+        alphabet: "[data-alphabet]",
+        chips: "[data-chips]",
+        results: "[data-results]"
+    };
+
     /**
      * Locate Atlas controls.
      */
     #discoverControls() {
+    
+        for (const [type, selector] of Object.entries(this.#controlSelectors)) {
 
-        this.#controls.search =
-            Array.from(this.#root.querySelectorAll("[data-search]"));
+            this.#controls[type] = Array.from(
+                this.#root.querySelectorAll(selector)
+            );
 
-        this.#controls.filters =
-            Array.from(this.#root.querySelectorAll("[data-filter]"));
-
-        this.#controls.sorts =
-            Array.from(this.#root.querySelectorAll("[data-sort]"));
-
-        this.#controls.layouts =
-            Array.from(this.#root.querySelectorAll("[data-layout]"));
-
-        this.#controls.alphabet =
-            Array.from(this.#root.querySelectorAll("[data-alphabet]"));
-
-        this.#controls.chips =
-            Array.from(this.#root.querySelectorAll("[data-chips]"));
-
-        this.#controls.results =
-            Array.from(this.#root.querySelectorAll("[data-results]"));
+        }
 
     }
 

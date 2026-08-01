@@ -169,3 +169,15 @@ Public access is provided through explicit getters where appropriate.
 ### Reason
 
 This keeps the public API intentional, prevents accidental coupling between classes, and aligns with Atlas's goal of exposing as few concepts as possible.
+
+---
+
+## ADR-011 — Fail Fast on Invalid Structure
+
+**Status:** Accepted
+
+Atlas validates its required HTML structure during discovery and throws descriptive errors when the structure is invalid.
+
+### Reason
+
+Failing during initialisation is preferable to silently ignoring invalid markup, as it makes configuration errors easier to diagnose.
