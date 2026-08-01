@@ -46,6 +46,15 @@ Builds an internal registry describing the page.
 * Stores DOM references only.
 * Exposes a read-only API.
 
+### Public API
+
+- `root`
+- `directory`
+- `members`
+- `controls`
+
+All properties are read-only.
+
 ---
 
 ## Store

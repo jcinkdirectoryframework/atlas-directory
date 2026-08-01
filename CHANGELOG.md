@@ -8,6 +8,7 @@
 - Documentation.
 - Development environment.
 - Demo application.
+- Registry implementation.
 
 ### Changed
 

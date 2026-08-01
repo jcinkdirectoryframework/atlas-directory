@@ -16,7 +16,7 @@ A dependency-free, HTML-driven directory engine.
 
 ## Current Milestone
 
-Development environment established
+Registry implementation
 
 ---
 
@@ -37,6 +37,9 @@ Development environment established
 * Documentation structure established.
 * GitHub Pages selected as the development preview.
 * Demo application created.
+* Registry class implemented.
+* Single-pass discovery established.
+* Read-only discovery API implemented.
 
 ---
 
@@ -45,6 +48,7 @@ Development environment established
 ```text
 src/
     core/
+    models/
     modules/
     adapters/
     styles/
@@ -74,7 +78,7 @@ tests/
 
 ## Next Milestone
 
-Implement Registry.js
+Integrate Registry into Atlas.
 
 Goals:
 
