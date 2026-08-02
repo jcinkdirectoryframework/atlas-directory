@@ -66,6 +66,7 @@ export default class Member {
      * - The raw text content
      * - A normalized version (lowercase, trimmed)
      * - Whether the field is filterable (default: true, opt-out with data-filterable="false")
+     * - Whether the field is searchable (default: false, opt-in with data-searchable="true")
      */
     #parseFields() {
 
@@ -76,6 +77,7 @@ export default class Member {
             const fieldName = el.dataset.field;
             const rawValue = el.textContent.trim();
             const filterable = el.dataset.filterable !== 'false'; // Default: true
+            const searchable = el.dataset.searchable === 'true'; // Default: false
 
             // Skip empty field names
             if (!fieldName) {
@@ -96,7 +98,8 @@ export default class Member {
             this.#fields.set(fieldName, {
                 raw: rawValue,
                 normalized: this.#normalize(rawValue),
-                filterable: filterable
+                filterable: filterable,
+                searchable: searchable
             });
 
             this.#fieldElements.set(fieldName, el);
@@ -183,12 +186,27 @@ export default class Member {
     }
 
     /**
+     * Check if a field is searchable.
+     *
+     * @param {string} fieldName
+     * @returns {boolean}
+     */
+    isSearchable(fieldName) {
+
+        const field = this.#fields.get(fieldName);
+
+        return field ? field.searchable : false;
+
+    }
+
+    /**
      * Check if the member matches a search query.
      *
-     * Searches all fields for the normalized query string.
+     * Searches only searchable fields (opt-in with data-searchable="true").
+     * Uses "starts with" matching (case-insensitive).
      *
      * @param {string} query - The search query
-     * @returns {boolean} True if the query matches any field
+     * @returns {boolean} True if the query matches any searchable field
      */
     matches(query) {
 
@@ -199,7 +217,10 @@ export default class Member {
         }
 
         for (const [fieldName, field] of this.#fields) {
-            if (field.normalized.includes(normalizedQuery)) {
+            if (!field.searchable) {
+                continue;
+            }
+            if (field.normalized.startsWith(normalizedQuery)) {
                 return true;
             }
         }

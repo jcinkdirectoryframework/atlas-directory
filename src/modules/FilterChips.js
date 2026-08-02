@@ -74,7 +74,7 @@ export default class FilterChips {
         const filters = this.#store.filters;
         const activeFields = Object.keys(filters);
 
-        // If no active filters, show a message or nothing
+        // If no active filters, show a message and return (no Clear All button)
         if (activeFields.length === 0) {
             const message = document.createElement('span');
             message.className = 'atlas-chips-empty';
@@ -130,7 +130,7 @@ export default class FilterChips {
 
         }
 
-        // "Clear All" button
+        // "Clear All" button (only when there are active filters)
         const clearAllBtn = document.createElement('button');
         clearAllBtn.className = 'atlas-clear-all';
         clearAllBtn.textContent = 'Clear All';
@@ -183,7 +183,7 @@ export default class FilterChips {
 
         document.dispatchEvent(event);
 
-        // Re-render chips
+        // Re-render chips (this will show "No active filters" if all are removed)
         this.render();
 
     }
@@ -210,7 +210,7 @@ export default class FilterChips {
 
         document.dispatchEvent(event);
 
-        // Re-render chips
+        // Re-render chips (this will show "No active filters")
         this.render();
 
     }
