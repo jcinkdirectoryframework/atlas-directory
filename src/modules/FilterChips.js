@@ -149,15 +149,26 @@ export default class FilterChips {
      */
     #removeFilter(fieldName, value) {
 
-        // Toggle the filter off (removes it from Store)
-        const isActive = this.#store.isFilterActive(fieldName, value);
+        // Get current filters for this field
+        const currentValues = this.#store.filters[fieldName] || [];
 
-        if (isActive) {
-            this.#store.toggleFilter(fieldName, value);
+        // Remove the value from the array
+        const index = currentValues.indexOf(value);
+        if (index === -1) {
+            // Value not found, nothing to do
+            return;
+        }
+
+        currentValues.splice(index, 1);
+
+        // If no values left, clear the field entirely
+        if (currentValues.length === 0) {
+            delete this.#store.filters[fieldName];
+        } else {
+            this.#store.filters[fieldName] = currentValues;
         }
 
         // Update the "All" button state for this field
-        // We need to update the FilterGenerator's UI
         this.#updateFilterGeneratorUI(fieldName);
 
         // Dispatch event to trigger Atlas update
