@@ -47,11 +47,6 @@ export default class ResultCounter {
         // Initial render
         this.render();
 
-        // Listen for filter changes
-        document.addEventListener('atlas:filtersChanged', () => {
-            this.render();
-        });
-
     }
 
     /**
@@ -61,14 +56,31 @@ export default class ResultCounter {
 
         const total = this.#memberCollection.size;
         const filters = this.#store.filters;
-        const activeFields = Object.keys(filters);
+        const searchQuery = this.#store.search;
+        const hasFilters = Object.keys(filters).length > 0;
+        const hasSearch = searchQuery && searchQuery.trim();
 
         let visible = total;
 
-        if (activeFields.length > 0) {
-            const filtered = this.#memberCollection.applyFilters(filters);
-            // applyFilters returns a MemberCollection, use .size
-            visible = filtered.size;
+        if (hasFilters || hasSearch) {
+            // Get filtered members (filters + search combined)
+            let filtered = this.#memberCollection.getAll();
+
+            if (hasFilters) {
+                filtered = this.#memberCollection.applyFilters(filters);
+            }
+
+            if (hasSearch) {
+                const searchResults = [];
+                for (const member of filtered) {
+                    if (member.matches(searchQuery)) {
+                        searchResults.push(member);
+                    }
+                }
+                filtered = searchResults;
+            }
+
+            visible = filtered.length;
         }
 
         // Clear the container

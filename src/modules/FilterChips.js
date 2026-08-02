@@ -87,8 +87,9 @@ export default class FilterChips {
             return;
         }
 
-        // Create chips for each active filter
-        for (const fieldName of activeFields) {
+        // Create chips for each active filter (sorted alphabetically by field name)
+        const sortedFieldNames = activeFields.sort();
+        for (const fieldName of sortedFieldNames) {
 
             const values = filters[fieldName];
             const fieldInfo = this.#fieldFilterMap.get(fieldName);
