@@ -98,18 +98,24 @@ export default class Atlas {
 
     }
 
-    /**
+     /**
      * Create the MemberCollection from discovered members.
      */
     #createMemberCollection() {
 
-        const memberElements = this.#registry.members;
+        try {
+            const memberElements = this.#registry.members;
 
-        const members = memberElements.map((element, index) => {
-            return new Member(element, index);
-        });
+            const members = memberElements.map((element, index) => {
+                return new Member(element, index);
+            });
 
-        this.#memberCollection = new MemberCollection(members);
+            this.#memberCollection = new MemberCollection(members);
+
+        } catch (error) {
+            console.error('Failed to create MemberCollection:', error);
+            throw error;
+        }
 
     }
 
@@ -128,9 +134,14 @@ export default class Atlas {
             `Members: ${this.#registry.members.length}`
         );
 
-        console.info(
-            `Member fields: ${this.#memberCollection.getAllFieldNames().join(', ') || '(none)'}`
-        );
+        try {
+            const fieldNames = this.#memberCollection.getAllFieldNames();
+            console.info(
+                `Member fields: ${fieldNames.join(', ') || '(none)'}`
+            );
+        } catch (error) {
+            console.error('Error getting field names:', error);
+        }
 
         console.info(
             `Search controls: ${this.#registry.controls.search.length}`
@@ -145,16 +156,20 @@ export default class Atlas {
         );
 
         // Detailed member data for debugging
-        console.group("Member data");
+        try {
+            console.group("Member data");
 
-        for (const member of this.#memberCollection) {
-            console.log(
-                `[${member.id}]`,
-                member.toObject()
-            );
+            for (const member of this.#memberCollection) {
+                console.log(
+                    `[${member.id}]`,
+                    member.toObject()
+                );
+            }
+
+            console.groupEnd();
+        } catch (error) {
+            console.error('Error displaying member data:', error);
         }
-
-        console.groupEnd();
 
         console.groupEnd();
 
