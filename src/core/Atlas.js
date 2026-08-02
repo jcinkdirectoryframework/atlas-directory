@@ -198,7 +198,7 @@ export default class Atlas {
 
     }
 
-    /**
+     /**
      * Update member visibility based on filter state.
      */
     #updateMemberVisibility() {
@@ -206,27 +206,22 @@ export default class Atlas {
         // Get all member elements from the Registry
         const memberElements = this.#registry.members;
 
-        // Get IDs of members that pass the filters
+        // Create a Set of member IDs that pass the filters
         const visibleIds = new Set(
             this.#filteredMembers.map(member => member.id)
         );
 
-        // Toggle visibility
+        // Toggle visibility for each member element
         for (const element of memberElements) {
 
-            // Find the member in the collection to get its ID
-            // We need a way to map element → member
-            // For now, we'll use a data attribute or store a reference
+            // Get the Member instance stored on the element
+            const member = element._atlasMember;
 
-            // Simpler approach: find the member by matching element
-            let isVisible = false;
-
-            for (const member of this.#filteredMembers) {
-                if (member.element === element) {
-                    isVisible = true;
-                    break;
-                }
+            if (!member) {
+                continue;
             }
+
+            const isVisible = visibleIds.has(member.id);
 
             if (isVisible) {
                 element.hidden = false;

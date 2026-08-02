@@ -39,6 +39,9 @@ export default class Member {
         this.#id = this.#generateId(element, index);
         this.#parseFields();
 
+        // Store reference to this Member on the DOM element
+        element._atlasMember = this;
+
     }
 
     /**
