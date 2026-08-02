@@ -1,5 +1,45 @@
 # Changelog
 
+## [M0.8] — 2026-08-03
+
+### Added
+
+- **SortGenerator module** (`src/modules/SortGenerator.js`)
+  - Generates sort buttons from MemberCollection data
+  - Discovered via `[data-sort]` container
+  - Sortable fields opt-in with `data-sortable="true"` (default: false)
+  - Only fields present in ALL members are sortable
+  - Three-state toggle: asc → desc → off
+  - Visual indicators: `.active`, `.asc`, `.desc` classes
+  - Arrow indicators: ↑ for ascending, ↓ for descending
+
+- **Sort integration in Atlas**
+  - Sort combines with filters and search (AND logic)
+  - DOM reordering on sort
+  - Debug output now shows sortable fields
+
+### Changed
+
+- **Member class**
+  - Added `sortable` flag support
+  - Added `isSortable()` method
+
+- **MemberCollection class**
+  - Added `getSortableFields()` method (only fields present in ALL members)
+
+- **Atlas class**
+  - Integrated SortGenerator
+  - Added `#sortMembers()` method
+  - Added `#reorderMembers()` method
+
+- **demo.css**
+  - Added styles for sort buttons and states
+
+### Fixed
+
+- Sort UI now updates correctly when filters change
+- Sort buttons show correct state after filter changes
+
 ## [M0.7] — 2026-08-02
 
 ### Added
