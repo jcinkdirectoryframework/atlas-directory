@@ -208,7 +208,7 @@ export default class Atlas {
 
         // Create a Set of member IDs that pass the filters
         const visibleIds = new Set(
-            this.#filteredMembers.map(member => member.id)
+            this.#filteredMembers.getAll().map(member => member.id)
         );
 
         if (this.options.debug) {
