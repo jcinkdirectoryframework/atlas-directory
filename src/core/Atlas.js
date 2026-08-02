@@ -194,7 +194,9 @@ export default class Atlas {
 
         const filters = this.#store.filters;
 
-        this.#filteredMembers = this.#memberCollection.applyFilters(filters);
+        const filteredArray = this.#memberCollection.applyFilters(filters);
+
+        this.#filteredMembers = new MemberCollection(filteredArray);
 
     }
 
