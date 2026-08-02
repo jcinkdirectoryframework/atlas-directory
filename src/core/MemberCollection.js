@@ -110,7 +110,7 @@ export default class MemberCollection {
 
     }
 
-        /**
+    /**
      * Get all field names that are filterable.
      *
      * @returns {string[]} Array of filterable field names
@@ -128,6 +128,37 @@ export default class MemberCollection {
         }
 
         return Array.from(fieldSet).sort();
+
+    }
+
+    /**
+     * Get all field names that are sortable AND present in ALL members.
+     *
+     * @returns {string[]} Array of sortable field names that exist in all members
+     */
+    getSortableFields() {
+
+        const totalMembers = this.#members.size;
+        const fieldCounts = new Map();
+
+        // Count how many members have each sortable field
+        for (const member of this.#members.values()) {
+            for (const fieldName of member.fieldNames) {
+                if (member.isSortable(fieldName)) {
+                    fieldCounts.set(fieldName, (fieldCounts.get(fieldName) || 0) + 1);
+                }
+            }
+        }
+
+        // Only return fields that exist in ALL members
+        const sortableFields = [];
+        for (const [fieldName, count] of fieldCounts) {
+            if (count === totalMembers) {
+                sortableFields.push(fieldName);
+            }
+        }
+
+        return sortableFields.sort();
 
     }
 
@@ -172,54 +203,6 @@ export default class MemberCollection {
         }
 
         return Array.from(valueSet).sort();
-
-    }
-
-        /**
-     * Apply filters to the collection.
-     *
-     * @param {Object} filters - { fieldName: [value1, value2], ... }
-     * @returns {Member[]} Array of members that match all active filters
-     */
-    applyFilters(filters) {
-
-        // If no filters, return all members
-        const activeFields = Object.keys(filters);
-        if (activeFields.length === 0) {
-            return this.getAll();
-        }
-
-        return this.filter(member => {
-
-            for (const [fieldName, values] of Object.entries(filters)) {
-
-                // If no values for this field, skip
-                if (!values || values.length === 0) {
-                    continue;
-                }
-
-                const memberValue = member.get(fieldName);
-
-                // If member doesn't have this field, they don't match
-                if (!memberValue) {
-                    return false;
-                }
-
-                // Check if member's value matches any of the selected values
-                const normalizedMemberValue = memberValue.toLowerCase();
-                const matches = values.some(value =>
-                    value.toLowerCase() === normalizedMemberValue
-                );
-
-                if (!matches) {
-                    return false;
-                }
-
-            }
-
-            return true;
-
-        });
 
     }
 
@@ -270,6 +253,54 @@ export default class MemberCollection {
         const sorted = this.getAll().sort(comparator);
 
         return new MemberCollection(sorted);
+
+    }
+
+    /**
+     * Apply filters to the collection.
+     *
+     * @param {Object} filters - { fieldName: [value1, value2], ... }
+     * @returns {Member[]} Array of members that match all active filters
+     */
+    applyFilters(filters) {
+
+        // If no filters, return all members
+        const activeFields = Object.keys(filters);
+        if (activeFields.length === 0) {
+            return this.getAll();
+        }
+
+        return this.filter(member => {
+
+            for (const [fieldName, values] of Object.entries(filters)) {
+
+                // If no values for this field, skip
+                if (!values || values.length === 0) {
+                    continue;
+                }
+
+                const memberValue = member.get(fieldName);
+
+                // If member doesn't have this field, they don't match
+                if (!memberValue) {
+                    return false;
+                }
+
+                // Check if member's value matches any of the selected values
+                const normalizedMemberValue = memberValue.toLowerCase();
+                const matches = values.some(value =>
+                    value.toLowerCase() === normalizedMemberValue
+                );
+
+                if (!matches) {
+                    return false;
+                }
+
+            }
+
+            return true;
+
+        });
 
     }
 

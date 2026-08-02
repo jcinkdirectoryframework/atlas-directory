@@ -25,6 +25,7 @@ import Store from "./Store.js";
 import FilterGenerator from "../modules/FilterGenerator.js";
 import FilterChips from "../modules/FilterChips.js";
 import ResultCounter from "../modules/ResultCounter.js";
+import SortGenerator from "../modules/SortGenerator.js";
 
 export default class Atlas {
 
@@ -34,6 +35,7 @@ export default class Atlas {
     #filterGenerator = null;
     #filterChips = null;
     #resultCounter = null;
+    #sortGenerator = null;
     #filteredMembers = null;
 
     /**
@@ -104,7 +106,9 @@ export default class Atlas {
 
         this.#createResultCounter();
 
-        this.#applyFilters();
+        this.#createSortGenerator();
+
+        this.#applyFiltersAndSearch();
 
         this.#ready();
 
@@ -117,7 +121,16 @@ export default class Atlas {
 
         // Listen for filter changes
         document.addEventListener('atlas:filtersChanged', () => {
-            this.#applyFilters();
+            this.#applyFiltersAndSearch();
+            this.#updateMemberVisibility();
+            if (this.#sortGenerator) {
+                this.#sortGenerator.#updateUI();
+            }
+        });
+
+        // Listen for sort changes
+        document.addEventListener('atlas:sortChanged', () => {
+            this.#applyFiltersAndSearch();
             this.#updateMemberVisibility();
         });
 
@@ -126,7 +139,7 @@ export default class Atlas {
         if (searchInput) {
             searchInput.addEventListener('input', (event) => {
                 this.#store.setSearch(event.target.value);
-                this.#applyFilters();
+                this.#applyFiltersAndSearch();
                 this.#updateMemberVisibility();
             });
         }
@@ -226,6 +239,28 @@ export default class Atlas {
     }
 
     /**
+     * Create the SortGenerator.
+     */
+    #createSortGenerator() {
+
+        const container = this.#findSortContainer();
+
+        if (!container) {
+            if (this.options.debug) {
+                console.warn('Atlas: No [data-sort] container found. Sort controls will not be displayed.');
+            }
+            return;
+        }
+
+        this.#sortGenerator = new SortGenerator(
+            container,
+            this.#memberCollection,
+            this.#store
+        );
+
+    }
+
+    /**
      * Find the filters container.
      */
     #findFilterContainer() {
@@ -293,12 +328,36 @@ export default class Atlas {
     }
 
     /**
-     * Apply filters and search to the member collection.
+     * Find the sort container.
      */
-    #applyFilters() {
+    #findSortContainer() {
+
+        // Check Registry first (sorts is in controls)
+        const container = this.#registry.controls.sorts[0];
+
+        if (container) {
+            return container;
+        }
+
+        // Fallback: direct query
+        const fallback = this.root.querySelector('[data-sort]');
+
+        if (fallback) {
+            return fallback;
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Apply filters, search, and sort to the member collection.
+     */
+    #applyFiltersAndSearch() {
 
         const filters = this.#store.filters;
         const searchQuery = this.#store.search;
+        const sort = this.#store.sort;
 
         // Start with all members
         let filtered = this.#memberCollection.getAll();
@@ -323,20 +382,46 @@ export default class Atlas {
             filtered = searchResults;
         }
 
+        // Apply sort if active
+        if (sort && sort.field) {
+            filtered = this.#sortMembers(filtered, sort.field, sort.direction);
+        }
+
         // Always wrap in MemberCollection
         this.#filteredMembers = new MemberCollection(filtered);
 
     }
 
     /**
-     * Update member visibility based on filter state.
+     * Sort an array of members by a field.
+     */
+    #sortMembers(members, field, direction) {
+
+        const sorted = [...members];
+
+        sorted.sort((a, b) => {
+            const valA = a.get(field) || '';
+            const valB = b.get(field) || '';
+
+            // Case-insensitive comparison
+            const compareResult = valA.localeCompare(valB, undefined, { sensitivity: 'base' });
+
+            return direction === 'asc' ? compareResult : -compareResult;
+        });
+
+        return sorted;
+
+    }
+
+    /**
+     * Update member visibility and order based on filter state.
      */
     #updateMemberVisibility() {
 
         // Defensive: ensure #filteredMembers is a MemberCollection
         if (!this.#filteredMembers || !(this.#filteredMembers instanceof MemberCollection)) {
             console.warn('Atlas: #filteredMembers is not a MemberCollection, re-applying filters');
-            this.#applyFilters();
+            this.#applyFiltersAndSearch();
         }
 
         // Get all member elements from the Registry
@@ -380,6 +465,9 @@ export default class Atlas {
 
         }
 
+        // Reorder the DOM to match the sorted order (only for visible members)
+        this.#reorderMembers();
+
         // Update result counter if it exists
         if (this.#resultCounter) {
             this.#resultCounter.render();
@@ -388,6 +476,31 @@ export default class Atlas {
         // Update filter chips if they exist
         if (this.#filterChips) {
             this.#filterChips.render();
+        }
+
+    }
+
+    /**
+     * Reorder members in the DOM to match the sorted order.
+     */
+    #reorderMembers() {
+
+        const directory = this.#registry.directory;
+        const sortedMembers = this.#filteredMembers.getAll();
+
+        // Get all current member elements
+        const currentElements = directory.querySelectorAll('[data-member]');
+
+        // Remove all members from the directory
+        for (const element of currentElements) {
+            element.remove();
+        }
+
+        // Re-append in sorted order (only visible members)
+        for (const member of sortedMembers) {
+            if (!member.element.hidden) {
+                directory.appendChild(member.element);
+            }
         }
 
     }
@@ -416,6 +529,10 @@ export default class Atlas {
         );
 
         console.info(
+            `Sortable fields: ${this.#memberCollection.getSortableFields().join(', ') || '(none)'}`
+        );
+
+        console.info(
             `Search controls: ${this.#registry.controls.search.length}`
         );
 
@@ -429,6 +546,10 @@ export default class Atlas {
 
         console.info(
             `Results container: ${this.#registry.resultsContainer ? 1 : 0}`
+        );
+
+        console.info(
+            `Sort containers: ${this.#registry.controls.sorts.length}`
         );
 
         console.info(
@@ -477,6 +598,13 @@ export default class Atlas {
      */
     get filterGenerator() {
         return this.#filterGenerator;
+    }
+
+    /**
+     * Access the SortGenerator.
+     */
+    get sortGenerator() {
+        return this.#sortGenerator;
     }
 
 }

@@ -67,6 +67,7 @@ export default class Member {
      * - A normalized version (lowercase, trimmed)
      * - Whether the field is filterable (default: true, opt-out with data-filterable="false")
      * - Whether the field is searchable (default: false, opt-in with data-searchable="true")
+     * - Whether the field is sortable (default: false, opt-in with data-sortable="true")
      */
     #parseFields() {
 
@@ -78,6 +79,7 @@ export default class Member {
             const rawValue = el.textContent.trim();
             const filterable = el.dataset.filterable !== 'false'; // Default: true
             const searchable = el.dataset.searchable === 'true'; // Default: false
+            const sortable = el.dataset.sortable === 'true'; // Default: false
 
             // Skip empty field names
             if (!fieldName) {
@@ -99,7 +101,8 @@ export default class Member {
                 raw: rawValue,
                 normalized: this.#normalize(rawValue),
                 filterable: filterable,
-                searchable: searchable
+                searchable: searchable,
+                sortable: sortable
             });
 
             this.#fieldElements.set(fieldName, el);
@@ -196,6 +199,20 @@ export default class Member {
         const field = this.#fields.get(fieldName);
 
         return field ? field.searchable : false;
+
+    }
+
+    /**
+     * Check if a field is sortable.
+     *
+     * @param {string} fieldName
+     * @returns {boolean}
+     */
+    isSortable(fieldName) {
+
+        const field = this.#fields.get(fieldName);
+
+        return field ? field.sortable : false;
 
     }
 

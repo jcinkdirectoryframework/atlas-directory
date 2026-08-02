@@ -1,5 +1,42 @@
 # Changelog
 
+## [M0.7] — 2026-08-02
+
+### Added
+
+- **Search Functionality**
+  - `[data-search]` input is automatically discovered and integrated
+  - Search uses "starts with" matching (case-insensitive)
+  - Searchable fields are opt-in with `data-searchable="true"` (default: false)
+  - Search combines with filters using AND logic (members must match both)
+
+### Changed
+
+- **Member class**
+  - Added `searchable` flag support (default: false, opt-in with `data-searchable="true"`)
+  - Added `isSearchable()` method
+  - Updated `matches()` to use "starts with" matching and only searchable fields
+
+- **Atlas class**
+  - Integrated search input event listener
+  - Updated `#applyFilters()` to combine search with filters
+
+- **ResultCounter**
+  - Updated to handle both MemberCollection (.size) and arrays (.length)
+  - Removed internal event listener (Atlas now manages updates)
+
+- **FilterChips**
+  - Fixed "Clear All" button to disappear when all chips removed
+  - Chips now display `Field: Value` format (e.g., "Species: Elf")
+  - Chips are now sorted alphabetically by field name
+  - Removed separate chip group labels for cleaner UI
+
+### Fixed
+
+- Result counter no longer shows "undefined" when filters are active
+- "Clear All" button now correctly disappears when all filters are removed
+- Counter updates correctly on both filter and search changes
+
 ## [M0.6] — 2026-08-02
 
 ### Added
