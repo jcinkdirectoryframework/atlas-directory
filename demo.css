@@ -2,7 +2,7 @@
 
 body {
     font-family: system-ui, -apple-system, sans-serif;
-    max-width: 800px;
+    max-width: 900px;
     margin: 2rem auto;
     padding: 0 1rem;
     background: #f8f9fa;
@@ -34,20 +34,100 @@ body {
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
-[data-layout] {
-    padding: 0.5rem 1rem;
+/* Sort Controls */
+[data-sort] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    align-items: center;
+    border-bottom: 1px solid #e9ecef;
+}
+
+[data-sort] button {
+    padding: 0.4rem 1rem;
     border: 1px solid #dee2e6;
     border-radius: 6px;
-    background: white;
+    background: #f8f9fa;
+    color: #495057;
     cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+[data-sort] button:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+[data-sort] button:active {
+    transform: scale(0.96);
+}
+
+[data-sort] button.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+[data-sort] button.active:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
+[data-sort] button.asc {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+[data-sort] button.asc:hover {
+    background: #1e7e34;
+    border-color: #1e7e34;
+}
+
+[data-sort] button.desc {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+[data-sort] button.desc:hover {
+    background: #bd2130;
+    border-color: #bd2130;
+}
+
+.atlas-sort-empty {
+    color: #adb5bd;
+    font-style: italic;
     font-size: 0.9rem;
-    transition: all 0.2s;
+}
+
+/* Layout buttons */
+[data-layout] {
+    padding: 0.4rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background: #f8f9fa;
+    color: #495057;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
 }
 
 [data-layout]:hover {
     background: #e9ecef;
+    border-color: #adb5bd;
 }
 
+[data-layout].active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Filter Controls */
 [data-filters] {
     display: flex;
     flex-wrap: wrap;
@@ -105,6 +185,7 @@ body {
     border-color: #0056b3;
 }
 
+/* Filter Chips */
 [data-chips] {
     display: flex;
     flex-wrap: wrap;
@@ -118,13 +199,6 @@ body {
     color: #adb5bd;
     font-style: italic;
     font-size: 0.9rem;
-}
-
-.atlas-chip-group-label {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: #495057;
-    margin-right: 0.25rem;
 }
 
 .atlas-chip {
@@ -185,6 +259,7 @@ body {
     color: white;
 }
 
+/* Result Counter */
 .atlas-result-counter {
     display: block;
     padding: 0.5rem 0;
@@ -194,6 +269,7 @@ body {
     margin-top: 0.5rem;
 }
 
+/* Member Directory */
 [data-directory] {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
