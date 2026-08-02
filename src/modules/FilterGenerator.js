@@ -334,21 +334,21 @@ export default class FilterGenerator {
     }
 
     /**
-     * Refresh the filter UI.
-     *
-     * Useful after member data changes.
-     */
-    refresh() {
-        this.#generate();
-    }
-
-        /**
      * Get the field filter map.
      *
      * Used by FilterChips to access filter DOM elements.
      */
     get fieldFilterMap() {
         return this.#fieldFilterMap;
+    }
+
+    /**
+     * Refresh the filter UI.
+     *
+     * Useful after member data changes.
+     */
+    refresh() {
+        this.#generate();
     }
 
 }

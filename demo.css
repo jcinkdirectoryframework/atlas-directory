@@ -1,4 +1,194 @@
-/* Filter Chips */
+        /* Basic styling for the demo */
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        [data-atlas] {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        [data-search] {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        [data-filters] {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        [data-filter] {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        [data-filter] label {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        [data-filter-options] {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        [data-filter-options] button {
+            padding: 4px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: #495057;
+            transition: all 0.2s;
+        }
+
+        [data-filter-options] button:hover {
+            background: #e9ecef;
+        }
+
+        [data-filter-options] button.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        [data-chips] {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            min-height: 2.5rem;
+        }
+
+        .atlas-chips-empty {
+            color: #999;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .atlas-chip-group-label {
+            font-weight: bold;
+            font-size: 0.875rem;
+            color: #495057;
+            margin-right: 0.25rem;
+        }
+
+        .atlas-chip {
+            display: inline-flex;
+            align-items: center;
+            background: #e9ecef;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 0.875rem;
+            border: 1px solid #dee2e6;
+            gap: 4px;
+        }
+
+        .atlas-chip-text {
+            color: #495057;
+        }
+
+        .atlas-chip-remove {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 2px;
+            color: #868e96;
+            line-height: 1;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .atlas-chip-remove:hover {
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .atlas-clear-all {
+            background: none;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .atlas-clear-all:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .atlas-result-counter {
+            display: block;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
+        }
+
+        [data-directory] {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        [data-member] {
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: white;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        [data-member][hidden] {
+            display: none;
+        }
+
+        [data-member] h3 {
+            margin: 0 0 0.5rem 0;
+            color: #212529;
+        }
+
+        [data-member] p {
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        [data-member] p::before {
+            content: attr(data-field) ": ";
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        /* Filter Chips */
 .atlas-chips-empty {
     color: #999;
     font-style: italic;

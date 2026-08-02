@@ -19,7 +19,7 @@ export default class FilterChips {
 
     #container;
     #store;
-    #fieldFilterMap = new Map(); // fieldName → label
+    #fieldFilterMap;
 
     /**
      * Create a FilterChips instance.
@@ -38,18 +38,13 @@ export default class FilterChips {
             throw new Error('FilterChips requires a Store');
         }
 
+        if (!fieldFilterMap) {
+            throw new Error('FilterChips requires a fieldFilterMap');
+        }
+
         this.#container = container;
         this.#store = store;
         this.#fieldFilterMap = fieldFilterMap;
-
-        // Build a lookup map for field labels
-        for (const [fieldName] of fieldFilterMap) {
-            this.#fieldFilterMap.set(fieldName, {
-                label: fieldName.charAt(0).toUpperCase() + fieldName.slice(1),
-                container: fieldFilterMap.get(fieldName).container,
-                valueButtons: fieldFilterMap.get(fieldName).valueButtons
-            });
-        }
 
         // Initial render
         this.render();
@@ -59,6 +54,13 @@ export default class FilterChips {
             this.render();
         });
 
+    }
+
+    /**
+     * Get the display label for a field.
+     */
+    #getFieldLabel(fieldName) {
+        return fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
     }
 
     /**
@@ -93,7 +95,7 @@ export default class FilterChips {
             // Create a chip group label
             const groupLabel = document.createElement('span');
             groupLabel.className = 'atlas-chip-group-label';
-            groupLabel.textContent = `${fieldInfo.label}:`;
+            groupLabel.textContent = `${this.#getFieldLabel(fieldName)}:`;
             this.#container.appendChild(groupLabel);
 
             for (const value of values) {
@@ -217,7 +219,7 @@ export default class FilterChips {
         }
 
         // Find the all button in the FilterGenerator's DOM
-        const allButton = fieldInfo.container.querySelector('button[data-value="all"]');
+        const allButton = fieldInfo.allButton;
 
         if (allButton) {
             const hasActiveFilters = this.#store.hasFieldFilters(fieldName);

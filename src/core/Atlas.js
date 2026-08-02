@@ -171,46 +171,6 @@ export default class Atlas {
     }
 
     /**
-     * Find the filters container.
-     */
-    #findFilterContainer() {
-
-        // Check Registry first
-        const container = this.#registry.filtersContainer;
-
-        if (container) {
-            return container;
-        }
-
-        // Fallback: direct query
-        const fallback = this.root.querySelector('[data-filters]');
-
-        if (fallback) {
-            return fallback;
-        }
-
-        throw new Error(
-            'Atlas requires a [data-filters] container for filter placement.'
-        );
-
-    }
-
-    /**
-     * Apply filters to the member collection.
-     */
-    #applyFilters() {
-
-        const filters = this.#store.filters;
-
-        // Ensure we always have a MemberCollection
-        const filteredArray = this.#memberCollection.applyFilters(filters);
-
-        // Always wrap in MemberCollection, even if empty
-        this.#filteredMembers = new MemberCollection(filteredArray);
-
-    }
-
-       /**
      * Create the FilterChips.
      */
     #createFilterChips() {
@@ -250,6 +210,31 @@ export default class Atlas {
             container,
             this.#memberCollection,
             this.#store
+        );
+
+    }
+
+    /**
+     * Find the filters container.
+     */
+    #findFilterContainer() {
+
+        // Check Registry first
+        const container = this.#registry.filtersContainer;
+
+        if (container) {
+            return container;
+        }
+
+        // Fallback: direct query
+        const fallback = this.root.querySelector('[data-filters]');
+
+        if (fallback) {
+            return fallback;
+        }
+
+        throw new Error(
+            'Atlas requires a [data-filters] container for filter placement.'
         );
 
     }
@@ -296,7 +281,22 @@ export default class Atlas {
 
     }
 
-         /**
+    /**
+     * Apply filters to the member collection.
+     */
+    #applyFilters() {
+
+        const filters = this.#store.filters;
+
+        // Ensure we always have a MemberCollection
+        const filteredArray = this.#memberCollection.applyFilters(filters);
+
+        // Always wrap in MemberCollection, even if empty
+        this.#filteredMembers = new MemberCollection(filteredArray);
+
+    }
+
+    /**
      * Update member visibility based on filter state.
      */
     #updateMemberVisibility() {
