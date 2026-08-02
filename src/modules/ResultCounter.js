@@ -67,7 +67,8 @@ export default class ResultCounter {
 
         if (activeFields.length > 0) {
             const filtered = this.#memberCollection.applyFilters(filters);
-            visible = filtered.length;
+            // applyFilters returns a MemberCollection, use .size
+            visible = filtered.size;
         }
 
         // Clear the container
