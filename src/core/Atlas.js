@@ -115,10 +115,21 @@ export default class Atlas {
      */
     #bindEvents() {
 
+        // Listen for filter changes
         document.addEventListener('atlas:filtersChanged', () => {
             this.#applyFilters();
             this.#updateMemberVisibility();
         });
+
+        // Listen for search input
+        const searchInput = this.root.querySelector('[data-search]');
+        if (searchInput) {
+            searchInput.addEventListener('input', (event) => {
+                this.#store.setSearch(event.target.value);
+                this.#applyFilters();
+                this.#updateMemberVisibility();
+            });
+        }
 
     }
 
@@ -282,17 +293,38 @@ export default class Atlas {
     }
 
     /**
-     * Apply filters to the member collection.
+     * Apply filters and search to the member collection.
      */
     #applyFilters() {
 
         const filters = this.#store.filters;
+        const searchQuery = this.#store.search;
 
-        // Ensure we always have a MemberCollection
-        const filteredArray = this.#memberCollection.applyFilters(filters);
+        // Start with all members
+        let filtered = this.#memberCollection.getAll();
 
-        // Always wrap in MemberCollection, even if empty
-        this.#filteredMembers = new MemberCollection(filteredArray);
+        // Apply filters if any are active
+        const activeFilters = Object.keys(filters).filter(
+            fieldName => filters[fieldName] && filters[fieldName].length > 0
+        );
+
+        if (activeFilters.length > 0) {
+            filtered = this.#memberCollection.applyFilters(filters);
+        }
+
+        // Apply search if query exists
+        if (searchQuery && searchQuery.trim()) {
+            const searchResults = [];
+            for (const member of filtered) {
+                if (member.matches(searchQuery)) {
+                    searchResults.push(member);
+                }
+            }
+            filtered = searchResults;
+        }
+
+        // Always wrap in MemberCollection
+        this.#filteredMembers = new MemberCollection(filtered);
 
     }
 

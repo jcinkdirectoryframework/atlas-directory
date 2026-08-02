@@ -72,7 +72,11 @@ export default class FilterChips {
         this.#container.innerHTML = '';
 
         const filters = this.#store.filters;
-        const activeFields = Object.keys(filters);
+
+        // Filter out any fields with empty arrays
+        const activeFields = Object.keys(filters).filter(
+            fieldName => filters[fieldName] && filters[fieldName].length > 0
+        );
 
         // If no active filters, show a message and return (no Clear All button)
         if (activeFields.length === 0) {
@@ -84,8 +88,9 @@ export default class FilterChips {
         }
 
         // Create chips for each active filter
-        for (const [fieldName, values] of Object.entries(filters)) {
+        for (const fieldName of activeFields) {
 
+            const values = filters[fieldName];
             const fieldInfo = this.#fieldFilterMap.get(fieldName);
 
             if (!fieldInfo) {
