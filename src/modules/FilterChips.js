@@ -92,12 +92,6 @@ export default class FilterChips {
                 continue;
             }
 
-            // Create a chip group label
-            const groupLabel = document.createElement('span');
-            groupLabel.className = 'atlas-chip-group-label';
-            groupLabel.textContent = `${this.#getFieldLabel(fieldName)}:`;
-            this.#container.appendChild(groupLabel);
-
             for (const value of values) {
 
                 const chip = document.createElement('span');
@@ -105,10 +99,11 @@ export default class FilterChips {
                 chip.dataset.field = fieldName;
                 chip.dataset.value = value;
 
-                // Chip text
+                // Chip text: show field name + value
                 const text = document.createElement('span');
                 text.className = 'atlas-chip-text';
-                text.textContent = value;
+                const displayLabel = this.#getFieldLabel(fieldName);
+                text.textContent = `${displayLabel}: ${value}`;
                 chip.appendChild(text);
 
                 // Remove button (×)
