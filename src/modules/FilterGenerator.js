@@ -58,22 +58,32 @@ export default class FilterGenerator {
      */
     #generate() {
 
+        console.debug('FilterGenerator: Generating filters...');
+
         // Clear the container
         this.#container.innerHTML = '';
 
         const filterableFields = this.#memberCollection.getFilterableFields();
 
+        console.debug('FilterGenerator: filterableFields =', filterableFields);
+
         if (filterableFields.length === 0) {
+            console.debug('FilterGenerator: No filterable fields found');
             this.#container.innerHTML = '<p>No filterable fields found.</p>';
             return;
         }
 
         for (const fieldName of filterableFields) {
+            console.debug(`FilterGenerator: Creating filter for "${fieldName}"`);
             this.#createFilterForField(fieldName);
         }
 
+        console.debug('FilterGenerator: fieldFilterMap size =', this.#fieldFilterMap.size);
+
         // Apply existing filter state to the UI
         this.syncWithStore();
+
+        console.debug('FilterGenerator: Generation complete');
 
     }
 
@@ -284,10 +294,17 @@ export default class FilterGenerator {
      */
     syncWithStore() {
 
+        console.debug('FilterGenerator: Syncing with Store...');
+        console.debug('FilterGenerator: fieldFilterMap size =', this.#fieldFilterMap.size);
+
         const filters = this.#store.filters;
+
+        console.debug('FilterGenerator: Current filters =', filters);
 
         // Update all fields
         for (const [fieldName, fieldData] of this.#fieldFilterMap) {
+
+            console.debug(`FilterGenerator: Updating field "${fieldName}"`);
 
             // Reset all value buttons
             for (const button of fieldData.valueButtons) {
