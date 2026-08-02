@@ -194,8 +194,10 @@ export default class Atlas {
 
         const filters = this.#store.filters;
 
+        // Ensure we always have a MemberCollection
         const filteredArray = this.#memberCollection.applyFilters(filters);
 
+        // Always wrap in MemberCollection, even if empty
         this.#filteredMembers = new MemberCollection(filteredArray);
 
     }
@@ -204,6 +206,12 @@ export default class Atlas {
      * Update member visibility based on filter state.
      */
     #updateMemberVisibility() {
+
+        // Defensive: ensure #filteredMembers is a MemberCollection
+        if (!this.#filteredMembers || !(this.#filteredMembers instanceof MemberCollection)) {
+            console.warn('Atlas: #filteredMembers is not a MemberCollection, re-applying filters');
+            this.#applyFilters();
+        }
 
         // Get all member elements from the Registry
         const memberElements = this.#registry.members;
