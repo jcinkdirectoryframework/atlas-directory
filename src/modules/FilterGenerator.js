@@ -7,7 +7,7 @@
  * - Discover filterable fields from MemberCollection
  * - Generate filter UI for each field
  * - Insert generated UI into the [data-filters] container
- * - Handle filter toggle events
+ * - Handle filter selection events
  * - Update Store when filters change
  *
  * Deliberately does NOT:
@@ -22,7 +22,7 @@ export default class FilterGenerator {
     #container;
     #memberCollection;
     #store;
-    #fieldFilterMap = new Map(); // fieldName → { container, buttons }
+    #fieldFilterMap = new Map(); // fieldName → { container, allButton, valueButtons }
 
     /**
      * Create a FilterGenerator.
@@ -103,66 +103,124 @@ export default class FilterGenerator {
         const optionsContainer = document.createElement('div');
         optionsContainer.dataset.filterOptions = '';
 
+        // Create "All" button (always first)
+        const allButton = document.createElement('button');
+        allButton.dataset.value = 'all';
+        allButton.textContent = 'All';
+        allButton.type = 'button';
+        allButton.classList.add('active'); // Active by default
+        optionsContainer.appendChild(allButton);
+
         // Create buttons for each unique value
-        const buttons = [];
+        const valueButtons = [];
 
         for (const value of uniqueValues) {
             const button = document.createElement('button');
             button.dataset.value = value;
             button.textContent = value;
             button.type = 'button';
-
-            // Store reference to the button
-            buttons.push(button);
+            valueButtons.push(button);
             optionsContainer.appendChild(button);
         }
 
         group.appendChild(optionsContainer);
         this.#container.appendChild(group);
 
-        // Store references
+        // Store references (including the "All" button)
         this.#fieldFilterMap.set(fieldName, {
             container: group,
-            buttons: buttons
+            allButton: allButton,
+            valueButtons: valueButtons
         });
 
         // Add event listeners
-        this.#attachEvents(fieldName, buttons);
+        this.#attachEvents(fieldName, allButton, valueButtons);
 
     }
 
     /**
      * Attach click events to filter buttons.
      */
-    #attachEvents(fieldName, buttons) {
+    #attachEvents(fieldName, allButton, valueButtons) {
 
-        for (const button of buttons) {
+        // "All" button clears all filters for this field
+        allButton.addEventListener('click', () => {
+            this.#handleAllClick(fieldName);
+        });
+
+        // Value buttons select a value (no toggle)
+        for (const button of valueButtons) {
             button.addEventListener('click', () => {
                 const value = button.dataset.value;
-                this.#handleFilterToggle(fieldName, value);
+                this.#handleValueSelect(fieldName, value);
             });
         }
 
     }
 
     /**
-     * Handle a filter toggle event.
+     * Handle "All" button click.
+     *
+     * Clears all filters for the field and updates the UI.
      */
-    #handleFilterToggle(fieldName, value) {
+    #handleAllClick(fieldName) {
 
-        // Toggle the filter in the Store
-        const isActive = this.#store.toggleFilter(fieldName, value);
+        // Clear all filters for this field in the Store
+        this.#store.clearFieldFilters(fieldName);
 
-        // Update the UI
-        this.#updateButtonState(fieldName, value, isActive);
+        // Update "All" button state
+        this.#updateAllButtonState(fieldName);
 
-        // Notify Atlas that filters have changed
-        // We use a custom event for loose coupling
+        // Reset all value buttons (remove active)
+        const fieldData = this.#fieldFilterMap.get(fieldName);
+        if (fieldData) {
+            for (const button of fieldData.valueButtons) {
+                button.classList.remove('active');
+            }
+        }
+
+        // Dispatch event to notify Atlas
+        const event = new CustomEvent('atlas:filtersChanged', {
+            detail: {
+                field: fieldName,
+                action: 'clear',
+                filters: this.#store.filters
+            }
+        });
+
+        document.dispatchEvent(event);
+
+    }
+
+    /**
+     * Handle a value button click.
+     *
+     * Selects the value (adds to filters) without toggling.
+     * Does nothing if the value is already active.
+     */
+    #handleValueSelect(fieldName, value) {
+
+        // Check if the value is already active
+        if (this.#store.isFilterActive(fieldName, value)) {
+            // Do nothing — value is already selected
+            return;
+        }
+
+        // Add the value to the Store
+        this.#store.toggleFilter(fieldName, value); // This adds it since it's not active
+
+        // Update the UI for this value
+        this.#updateButtonState(fieldName, value, true);
+
+        // Update the "All" button state for this field
+        this.#updateAllButtonState(fieldName);
+
+        // Dispatch event to notify Atlas
         const event = new CustomEvent('atlas:filtersChanged', {
             detail: {
                 field: fieldName,
                 value: value,
-                active: isActive,
+                action: 'select',
                 filters: this.#store.filters
             }
         });
@@ -182,7 +240,7 @@ export default class FilterGenerator {
             return;
         }
 
-        for (const button of fieldData.buttons) {
+        for (const button of fieldData.valueButtons) {
             if (button.dataset.value === value) {
                 if (isActive) {
                     button.classList.add('active');
@@ -196,6 +254,30 @@ export default class FilterGenerator {
     }
 
     /**
+     * Update the "All" button state for a field.
+     *
+     * If any value filters are active, "All" is inactive.
+     * If no value filters are active, "All" is active.
+     */
+    #updateAllButtonState(fieldName) {
+
+        const fieldData = this.#fieldFilterMap.get(fieldName);
+
+        if (!fieldData) {
+            return;
+        }
+
+        const hasActiveFilters = this.#store.hasFieldFilters(fieldName);
+
+        if (hasActiveFilters) {
+            fieldData.allButton.classList.remove('active');
+        } else {
+            fieldData.allButton.classList.add('active');
+        }
+
+    }
+
+    /**
      * Synchronize the UI with the current Store state.
      *
      * Called after generation and after external state changes.
@@ -204,34 +286,27 @@ export default class FilterGenerator {
 
         const filters = this.#store.filters;
 
-        // Clear all button states first
+        // Update all fields
         for (const [fieldName, fieldData] of this.#fieldFilterMap) {
-            for (const button of fieldData.buttons) {
+
+            // Reset all value buttons
+            for (const button of fieldData.valueButtons) {
                 button.classList.remove('active');
             }
-        }
 
-        // Apply active states from the Store
-        for (const [fieldName, values] of Object.entries(filters)) {
-            const fieldData = this.#fieldFilterMap.get(fieldName);
-            if (fieldData) {
-                for (const button of fieldData.buttons) {
-                    if (values.includes(button.dataset.value)) {
-                        button.classList.add('active');
-                    }
+            // Apply active states from the Store
+            const activeValues = filters[fieldName] || [];
+            for (const button of fieldData.valueButtons) {
+                if (activeValues.includes(button.dataset.value)) {
+                    button.classList.add('active');
                 }
             }
+
+            // Update the "All" button state
+            this.#updateAllButtonState(fieldName);
+
         }
 
-    }
-
-    /**
-     * Synchronize the UI with the current Store state.
-     *
-     * Public alias for syncWithStore.
-     */
-    #syncWithStore() {
-        this.syncWithStore();
     }
 
     /**
