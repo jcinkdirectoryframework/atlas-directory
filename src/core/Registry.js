@@ -87,6 +87,36 @@ export default class Registry {
     }
 
     /**
+     * Chips container.
+     */
+    get chipsContainer() {
+
+        const containers = this.#controls.chips;
+
+        if (containers.length === 0) {
+            return null;
+        }
+
+        return containers[0];
+
+    }
+
+    /**
+     * Results container.
+     */
+    get resultsContainer() {
+
+        const containers = this.#controls.results;
+
+        if (containers.length === 0) {
+            return null;
+        }
+
+        return containers[0];
+
+    }
+
+    /**
      * Atlas controls.
      */
     get controls() {

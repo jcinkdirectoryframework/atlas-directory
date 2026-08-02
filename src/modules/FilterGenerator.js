@@ -342,4 +342,13 @@ export default class FilterGenerator {
         this.#generate();
     }
 
+        /**
+     * Get the field filter map.
+     *
+     * Used by FilterChips to access filter DOM elements.
+     */
+    get fieldFilterMap() {
+        return this.#fieldFilterMap;
+    }
+
 }

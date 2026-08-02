@@ -23,6 +23,8 @@ import Member from "./Member.js";
 import MemberCollection from "./MemberCollection.js";
 import Store from "./Store.js";
 import FilterGenerator from "../modules/FilterGenerator.js";
+import FilterChips from "../modules/FilterChips.js";
+import ResultCounter from "../modules/ResultCounter.js";
 
 export default class Atlas {
 
@@ -30,6 +32,8 @@ export default class Atlas {
     #memberCollection = null;
     #store = null;
     #filterGenerator = null;
+    #filterChips = null;
+    #resultCounter = null;
     #filteredMembers = null;
 
     /**
@@ -95,6 +99,10 @@ export default class Atlas {
         this.#createStore();
 
         this.#createFilterGenerator();
+
+        this.#createFilterChips();
+
+        this.#createResultCounter();
 
         this.#applyFilters();
 
@@ -202,7 +210,93 @@ export default class Atlas {
 
     }
 
+       /**
+     * Create the FilterChips.
+     */
+    #createFilterChips() {
+
+        const container = this.#findChipsContainer();
+
+        if (!container) {
+            if (this.options.debug) {
+                console.warn('Atlas: No [data-chips] container found. Filter chips will not be displayed.');
+            }
+            return;
+        }
+
+        this.#filterChips = new FilterChips(
+            container,
+            this.#store,
+            this.#filterGenerator.fieldFilterMap
+        );
+
+    }
+
     /**
+     * Create the ResultCounter.
+     */
+    #createResultCounter() {
+
+        const container = this.#findResultsContainer();
+
+        if (!container) {
+            if (this.options.debug) {
+                console.warn('Atlas: No [data-results] container found. Result counter will not be displayed.');
+            }
+            return;
+        }
+
+        this.#resultCounter = new ResultCounter(
+            container,
+            this.#memberCollection,
+            this.#store
+        );
+
+    }
+
+    /**
+     * Find the chips container.
+     */
+    #findChipsContainer() {
+
+        const container = this.#registry.chipsContainer;
+
+        if (container) {
+            return container;
+        }
+
+        const fallback = this.root.querySelector('[data-chips]');
+
+        if (fallback) {
+            return fallback;
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Find the results container.
+     */
+    #findResultsContainer() {
+
+        const container = this.#registry.resultsContainer;
+
+        if (container) {
+            return container;
+        }
+
+        const fallback = this.root.querySelector('[data-results]');
+
+        if (fallback) {
+            return fallback;
+        }
+
+        return null;
+
+    }
+
+         /**
      * Update member visibility based on filter state.
      */
     #updateMemberVisibility() {
@@ -254,6 +348,16 @@ export default class Atlas {
 
         }
 
+        // Update result counter if it exists
+        if (this.#resultCounter) {
+            this.#resultCounter.render();
+        }
+
+        // Update filter chips if they exist
+        if (this.#filterChips) {
+            this.#filterChips.render();
+        }
+
     }
 
     /**
@@ -285,6 +389,14 @@ export default class Atlas {
 
         console.info(
             `Filter containers: ${this.#registry.filtersContainer ? 1 : 0}`
+        );
+
+        console.info(
+            `Chips container: ${this.#registry.chipsContainer ? 1 : 0}`
+        );
+
+        console.info(
+            `Results container: ${this.#registry.resultsContainer ? 1 : 0}`
         );
 
         console.info(

@@ -1,0 +1,65 @@
+/* Filter Chips */
+.atlas-chips-empty {
+    color: #999;
+    font-style: italic;
+}
+
+.atlas-chip-group-label {
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.atlas-chip {
+    display: inline-flex;
+    align-items: center;
+    background: #e9ecef;
+    border-radius: 16px;
+    padding: 4px 12px;
+    margin: 4px 4px 4px 0;
+    font-size: 0.875rem;
+    border: 1px solid #dee2e6;
+}
+
+.atlas-chip-text {
+    margin-right: 6px;
+}
+
+.atlas-chip-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 4px;
+    color: #666;
+    line-height: 1;
+}
+
+.atlas-chip-remove:hover {
+    color: #000;
+}
+
+.atlas-clear-all {
+    background: none;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.atlas-clear-all:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Result Counter */
+.atlas-result-counter {
+    display: block;
+    margin-top: 8px;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: #666;
+    border-top: 1px solid #eee;
+}
