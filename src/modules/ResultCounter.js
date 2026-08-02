@@ -80,7 +80,8 @@ export default class ResultCounter {
                 filtered = searchResults;
             }
 
-            visible = filtered.length;
+            // If filtered is a MemberCollection, use .size; if it's an array, use .length
+            visible = filtered.size !== undefined ? filtered.size : filtered.length;
         }
 
         // Clear the container
