@@ -123,9 +123,6 @@ export default class Atlas {
         document.addEventListener('atlas:filtersChanged', () => {
             this.#applyFiltersAndSearch();
             this.#updateMemberVisibility();
-            if (this.#sortGenerator) {
-                this.#sortGenerator.#updateUI();
-            }
         });
 
         // Listen for sort changes
