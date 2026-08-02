@@ -110,6 +110,27 @@ export default class MemberCollection {
 
     }
 
+        /**
+     * Get all field names that are filterable.
+     *
+     * @returns {string[]} Array of filterable field names
+     */
+    getFilterableFields() {
+
+        const fieldSet = new Set();
+
+        for (const member of this.#members.values()) {
+            for (const fieldName of member.fieldNames) {
+                if (member.isFilterable(fieldName)) {
+                    fieldSet.add(fieldName);
+                }
+            }
+        }
+
+        return Array.from(fieldSet).sort();
+
+    }
+
     /**
      * Get unique values for a specific field across all members.
      *
@@ -151,6 +172,54 @@ export default class MemberCollection {
         }
 
         return Array.from(valueSet).sort();
+
+    }
+
+        /**
+     * Apply filters to the collection.
+     *
+     * @param {Object} filters - { fieldName: [value1, value2], ... }
+     * @returns {Member[]} Array of members that match all active filters
+     */
+    applyFilters(filters) {
+
+        // If no filters, return all members
+        const activeFields = Object.keys(filters);
+        if (activeFields.length === 0) {
+            return this.getAll();
+        }
+
+        return this.filter(member => {
+
+            for (const [fieldName, values] of Object.entries(filters)) {
+
+                // If no values for this field, skip
+                if (!values || values.length === 0) {
+                    continue;
+                }
+
+                const memberValue = member.get(fieldName);
+
+                // If member doesn't have this field, they don't match
+                if (!memberValue) {
+                    return false;
+                }
+
+                // Check if member's value matches any of the selected values
+                const normalizedMemberValue = memberValue.toLowerCase();
+                const matches = values.some(value =>
+                    value.toLowerCase() === normalizedMemberValue
+                );
+
+                if (!matches) {
+                    return false;
+                }
+
+            }
+
+            return true;
+
+        });
 
     }
 

@@ -33,7 +33,8 @@ export default class Registry {
         layouts: [],
         alphabet: [],
         chips: [],
-        results: []
+        results: [],
+        filtersContainer: []
     };
 
     /**
@@ -68,6 +69,21 @@ export default class Registry {
      */
     get members() {
         return [...this.#members];
+    }
+
+    /**
+     * Filters container.
+     */
+    get filtersContainer() {
+
+        const containers = this.#controls.filtersContainer;
+
+        if (containers.length === 0) {
+            return null;
+        }
+
+        return containers[0];
+
     }
 
     /**
@@ -157,7 +173,8 @@ export default class Registry {
         layouts: "[data-layout]",
         alphabet: "[data-alphabet]",
         chips: "[data-chips]",
-        results: "[data-results]"
+        results: "[data-results]",
+        filtersContainer: "[data-filters]"
     };
 
     /**

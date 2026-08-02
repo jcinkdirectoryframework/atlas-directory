@@ -64,6 +64,14 @@ export default class Member {
      * - A normalized version (lowercase, trimmed)
      * - A reference to the DOM element
      */
+        /**
+     * Parse all fields from the member element.
+     *
+     * Finds all descendants with [data-field] and stores:
+     * - The raw text content
+     * - A normalized version (lowercase, trimmed)
+     * - Whether the field is filterable (default: true, opt-out with data-filterable="false")
+     */
     #parseFields() {
 
         const fieldElements = this.#element.querySelectorAll('[data-field]');
@@ -72,6 +80,7 @@ export default class Member {
 
             const fieldName = el.dataset.field;
             const rawValue = el.textContent.trim();
+            const filterable = el.dataset.filterable !== 'false'; // Default: true
 
             // Skip empty field names
             if (!fieldName) {
@@ -91,7 +100,8 @@ export default class Member {
 
             this.#fields.set(fieldName, {
                 raw: rawValue,
-                normalized: this.#normalize(rawValue)
+                normalized: this.#normalize(rawValue),
+                filterable: filterable
             });
 
             this.#fieldElements.set(fieldName, el);
@@ -161,6 +171,19 @@ export default class Member {
      */
     has(fieldName) {
         return this.#fields.has(fieldName);
+    }
+        /**
+     * Check if a field is filterable.
+     *
+     * @param {string} fieldName
+     * @returns {boolean}
+     */
+    isFilterable(fieldName) {
+
+        const field = this.#fields.get(fieldName);
+
+        return field ? field.filterable : false;
+
     }
 
     /**
