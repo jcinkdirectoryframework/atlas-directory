@@ -73,7 +73,7 @@ export default class FilterGenerator {
         }
 
         // Apply existing filter state to the UI
-        this.#syncWithStore();
+        this.syncWithStore();
 
     }
 
