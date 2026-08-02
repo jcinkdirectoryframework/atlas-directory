@@ -60,11 +60,6 @@ export default class ResultCounter {
         const hasFilters = Object.keys(filters).length > 0;
         const hasSearch = searchQuery && searchQuery.trim();
 
-        console.debug('ResultCounter: hasFilters =', hasFilters);
-        console.debug('ResultCounter: hasSearch =', hasSearch);
-        console.debug('ResultCounter: filters =', filters);
-        console.debug('ResultCounter: searchQuery =', searchQuery);
-
         let visible = total;
 
         if (hasFilters || hasSearch) {
@@ -73,9 +68,6 @@ export default class ResultCounter {
 
             if (hasFilters) {
                 filtered = this.#memberCollection.applyFilters(filters);
-                console.debug('ResultCounter: after applyFilters, filtered =', filtered);
-                console.debug('ResultCounter: filtered.size =', filtered.size);
-                console.debug('ResultCounter: filtered.length =', filtered.length);
             }
 
             if (hasSearch) {
@@ -86,13 +78,10 @@ export default class ResultCounter {
                     }
                 }
                 filtered = searchResults;
-                console.debug('ResultCounter: after search, filtered =', filtered);
-                console.debug('ResultCounter: filtered.length =', filtered.length);
             }
 
             // If filtered is a MemberCollection, use .size; if it's an array, use .length
             visible = filtered.size !== undefined ? filtered.size : filtered.length;
-            console.debug('ResultCounter: visible =', visible);
         }
 
         // Clear the container
