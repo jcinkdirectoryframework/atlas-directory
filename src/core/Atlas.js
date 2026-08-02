@@ -198,7 +198,7 @@ export default class Atlas {
 
     }
 
-     /**
+    /**
      * Update member visibility based on filter state.
      */
     #updateMemberVisibility() {
@@ -211,6 +211,10 @@ export default class Atlas {
             this.#filteredMembers.map(member => member.id)
         );
 
+        if (this.options.debug) {
+            console.debug('Filtered member IDs:', [...visibleIds]);
+        }
+
         // Toggle visibility for each member element
         for (const element of memberElements) {
 
@@ -218,10 +222,17 @@ export default class Atlas {
             const member = element._atlasMember;
 
             if (!member) {
+                if (this.options.debug) {
+                    console.warn('Member element has no _atlasMember reference:', element);
+                }
                 continue;
             }
 
             const isVisible = visibleIds.has(member.id);
+
+            if (this.options.debug) {
+                console.debug(`[${member.id}] visible: ${isVisible}`);
+            }
 
             if (isVisible) {
                 element.hidden = false;

@@ -65,14 +65,6 @@ export default class Member {
      * Finds all descendants with [data-field] and stores:
      * - The raw text content
      * - A normalized version (lowercase, trimmed)
-     * - A reference to the DOM element
-     */
-        /**
-     * Parse all fields from the member element.
-     *
-     * Finds all descendants with [data-field] and stores:
-     * - The raw text content
-     * - A normalized version (lowercase, trimmed)
      * - Whether the field is filterable (default: true, opt-out with data-filterable="false")
      */
     #parseFields() {
@@ -175,7 +167,8 @@ export default class Member {
     has(fieldName) {
         return this.#fields.has(fieldName);
     }
-        /**
+
+    /**
      * Check if a field is filterable.
      *
      * @param {string} fieldName
