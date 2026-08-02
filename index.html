@@ -4,8 +4,7 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Atlas Demo</title>
 
@@ -15,44 +14,18 @@
 
 <div data-atlas>
 
-    <input
-        data-search
-        placeholder="Search members...">
+    <input data-search placeholder="Search members...">
 
-    <button
-        data-layout="grid">
+    <button data-layout="grid">
         Grid
     </button>
 
-    <button
-        data-layout="list">
+    <button data-layout="list">
         List
     </button>
 
-    <div
-        data-filter
-        data-field="species">
-        <label>Species</label>
-        <select>
-            <option value="">All</option>
-            <option value="elf">Elf</option>
-            <option value="dwarf">Dwarf</option>
-            <option value="human">Human</option>
-        </select>
-    </div>
-
-    <div
-        data-filter
-        data-field="occupation">
-        <label>Occupation</label>
-        <select>
-            <option value="">All</option>
-            <option value="ranger">Ranger</option>
-            <option value="warrior">Warrior</option>
-            <option value="mage">Mage</option>
-            <option value="rogue">Rogue</option>
-        </select>
-    </div>
+    <!-- Atlas will generate filters here -->
+    <div data-filters></div>
 
     <section data-directory>
 
