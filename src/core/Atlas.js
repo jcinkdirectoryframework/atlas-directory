@@ -19,10 +19,13 @@
  */
 
 import Registry from "./Registry.js";
+import Member from "./Member.js";
+import MemberCollection from "./MemberCollection.js";
 
 export default class Atlas {
 
     #registry = null;
+    #memberCollection = null;
 
     /**
      * Create a new Atlas instance.
@@ -80,6 +83,8 @@ export default class Atlas {
 
         this.#createRegistry();
 
+        this.#createMemberCollection();
+
         this.#ready();
 
     }
@@ -90,6 +95,21 @@ export default class Atlas {
     #createRegistry() {
 
         this.#registry = new Registry(this.root);
+
+    }
+
+    /**
+     * Create the MemberCollection from discovered members.
+     */
+    #createMemberCollection() {
+
+        const memberElements = this.#registry.members;
+
+        const members = memberElements.map((element, index) => {
+            return new Member(element, index);
+        });
+
+        this.#memberCollection = new MemberCollection(members);
 
     }
 
@@ -109,6 +129,10 @@ export default class Atlas {
         );
 
         console.info(
+            `Member fields: ${this.#memberCollection.getAllFieldNames().join(', ') || '(none)'}`
+        );
+
+        console.info(
             `Search controls: ${this.#registry.controls.search.length}`
         );
 
@@ -120,8 +144,34 @@ export default class Atlas {
             `Layouts: ${this.#registry.controls.layouts.length}`
         );
 
+        // Detailed member data for debugging
+        console.group("Member data");
+
+        for (const member of this.#memberCollection) {
+            console.log(
+                `[${member.id}]`,
+                member.toObject()
+            );
+        }
+
         console.groupEnd();
 
+        console.groupEnd();
+
+    }
+
+    /**
+     * Access the Registry.
+     */
+    get registry() {
+        return this.#registry;
+    }
+
+    /**
+     * Access the MemberCollection.
+     */
+    get memberCollection() {
+        return this.#memberCollection;
     }
 
 }
