@@ -17,7 +17,7 @@
 
     <input
         data-search
-        placeholder="Search">
+        placeholder="Search members...">
 
     <button
         data-layout="grid">
@@ -32,31 +32,58 @@
     <div
         data-filter
         data-field="species">
+        <label>Species</label>
+        <select>
+            <option value="">All</option>
+            <option value="elf">Elf</option>
+            <option value="dwarf">Dwarf</option>
+            <option value="human">Human</option>
+        </select>
     </div>
 
     <div
         data-filter
         data-field="occupation">
+        <label>Occupation</label>
+        <select>
+            <option value="">All</option>
+            <option value="ranger">Ranger</option>
+            <option value="warrior">Warrior</option>
+            <option value="mage">Mage</option>
+            <option value="rogue">Rogue</option>
+        </select>
     </div>
 
     <section data-directory>
 
         <article data-member>
-
-            Alice
-
+            <h3 data-field="name">Alice</h3>
+            <p data-field="species">Elf</p>
+            <p data-field="occupation">Ranger</p>
         </article>
 
         <article data-member>
-
-            Bob
-
+            <h3 data-field="name">Bob</h3>
+            <p data-field="species">Dwarf</p>
+            <p data-field="occupation">Warrior</p>
         </article>
 
         <article data-member>
+            <h3 data-field="name">Charlie</h3>
+            <p data-field="species">Human</p>
+            <p data-field="occupation">Mage</p>
+        </article>
 
-            Charlie
+        <article data-member>
+            <h3 data-field="name">Diana</h3>
+            <p data-field="species">Elf</p>
+            <p data-field="occupation">Rogue</p>
+        </article>
 
+        <article data-member>
+            <h3 data-field="name">Eve</h3>
+            <p data-field="species">Human</p>
+            <p data-field="occupation">Warrior</p>
         </article>
 
     </section>
