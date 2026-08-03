@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture — Atlas Documentation</title>
+    <link rel="stylesheet" href="assets/css/docs.css">
+</head>
+<body>
+
+<div class="docs-wrapper">
+
+    <!-- ─── Sidebar ─────────────────────────────────── -->
+    <aside class="docs-sidebar">
+        <a href="index.html" class="logo">Atlas</a>
+        <span class="subtitle">HTML-driven directory engine</span>
+        <hr>
+
+        <span class="nav-label">Getting Started</span>
+        <a href="getting-started.html">Quick Start</a>
+        <a href="html-api.html">HTML API</a>
+
+        <span class="nav-label">Guides</span>
+        <a href="architecture.html" class="active">Architecture</a>
+        <a href="css-customisation.html">CSS Customisation</a>
+
+        <span class="nav-label">Examples</span>
+        <a href="examples/layout-examples.html">Layout Examples</a>
+
+        <hr>
+        <a href="../index.html" class="external">← Live Demo</a>
+        <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
+    </aside>
+
+    <!-- ─── Main Content ────────────────────────────── -->
+    <main class="docs-content">
+
+        <h1>Architecture</h1>
+        <p class="page-subtitle">How Atlas works under the hood</p>
+
+        <p>
+            Atlas is built around an event-driven architecture with clear separation of responsibilities.
+            The core philosophy is that <strong>Atlas coordinates, but does not control</strong>.
+            Modules communicate through events rather than direct coupling.
+        </p>
+
+        <h2>Architecture Flow</h2>
+
+        <pre><code>ATLAS (Public entry point — new Atlas())
+    |
+    | Creates core services and initialises modules
+    | Does NOT: search, filter, sort, render, or update the DOM
+    |
+    v
+EVENTBUS (Central communication hub)
+    |
+    | Publish/subscribe pattern
+    | Decouples modules
+    |
+    v
++-----------+  +-----------+  +---------------+
+| REGISTRY  |  |   STORE   |  | MEMBER COLL   |
+|           |  |           |  |               |
+| Discover  |  | State     |  | Data          |
+| Validate  |  | Persist   |  | Query         |
+| Cache     |  | Publish   |  | Filter        |
++-----------+  +-----------+  +---------------+
+                    |
+                    v
+              +-----------+
+              | RENDERER  |
+              |           |
+              | Listens to events
+              | Updates DOM (batch)
+              | Manages loading state
+              +-----------+
+                    |
+                    v
+              +-----------+
+              |  MODULES  |
+              |           |
+              | FilterGen | SortGen
+              | Filter    | Result
+              | Chips     | Counter
+              | Layout    |
+              | Manager   |
+              +-----------+</code></pre>
+
+        <h2>Core Classes</h2>
+
+        <h3>Atlas</h3>
+        <p>The public entry point. Creates core services, initialises modules, exposes the API.</p>
+
+        <h3>EventBus</h3>
+        <p>Central communication hub. Publish/subscribe pattern for loose coupling.</p>
+        <p><strong>Events:</strong> <code>store:filtersChanged</code>, <code>store:searchChanged</code>, <code>store:sortChanged</code>, <code>store:layoutChanged</code></p>
+
+        <h3>Registry</h3>
+        <p>Discovers and validates HTML. Finds <code>[data-directory]</code>, <code>[data-member]</code>, and controls. Exposes read-only API.</p>
+
+        <h3>Store</h3>
+        <p>Manages application state (filters, search, sort, layout). Publishes events when state changes.</p>
+
+        <h3>MemberCollection</h3>
+        <p>Manages member data. Provides query methods (filter, search, sort, unique values).</p>
+
+        <h3>Renderer</h3>
+        <p>Updates the DOM. Listens to Store events, batch updates using DocumentFragment, manages loading state. Contains no business logic.</p>
+
+        <h2>Modules</h2>
+
+        <ul>
+            <li><strong>FilterGenerator</strong> — Generates filter UI from member data</li>
+            <li><strong>FilterChips</strong> — Displays active filters as removable chips</li>
+            <li><strong>ResultCounter</strong> — Shows "Showing X of Y members"</li>
+            <li><strong>SortGenerator</strong> — Generates sort controls (three-state toggle)</li>
+            <li><strong>LayoutManager</strong> — Manages grid/list layout switching with persistence</li>
+        </ul>
+
+        <h2>Event Flow Example</h2>
+
+        <h3>User clicks a filter button:</h3>
+        <ol>
+            <li>FilterGenerator detects click</li>
+            <li>FilterGenerator calls Store.toggleFilter()</li>
+            <li>Store publishes 'store:filtersChanged'</li>
+            <li>Renderer listens → re-renders members</li>
+            <li>ResultCounter listens → updates count</li>
+            <li>FilterChips listens → updates chips</li>
+        </ol>
+
+        <h3>User types a search query:</h3>
+        <ol>
+            <li>Search input fires 'input' event</li>
+            <li>Atlas calls Store.setSearch()</li>
+            <li>Store publishes 'store:searchChanged'</li>
+            <li>Renderer listens → re-renders members</li>
+            <li>ResultCounter listens → updates count</li>
+        </ol>
+
+        <h2>Rendering Philosophy</h2>
+
+        <p>Atlas uses batch rendering:</p>
+        <ol>
+            <li>State changes → Store publishes event</li>
+            <li>Renderer receives → computes new state</li>
+            <li>DocumentFragment → builds DOM updates in memory</li>
+            <li>Single DOM write → appends fragment</li>
+        </ol>
+
+        <p>This minimises reflows and repaints.</p>
+
+        <h3>Loading State (No Flicker)</h3>
+        <ol>
+            <li>HTML starts with <code>data-atlas-loading</code> attribute</li>
+            <li>CSS hides the directory</li>
+            <li>Atlas initialises and renders members</li>
+            <li>Atlas removes <code>data-atlas-loading</code></li>
+            <li>CSS fades in the directory</li>
+        </ol>
+
+        <h2>Design Principles</h2>
+
+        <ul>
+            <li><strong>HTML First</strong> — Configure through HTML, not JavaScript</li>
+            <li><strong>Everything Is Data</strong> — Members are structured data</li>
+            <li><strong>HTML Is The Database</strong> — Read once, cache everything</li>
+            <li><strong>Semantic Names</strong> — No platform-specific identifiers in core</li>
+            <li><strong>Separation of Responsibilities</strong> — One class, one job</li>
+            <li><strong>CSS Owns Presentation</strong> — CSS decides appearance</li>
+            <li><strong>JavaScript Owns Behaviour</strong> — Search, filter, sort, state</li>
+            <li><strong>Zero Dependencies</strong> — No third-party libraries</li>
+            <li><strong>Performance Is A Design Requirement</strong> — ~1,000 members</li>
+            <li><strong>Accessibility Matters</strong> — Keyboard, screen reader, reduced-motion</li>
+        </ul>
+
+        <h2>Folder Structure</h2>
+
+        <pre><code>src/
+├── index.js                 # Public API exports
+├── core/                    # Core engine classes
+│   ├── Atlas.js
+│   ├── EventBus.js
+│   ├── Registry.js
+│   ├── Store.js
+│   ├── Member.js
+│   ├── MemberCollection.js
+│   └── Renderer.js
+├── modules/                 # Feature modules
+│   ├── FilterGenerator.js
+│   ├── FilterChips.js
+│   ├── ResultCounter.js
+│   ├── SortGenerator.js
+│   └── LayoutManager.js
+├── adapters/                # Platform adapters
+│   └── JCinkAdapter.js
+├── models/                  # Data models (currently empty)
+├── utils/                   # Utility functions (currently empty)
+└── styles/                  # CSS files
+    └── atlas.css</code></pre>
+
+    </main>
+
+</div>
+
+<script src="assets/js/docs.js"></script>
+</body>
+</html>

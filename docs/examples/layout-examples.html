@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Examples — Atlas Documentation</title>
+    <link rel="stylesheet" href="../assets/css/docs.css">
+</head>
+<body>
+
+<div class="docs-wrapper">
+
+    <!-- ─── Sidebar ─────────────────────────────────── -->
+    <aside class="docs-sidebar">
+        <a href="../index.html" class="logo">Atlas</a>
+        <span class="subtitle">HTML-driven directory engine</span>
+        <hr>
+
+        <span class="nav-label">Getting Started</span>
+        <a href="../getting-started.html">Quick Start</a>
+        <a href="../html-api.html">HTML API</a>
+
+        <span class="nav-label">Guides</span>
+        <a href="../architecture.html">Architecture</a>
+        <a href="../css-customisation.html">CSS Customisation</a>
+
+        <span class="nav-label">Examples</span>
+        <a href="layout-examples.html" class="active">Layout Examples</a>
+
+        <hr>
+        <a href="../../index.html" class="external">← Live Demo</a>
+        <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
+    </aside>
+
+    <!-- ─── Main Content ────────────────────────────── -->
+    <main class="docs-content">
+
+        <h1>Layout Examples</h1>
+        <p class="page-subtitle">Different ways to arrange your directory</p>
+
+        <p>
+            Atlas controls can be placed anywhere within <code>data-atlas</code>.
+            Here are some common layout patterns you can use.
+        </p>
+
+        <h2>Example 1: Standard Layout</h2>
+
+        <p>Controls at the top, directory below.</p>
+
+        <pre><code>&lt;div data-atlas&gt;
+    &lt;input data-search placeholder="Search..."&gt;
+    &lt;div data-filters&gt;&lt;/div&gt;
+    &lt;div data-sort&gt;&lt;/div&gt;
+    &lt;div data-chips&gt;&lt;/div&gt;
+    &lt;div data-results&gt;&lt;/div&gt;
+    &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+    &lt;button data-layout="list"&gt;List&lt;/button&gt;
+
+    &lt;div data-directory&gt;
+        &lt;article data-member&gt;...&lt;/article&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+        <h2>Example 2: Sidebar Layout</h2>
+
+        <p>Filters and controls in a sidebar, directory in the main area.</p>
+
+        <pre><code>&lt;div data-atlas style="display: flex; gap: 2rem;"&gt;
+    &lt;aside style="width: 250px;"&gt;
+        &lt;div data-filters&gt;&lt;/div&gt;
+        &lt;div data-sort&gt;&lt;/div&gt;
+        &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+        &lt;button data-layout="list"&gt;List&lt;/button&gt;
+    &lt;/aside&gt;
+
+    &lt;main style="flex: 1;"&gt;
+        &lt;input data-search placeholder="Search..."&gt;
+        &lt;div data-chips&gt;&lt;/div&gt;
+        &lt;div data-results&gt;&lt;/div&gt;
+
+        &lt;div data-directory&gt;
+            &lt;article data-member&gt;...&lt;/article&gt;
+        &lt;/div&gt;
+    &lt;/main&gt;
+&lt;/div&gt;</code></pre>
+
+        <h2>Example 3: Centered Minimal Layout</h2>
+
+        <p>Clean, centered design with minimal controls.</p>
+
+        <pre><code>&lt;div data-atlas style="max-width: 800px; margin: 0 auto; text-align: center;"&gt;
+    &lt;h2&gt;Our Members&lt;/h2&gt;
+
+    &lt;input data-search placeholder="Search..." style="width: 100%;"&gt;
+
+    &lt;div style="display: flex; justify-content: center; gap: 1rem;"&gt;
+        &lt;div data-filters&gt;&lt;/div&gt;
+        &lt;div data-sort&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div data-chips&gt;&lt;/div&gt;
+    &lt;div data-results&gt;&lt;/div&gt;
+
+    &lt;div data-directory style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; text-align: left;"&gt;
+        &lt;article data-member&gt;...&lt;/article&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+        <h2>Example 4: Two-Column Layout with Search Bar</h2>
+
+        <p>Search bar spanning full width, filters and directory side by side.</p>
+
+        <pre><code>&lt;div data-atlas&gt;
+    &lt;input data-search placeholder="Search..." style="width: 100%;"&gt;
+
+    &lt;div style="display: flex; gap: 2rem;"&gt;
+        &lt;div style="width: 300px;"&gt;
+            &lt;div data-filters&gt;&lt;/div&gt;
+            &lt;div data-sort&gt;&lt;/div&gt;
+            &lt;div data-chips&gt;&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div style="flex: 1;"&gt;
+            &lt;div data-results&gt;&lt;/div&gt;
+            &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+            &lt;button data-layout="list"&gt;List&lt;/button&gt;
+
+            &lt;div data-directory&gt;
+                &lt;article data-member&gt;...&lt;/article&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+        <h2>Layout Tips</h2>
+
+        <ul>
+            <li><strong>Controls are flexible</strong> — place them anywhere within <code>data-atlas</code></li>
+            <li><strong>Use CSS Grid or Flexbox</strong> for your own layout arrangements</li>
+            <li><strong>Atlas provides layout classes</strong> — <code>.atlas-layout-grid</code> and <code>.atlas-layout-list</code> on the directory</li>
+            <li><strong>Style member cards</strong> differently for grid vs list using these classes</li>
+        </ul>
+
+        <div class="tip">
+            <strong>Tip:</strong> You can style the directory layout however you want.
+            The <code>atlas-layout-grid</code> and <code>atlas-layout-list</code> classes are just
+            starting points — override them with your own styles.
+        </div>
+
+        <p>
+            <a href="../getting-started.html">← Back to Getting Started</a>
+        </p>
+
+    </main>
+
+</div>
+
+<script src="../assets/js/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started — Atlas Documentation</title>
+    <link rel="stylesheet" href="assets/css/docs.css">
+</head>
+<body>
+
+<div class="docs-wrapper">
+
+    <!-- ─── Sidebar ─────────────────────────────────── -->
+    <aside class="docs-sidebar">
+        <a href="index.html" class="logo">Atlas</a>
+        <span class="subtitle">HTML-driven directory engine</span>
+        <hr>
+
+        <span class="nav-label">Getting Started</span>
+        <a href="getting-started.html" class="active">Quick Start</a>
+        <a href="html-api.html">HTML API</a>
+
+        <span class="nav-label">Guides</span>
+        <a href="architecture.html">Architecture</a>
+        <a href="css-customisation.html">CSS Customisation</a>
+
+        <span class="nav-label">Examples</span>
+        <a href="examples/layout-examples.html">Layout Examples</a>
+
+        <hr>
+        <a href="../index.html" class="external">← Live Demo</a>
+        <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
+    </aside>
+
+    <!-- ─── Main Content ────────────────────────────── -->
+    <main class="docs-content">
+
+        <h1>Getting Started</h1>
+        <p class="page-subtitle">Add Atlas to your site in three steps</p>
+
+        <p>
+            Atlas is designed to be as simple as possible. You configure it through HTML,
+            style it with CSS, and initialise it with a single line of JavaScript.
+        </p>
+
+        <h2>Step 1: Add HTML</h2>
+
+        <p>Add the <code>data-atlas</code> attribute to your container, then add controls and members.</p>
+
+        <pre><code>&lt;div data-atlas&gt;
+    &lt;!-- Search --&gt;
+    &lt;input data-search placeholder="Search members..."&gt;
+
+    &lt;!-- Controls --&gt;
+    &lt;div data-filters&gt;&lt;/div&gt;
+    &lt;div data-sort&gt;&lt;/div&gt;
+    &lt;div data-chips&gt;&lt;/div&gt;
+    &lt;div data-results&gt;&lt;/div&gt;
+
+    &lt;!-- Layout buttons (optional) --&gt;
+    &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+    &lt;button data-layout="list"&gt;List&lt;/button&gt;
+
+    &lt;!-- Members --&gt;
+    &lt;div data-directory&gt;
+        &lt;article data-member&gt;
+            &lt;span data-field="name" data-searchable="true" data-sortable="true"&gt;
+                Katniss Everdeen
+            &lt;/span&gt;
+            &lt;span data-field="species" data-filterable="true"&gt;
+                Human
+            &lt;/span&gt;
+            &lt;span data-field="occupation" data-filterable="true"&gt;
+                Hunter
+            &lt;/span&gt;
+        &lt;/article&gt;
+        &lt;!-- Add more members --&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+        <div class="tip">
+            <strong>Tip:</strong> Controls can be placed anywhere within <code>data-atlas</code>.
+            Atlas discovers them automatically.
+        </div>
+
+        <h2>Step 2: Add CSS</h2>
+
+        <p>Atlas provides minimal core CSS. You can customise everything else.</p>
+
+        <pre><code>&lt;link rel="stylesheet" href="path/to/atlas.css"&gt;</code></pre>
+
+        <p>
+            Or copy the contents of <code>src/styles/atlas.css</code> into your own stylesheet.
+            See <a href="css-customisation.html">CSS Customisation</a> for styling guidance.
+        </p>
+
+        <h2>Step 3: Add JavaScript</h2>
+
+        <p>Import Atlas and initialise it.</p>
+
+        <pre><code>&lt;script type="module"&gt;
+    import Atlas from './dist/atlas.js';
+    new Atlas();
+&lt;/script&gt;</code></pre>
+
+        <p>That's it! Atlas discovers everything automatically.</p>
+
+        <h2>What's Next?</h2>
+
+        <ul>
+            <li>📖 <a href="html-api.html">HTML API Reference</a> — All available attributes</li>
+            <li>🎨 <a href="css-customisation.html">CSS Customisation</a> — Style your directory</li>
+            <li>🏗️ <a href="architecture.html">Architecture</a> — Understand how Atlas works</li>
+            <li>📐 <a href="examples/layout-examples.html">Layout Examples</a> — See different layouts</li>
+        </ul>
+
+    </main>
+
+</div>
+
+<script src="assets/js/docs.js"></script>
+</body>
+</html>

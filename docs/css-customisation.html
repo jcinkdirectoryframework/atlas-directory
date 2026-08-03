@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Customisation — Atlas Documentation</title>
+    <link rel="stylesheet" href="assets/css/docs.css">
+</head>
+<body>
+
+<div class="docs-wrapper">
+
+    <!-- ─── Sidebar ─────────────────────────────────── -->
+    <aside class="docs-sidebar">
+        <a href="index.html" class="logo">Atlas</a>
+        <span class="subtitle">HTML-driven directory engine</span>
+        <hr>
+
+        <span class="nav-label">Getting Started</span>
+        <a href="getting-started.html">Quick Start</a>
+        <a href="html-api.html">HTML API</a>
+
+        <span class="nav-label">Guides</span>
+        <a href="architecture.html">Architecture</a>
+        <a href="css-customisation.html" class="active">CSS Customisation</a>
+
+        <span class="nav-label">Examples</span>
+        <a href="examples/layout-examples.html">Layout Examples</a>
+
+        <hr>
+        <a href="../index.html" class="external">← Live Demo</a>
+        <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
+    </aside>
+
+    <!-- ─── Main Content ────────────────────────────── -->
+    <main class="docs-content">
+
+        <h1>CSS Customisation</h1>
+        <p class="page-subtitle">Style your Atlas directory</p>
+
+        <p>
+            Atlas provides <strong>minimal core CSS</strong> for functionality. All visual styling is left to you.
+            This gives you complete control over the look and feel of your directory.
+        </p>
+
+        <h2>What Atlas Provides</h2>
+
+        <p>Atlas provides only these selectors:</p>
+
+        <table>
+            <tr><th>Selector</th><th>Purpose</th></tr>
+            <tr><td><code>[data-atlas-loading] [data-directory]</code></td><td>Hides directory during loading</td></tr>
+            <tr><td><code>[data-directory]</code></td><td>Directory container</td></tr>
+            <tr><td><code>[data-directory].atlas-layout-grid</code></td><td>Grid layout mode</td></tr>
+            <tr><td><code>[data-directory].atlas-layout-list</code></td><td>List layout mode</td></tr>
+            <tr><td><code>[data-member][hidden]</code></td><td>Hidden member</td></tr>
+            <tr><td><code>[data-member][data-hidden]</code></td><td>Hidden member</td></tr>
+        </table>
+
+        <h2>What You Should Style</h2>
+
+        <table>
+            <tr><th>Element</th><th>Suggested Styling</th></tr>
+            <tr><td><code>[data-search]</code></td><td>Input field styling</td></tr>
+            <tr><td><code>[data-filters]</code></td><td>Container layout, spacing</td></tr>
+            <tr><td><code>[data-filter]</code></td><td>Filter group layout</td></tr>
+            <tr><td><code>[data-filter-options] button</code></td><td>Filter buttons (active/inactive states)</td></tr>
+            <tr><td><code>[data-sort] button</code></td><td>Sort buttons (active/asc/desc states)</td></tr>
+            <tr><td><code>[data-chips]</code></td><td>Chip container</td></tr>
+            <tr><td><code>.atlas-chip</code></td><td>Individual chip</td></tr>
+            <tr><td><code>.atlas-chip-remove</code></td><td>Remove button on chip</td></tr>
+            <tr><td><code>.atlas-clear-all</code></td><td>Clear All button</td></tr>
+            <tr><td><code>.atlas-result-counter</code></td><td>Result counter text</td></tr>
+            <tr><td><code>[data-layout]</code></td><td>Layout toggle buttons</td></tr>
+            <tr><td><code>[data-member]</code></td><td>Member card styling</td></tr>
+            <tr><td><code>[data-field]</code></td><td>Individual field display</td></tr>
+        </table>
+
+        <h2>Example CSS</h2>
+
+        <p>Here's a complete example of custom styles you might add to your site:</p>
+
+        <pre><code>/* ─── Search Input ────────────────────────────────── */
+
+[data-search] {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 300px;
+    transition: border-color 0.2s;
+}
+
+[data-search]:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* ─── Filter Buttons ───────────────────────────────── */
+
+[data-filter-options] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+[data-filter-options] button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+}
+
+[data-filter-options] button:hover {
+    background: #f1f5f9;
+}
+
+[data-filter-options] button.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+/* ─── Sort Buttons ─────────────────────────────────── */
+
+[data-sort] button {
+    padding: 0.4rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+}
+
+[data-sort] button:hover {
+    background: #f1f5f9;
+}
+
+[data-sort] button.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+[data-sort] button.asc {
+    background: #22c55e;
+    color: white;
+    border-color: #22c55e;
+}
+
+[data-sort] button.desc {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+/* ─── Chips ────────────────────────────────────────── */
+
+.atlas-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #f1f5f9;
+    border-radius: 20px;
+    padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+    font-size: 0.85rem;
+    border: 1px solid #ddd;
+}
+
+.atlas-chip-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #64748b;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.atlas-chip-remove:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.atlas-clear-all {
+    background: none;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.atlas-clear-all:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* ─── Result Counter ───────────────────────────────── */
+
+.atlas-result-counter {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+/* ─── Member Cards ─────────────────────────────────── */
+
+[data-member] {
+    padding: 1rem 1.25rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    transition: box-shadow 0.2s;
+}
+
+[data-member]:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-field] {
+    display: block;
+}
+
+[data-field="name"] {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* ─── Layout Controls ──────────────────────────────── */
+
+[data-layout] {
+    padding: 0.4rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+[data-layout].active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+/* ─── Grid Layout ──────────────────────────────────── */
+
+[data-directory].atlas-layout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+/* ─── List Layout ──────────────────────────────────── */
+
+[data-directory].atlas-layout-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+[data-directory].atlas-layout-list [data-member] {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+[data-directory].atlas-layout-list [data-field] {
+    display: inline;
+}</code></pre>
+
+        <h2>Tips</h2>
+
+        <ul>
+            <li><strong>Use CSS variables</strong> for theming — makes global changes easier</li>
+            <li><strong>Start with the demo.css</strong> in the repository as a reference</li>
+            <li><strong>Test both grid and list layouts</strong> when customising member cards</li>
+            <li><strong>Don't override <code>!important</code></strong> unless necessary — Atlas uses minimal specificity</li>
+        </ul>
+
+    </main>
+
+</div>
+
+<script src="assets/js/docs.js"></script>
+</body>
+</html>

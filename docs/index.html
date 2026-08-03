@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlas — Documentation</title>
+    <link rel="stylesheet" href="assets/css/docs.css">
+</head>
+<body>
+
+<div class="docs-wrapper">
+
+    <!-- ─── Sidebar ─────────────────────────────────── -->
+    <aside class="docs-sidebar">
+        <a href="index.html" class="logo">Atlas</a>
+        <span class="subtitle">HTML-driven directory engine</span>
+        <hr>
+
+        <span class="nav-label">Getting Started</span>
+        <a href="getting-started.html">Quick Start</a>
+        <a href="html-api.html">HTML API</a>
+
+        <span class="nav-label">Guides</span>
+        <a href="architecture.html">Architecture</a>
+        <a href="css-customisation.html">CSS Customisation</a>
+
+        <span class="nav-label">Examples</span>
+        <a href="examples/layout-examples.html">Layout Examples</a>
+
+        <hr>
+        <a href="../index.html" class="external">← Live Demo</a>
+        <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
+    </aside>
+
+    <!-- ─── Main Content ────────────────────────────── -->
+    <main class="docs-content">
+
+        <h1>Atlas Documentation</h1>
+        <p class="page-subtitle">A dependency-free, HTML-driven directory engine</p>
+
+        <p>
+            Atlas transforms static HTML member lists into interactive directories
+            with searching, filtering, sorting, and layout switching — all
+            configured through semantic HTML.
+        </p>
+
+        <div class="tip">
+            <strong>Quick Start:</strong> Add <code>data-atlas</code> to your container,
+            add controls with <code>data-search</code>, <code>data-filters</code>,
+            and <code>data-sort</code>, then call <code>new Atlas()</code>.
+            <a href="getting-started.html">→ Read the guide</a>
+        </div>
+
+        <h2>Features</h2>
+
+        <ul>
+            <li><strong>Zero Dependencies</strong> — No jQuery, no frameworks. Just vanilla JavaScript.</li>
+            <li><strong>HTML-First</strong> — Configure everything through HTML attributes.</li>
+            <li><strong>Instant Search</strong> — Type to filter members in real-time.</li>
+            <li><strong>Faceted Filtering</strong> — Multi-select filters for any field.</li>
+            <li><strong>Smart Sorting</strong> — Three-state toggle (asc → desc → off).</li>
+            <li><strong>Layout Switching</strong> — Grid and list views with persistent preference.</li>
+            <li><strong>No Flicker</strong> — Smooth loading with CSS transitions.</li>
+            <li><strong>Accessible</strong> — Keyboard navigation, screen reader support.</li>
+            <li><strong>~1,000 Members</strong> — Optimised for directories of up to one thousand members.</li>
+        </ul>
+
+        <h2>Documentation Sections</h2>
+
+        <ul>
+            <li><a href="getting-started.html">Getting Started</a> — Quick start guide for new users</li>
+            <li><a href="html-api.html">HTML API Reference</a> — All attributes and configuration options</li>
+            <li><a href="architecture.html">Architecture</a> — How Atlas works under the hood</li>
+            <li><a href="css-customisation.html">CSS Customisation</a> — Styling guide for your own themes</li>
+            <li><a href="examples/layout-examples.html">Layout Examples</a> — Example layouts and templates</li>
+        </ul>
+
+        <h2>View the Demo</h2>
+
+        <p>
+            See Atlas in action with a live demo of the framework:
+            <a href="../index.html">jcinkdirectoryframework.github.io/atlas-directory/</a>
+        </p>
+
+    </main>
+
+</div>
+
+<script src="assets/js/docs.js"></script>
+</body>
+</html>

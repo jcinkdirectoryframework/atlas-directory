@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML API — Atlas Documentation</title>
+    <link rel="stylesheet" href="assets/css/docs.css">
+</head>
+<body>
+
+<div class="docs-wrapper">
+
+    <!-- ─── Sidebar ─────────────────────────────────── -->
+    <aside class="docs-sidebar">
+        <a href="index.html" class="logo">Atlas</a>
+        <span class="subtitle">HTML-driven directory engine</span>
+        <hr>
+
+        <span class="nav-label">Getting Started</span>
+        <a href="getting-started.html">Quick Start</a>
+        <a href="html-api.html" class="active">HTML API</a>
+
+        <span class="nav-label">Guides</span>
+        <a href="architecture.html">Architecture</a>
+        <a href="css-customisation.html">CSS Customisation</a>
+
+        <span class="nav-label">Examples</span>
+        <a href="examples/layout-examples.html">Layout Examples</a>
+
+        <hr>
+        <a href="../index.html" class="external">← Live Demo</a>
+        <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
+    </aside>
+
+    <!-- ─── Main Content ────────────────────────────── -->
+    <main class="docs-content">
+
+        <h1>HTML API Reference</h1>
+        <p class="page-subtitle">All attributes and configuration options</p>
+
+        <h2>Root Container</h2>
+
+        <pre><code>&lt;div data-atlas&gt;
+    ...
+&lt;/div&gt;</code></pre>
+
+        <p><code>data-atlas</code> — Marks the root container. Every Atlas instance begins with this.</p>
+
+        <h2>Loading State</h2>
+
+        <p>Atlas automatically manages loading state to prevent flicker:</p>
+
+        <pre><code>&lt;!-- Atlas adds this during initialisation --&gt;
+&lt;div data-atlas data-atlas-loading&gt;
+    ...
+&lt;/div&gt;
+
+&lt;!-- Atlas removes it when ready --&gt;
+&lt;div data-atlas&gt;
+    ...
+&lt;/div&gt;</code></pre>
+
+        <p>Atlas provides minimal CSS for this in <code>src/styles/atlas.css</code>.</p>
+
+        <h2>Member Directory</h2>
+
+        <pre><code>&lt;div data-directory&gt;
+    &lt;article data-member&gt;...&lt;/article&gt;
+    &lt;article data-member&gt;...&lt;/article&gt;
+&lt;/div&gt;</code></pre>
+
+        <ul>
+            <li><code>data-directory</code> — Container for all member cards</li>
+            <li><code>data-member</code> — Individual member card</li>
+        </ul>
+
+        <h2>Member Fields</h2>
+
+        <pre><code>&lt;article data-member&gt;
+    &lt;span data-field="name"&gt;Katniss Everdeen&lt;/span&gt;
+    &lt;span data-field="species"&gt;Human&lt;/span&gt;
+    &lt;span data-field="occupation"&gt;Hunter&lt;/span&gt;
+&lt;/article&gt;</code></pre>
+
+        <p><code>data-field</code> — Defines a field value. The value is the semantic field name.</p>
+
+        <h3>Field Attributes</h3>
+
+        <table>
+            <tr><th>Attribute</th><th>Description</th><th>Default</th></tr>
+            <tr><td><code>data-filterable</code></td><td>Whether the field appears in filters</td><td><code>true</code></td></tr>
+            <tr><td><code>data-searchable</code></td><td>Whether the field is searched</td><td><code>false</code></td></tr>
+            <tr><td><code>data-sortable</code></td><td>Whether the field appears in sort controls</td><td><code>false</code></td></tr>
+        </table>
+
+        <h4>Examples</h4>
+
+        <pre><code>&lt;!-- Opt out of filtering --&gt;
+&lt;span data-field="species" data-filterable="false"&gt;Human&lt;/span&gt;
+
+&lt;!-- Opt in to search --&gt;
+&lt;span data-field="name" data-searchable="true"&gt;Katniss Everdeen&lt;/span&gt;
+
+&lt;!-- Opt in to sorting --&gt;
+&lt;span data-field="name" data-sortable="true"&gt;Katniss Everdeen&lt;/span&gt;</code></pre>
+
+        <h2>Controls</h2>
+
+        <p>Controls can be placed anywhere within <code>data-atlas</code>. Atlas discovers them automatically.</p>
+
+        <h3>Search</h3>
+        <pre><code>&lt;input data-search placeholder="Search members..."&gt;</code></pre>
+        <p><code>data-search</code> — Marks a search input field.</p>
+
+        <h3>Filter Container</h3>
+        <pre><code>&lt;div data-filters&gt;&lt;/div&gt;</code></pre>
+        <p><code>data-filters</code> — Container where Atlas generates filter interfaces.</p>
+
+        <h3>Sort Container</h3>
+        <pre><code>&lt;div data-sort&gt;&lt;/div&gt;</code></pre>
+        <p><code>data-sort</code> — Container where Atlas generates sort buttons.</p>
+
+        <h3>Filter Chips</h3>
+        <pre><code>&lt;div data-chips&gt;&lt;/div&gt;</code></pre>
+        <p><code>data-chips</code> — Container where Atlas displays active filter chips.</p>
+
+        <h3>Result Counter</h3>
+        <pre><code>&lt;div data-results&gt;&lt;/div&gt;</code></pre>
+        <p><code>data-results</code> — Container where Atlas displays the result counter.</p>
+
+        <h3>Layout Controls</h3>
+        <pre><code>&lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+&lt;button data-layout="list"&gt;List&lt;/button&gt;</code></pre>
+        <p>
+            <code>data-layout</code> — Layout toggle button. Value must be <code>grid</code> or <code>list</code>.
+            Default layout is <code>grid</code>.
+            <strong>These buttons are optional.</strong> If omitted, Atlas uses grid layout only.
+        </p>
+
+        <div class="tip">
+            <strong>Tip:</strong> Layout preference persists to localStorage.
+            If you only want grid layout, simply don't include these buttons.
+        </div>
+
+        <h2>Complete Example</h2>
+
+        <pre><code>&lt;div data-atlas&gt;
+    &lt;input data-search placeholder="Search members..."&gt;
+
+    &lt;div data-filters&gt;&lt;/div&gt;
+    &lt;div data-sort&gt;&lt;/div&gt;
+
+    &lt;div data-chips&gt;&lt;/div&gt;
+    &lt;div data-results&gt;&lt;/div&gt;
+
+    &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+    &lt;button data-layout="list"&gt;List&lt;/button&gt;
+
+    &lt;div data-directory&gt;
+        &lt;article data-member&gt;
+            &lt;span data-field="name" data-searchable="true" data-sortable="true"&gt;
+                Katniss Everdeen
+            &lt;/span&gt;
+            &lt;span data-field="species" data-filterable="true"&gt;
+                Human
+            &lt;/span&gt;
+            &lt;span data-field="occupation" data-filterable="true"&gt;
+                Hunter
+            &lt;/span&gt;
+        &lt;/article&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+        <h2>Attribute Reference</h2>
+
+        <table>
+            <tr><th>Attribute</th><th>Element</th><th>Description</th></tr>
+            <tr><td><code>data-atlas</code></td><td>div</td><td>Root container</td></tr>
+            <tr><td><code>data-directory</code></td><td>div</td><td>Member directory container</td></tr>
+            <tr><td><code>data-member</code></td><td>article</td><td>Individual member card</td></tr>
+            <tr><td><code>data-field</code></td><td>Any</td><td>Field value (e.g., <code>data-field="name"</code>)</td></tr>
+            <tr><td><code>data-filterable</code></td><td>Any</td><td>Opt-out of filtering (default: true)</td></tr>
+            <tr><td><code>data-searchable</code></td><td>Any</td><td>Opt-in to search (default: false)</td></tr>
+            <tr><td><code>data-sortable</code></td><td>Any</td><td>Opt-in to sorting (default: false)</td></tr>
+            <tr><td><code>data-search</code></td><td>input</td><td>Search input field</td></tr>
+            <tr><td><code>data-filters</code></td><td>div</td><td>Filter container</td></tr>
+            <tr><td><code>data-sort</code></td><td>div</td><td>Sort container</td></tr>
+            <tr><td><code>data-chips</code></td><td>div</td><td>Filter chips container</td></tr>
+            <tr><td><code>data-results</code></td><td>div</td><td>Result counter container</td></tr>
+            <tr><td><code>data-layout</code></td><td>button</td><td>Layout toggle (grid or list) — optional</td></tr>
+        </table>
+
+    </main>
+
+</div>
+
+<script src="assets/js/docs.js"></script>
+</body>
+</html>
