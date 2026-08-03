@@ -1,4 +1,22 @@
-/* Demo styles for Atlas */
+/* ============================================
+   Atlas — Loading State (Prevents Flicker)
+   ============================================ */
+
+/* Hide directory while Atlas is loading */
+[data-atlas-loading] [data-directory] {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* Fade in when ready */
+[data-directory] {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+/* ============================================
+   Demo Page Styles
+   ============================================ */
 
 body {
     font-family: system-ui, -apple-system, sans-serif;
@@ -299,6 +317,11 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+[data-directory].atlas-layout-grid [data-member] [data-field] {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
 /* List layout */
 [data-directory].atlas-layout-list {
     display: flex;
@@ -334,7 +357,18 @@ body {
     color: #6c757d;
 }
 
-/* Member hidden state */
-[data-directory] [data-member][hidden] {
-    display: none;
+[data-directory].atlas-layout-list [data-member] [data-field] {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+[data-directory].atlas-layout-list [data-member] [data-field]:not(:first-of-type) {
+    margin-left: 1rem;
+}
+
+/* Member hidden state — supports both [hidden] and [data-hidden] */
+[data-directory] [data-member][hidden],
+[data-directory] [data-member][data-hidden] {
+    display: none !important;
 }

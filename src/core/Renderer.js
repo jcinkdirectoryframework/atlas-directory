@@ -1,354 +1,314 @@
 /**
  * Renderer
  *
- * Efficiently updates the DOM to reflect the current state.
+ * Manages DOM updates for Atlas based on Store state.
  *
  * Responsibilities:
- * - Diff current vs new member state
- * - Toggle visibility (hidden/data-hidden) on changed members only
- * - Reorder members efficiently (only move what's needed)
- * - Batch DOM updates using requestAnimationFrame
+ * - Update member visibility based on filter/search state
+ * - Reorder members based on sort state
+ * - Batch DOM updates for performance
+ * - Handle loading state (flicker prevention)
+ * - No business logic — only DOM operations
  *
  * Deliberately does NOT:
  * - Know about filters, search, or sort logic
- * - Manage application state
- * - Apply styling (CSS owns presentation)
+ * - Manage state
+ * - Generate UI
+ * - Apply business rules
  */
 
 export default class Renderer {
 
-    #directory;
-    #members = new Map(); // id → { element, visible }
-    #pendingRender = false;
-    #pendingMembers = null;
+    #registry = null;
+    #memberCollection = null;
+    #store = null;
+    #events = null;
+    #filteredMembers = null;
 
     /**
      * Create a Renderer.
      *
-     * @param {HTMLElement} directory - The [data-directory] container
+     * @param {Object} dependencies
+     * @param {Registry} dependencies.registry - The Registry instance
+     * @param {MemberCollection} dependencies.memberCollection - The MemberCollection instance
+     * @param {Store} dependencies.store - The Store instance
+     * @param {EventBus} dependencies.events - The EventBus instance
      */
-    constructor(directory) {
+    constructor({ registry, memberCollection, store, events }) {
 
-        if (!directory) {
-            throw new Error('Renderer requires a directory element');
+        if (!registry) {
+            throw new Error('Renderer requires a Registry');
         }
 
-        this.#directory = directory;
+        if (!memberCollection) {
+            throw new Error('Renderer requires a MemberCollection');
+        }
 
-        // Initialise member map from the DOM
-        this.#syncWithDOM();
+        if (!store) {
+            throw new Error('Renderer requires a Store');
+        }
+
+        if (!events) {
+            throw new Error('Renderer requires an EventBus');
+        }
+
+        this.#registry = registry;
+        this.#memberCollection = memberCollection;
+        this.#store = store;
+        this.#events = events;
+
+        // Initially, all members are visible
+        this.#filteredMembers = memberCollection.getAll();
+
+        // Set up loading state
+        this.#setupLoadingState();
+
+        // Subscribe to store events
+        this.#subscribeToEvents();
 
     }
 
     /**
-     * Sync the internal state with the current DOM.
+     * Set up the loading state to prevent flicker.
      */
-    #syncWithDOM() {
+    #setupLoadingState() {
 
-        const elements = this.#directory.querySelectorAll('[data-member]');
+        const root = this.#registry.root;
 
-        for (const element of elements) {
-            const member = element._atlasMember;
-            if (member) {
-                this.#members.set(member.id, {
-                    element: element,
-                    visible: !element.hidden
-                });
-            }
-        }
+        // Add loading attribute
+        root.setAttribute('data-atlas-loading', '');
 
-    }
+        // After initial render, remove loading state
+        requestAnimationFrame(() => {
+            // Ensure we're using the latest filtered members
+            this.#applyFiltersAndSearch();
+            this.render();
 
-    /**
-     * Render a new set of members in the correct order.
-     *
-     * @param {Member[]} members - Array of members in the desired order (already filtered/sorted)
-     */
-    render(members) {
-
-        // Store the pending update
-        this.#pendingMembers = members;
-
-        // Schedule a render if not already pending
-        if (!this.#pendingRender) {
-            this.#pendingRender = true;
-            requestAnimationFrame(() => {
-                this.#performRender();
-            });
-        }
-
-    }
-
-    /**
-     * Perform the actual render (called via requestAnimationFrame).
-     */
-    #performRender() {
-
-        this.#pendingRender = false;
-
-        const members = this.#pendingMembers;
-
-        if (!members) {
-            return;
-        }
-
-        // 1. Get current state from DOM
-        const currentState = this.#getCurrentState();
-
-        // 2. Build new state from members
-        const newState = this.#buildNewState(members);
-
-        // 3. Diff and apply changes
-        this.#applyChanges(currentState, newState);
-
-        // 4. Update internal state
-        this.#updateInternalState(newState);
-
-        this.#pendingMembers = null;
-
-    }
-
-    /**
-     * Get the current state from the DOM.
-     */
-    #getCurrentState() {
-
-        const state = {
-            order: [],           // Array of member IDs in DOM order
-            visible: new Set(),  // Set of member IDs that are visible
-            elements: new Map()  // id → element
-        };
-
-        const elements = this.#directory.querySelectorAll('[data-member]');
-
-        for (const element of elements) {
-            const member = element._atlasMember;
-            if (member) {
-                const id = member.id;
-                state.order.push(id);
-                state.elements.set(id, element);
-                if (!element.hidden) {
-                    state.visible.add(id);
-                }
-            }
-        }
-
-        return state;
-
-    }
-
-    /**
-     * Build the new state from the member array.
-     */
-    #buildNewState(members) {
-
-        const state = {
-            order: [],           // Array of member IDs in new order
-            visible: new Set(),  // Set of member IDs that should be visible
-            elements: new Map()  // id → element (reused from internal map)
-        };
-
-        for (const member of members) {
-            const id = member.id;
-            state.order.push(id);
-            state.visible.add(id);
-            state.elements.set(id, member.element);
-        }
-
-        return state;
-
-    }
-
-    /**
-     * Apply changes between current and new state.
-     */
-    #applyChanges(currentState, newState) {
-
-        // 1. Handle visibility changes
-        this.#applyVisibilityChanges(currentState, newState);
-
-        // 2. Handle reordering
-        this.#applyReorder(newState);
-
-    }
-
-    /**
-     * Apply visibility changes (show/hide members).
-     */
-    #applyVisibilityChanges(currentState, newState) {
-
-        const currentVisible = currentState.visible;
-        const newVisible = newState.visible;
-
-        // Find members that should be hidden (visible in current, not in new)
-        for (const id of currentVisible) {
-            if (!newVisible.has(id)) {
-                const element = currentState.elements.get(id);
-                if (element) {
-                    element.hidden = true;
-                    element.setAttribute('data-hidden', 'true');
-                }
-            }
-        }
-
-        // Find members that should be shown (not visible in current, visible in new)
-        for (const id of newVisible) {
-            if (!currentVisible.has(id)) {
-                const element = newState.elements.get(id);
-                if (element) {
-                    element.hidden = false;
-                    element.removeAttribute('data-hidden');
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Apply reordering to the DOM.
-     *
-     * Handles both full reorders (no filters) and partial reorders (with filters).
-     * For filtered views, only visible members are in the order array.
-     */
-    #applyReorder(newState) {
-
-        const directory = this.#directory;
-        const newOrder = newState.order;
-
-        // Get current member elements in the directory
-        const currentElements = Array.from(directory.querySelectorAll('[data-member]'));
-
-        // If no members, nothing to do
-        if (currentElements.length === 0 && newOrder.length === 0) {
-            return;
-        }
-
-        // Get current IDs in DOM order (including hidden members)
-        const currentIds = currentElements.map(el => {
-            const member = el._atlasMember;
-            return member ? member.id : null;
+            // Remove loading attribute
+            root.removeAttribute('data-atlas-loading');
         });
 
-        // Check if the order of VISIBLE members has changed
-        // We need to compare only the members that are in newOrder
-        let needsReorder = false;
-        const visibleCurrentIds = currentIds.filter(id => newOrder.includes(id));
+    }
 
-        if (visibleCurrentIds.length !== newOrder.length) {
-            needsReorder = true;
-        } else {
-            for (let i = 0; i < newOrder.length; i++) {
-                if (visibleCurrentIds[i] !== newOrder[i]) {
-                    needsReorder = true;
-                    break;
+    /**
+     * Subscribe to store events.
+     */
+    #subscribeToEvents() {
+
+        // When filters change
+        this.#events.subscribe('store:filtersChanged', () => {
+            this.#onStateChange();
+        });
+
+        // When search changes
+        this.#events.subscribe('store:searchChanged', () => {
+            this.#onStateChange();
+        });
+
+        // When sort changes
+        this.#events.subscribe('store:sortChanged', () => {
+            this.#onStateChange();
+        });
+
+    }
+
+    /**
+     * Handle state changes from the Store.
+     */
+    #onStateChange() {
+
+        this.#applyFiltersAndSearch();
+        this.render();
+
+    }
+
+    /**
+     * Apply filters, search, and sort to the member collection.
+     *
+     * This is the business logic layer — it determines which members
+     * should be visible and in what order.
+     */
+    #applyFiltersAndSearch() {
+
+        const filters = this.#store.filters;
+        const searchQuery = this.#store.search;
+        const sort = this.#store.sort;
+
+        // Start with all members
+        let filtered = this.#memberCollection.getAll();
+
+        // Apply filters if any are active
+        const activeFields = Object.keys(filters).filter(
+            fieldName => filters[fieldName] && filters[fieldName].length > 0
+        );
+
+        if (activeFields.length > 0) {
+            filtered = this.#memberCollection.applyFilters(filters);
+        }
+
+        // Apply search if query exists
+        if (searchQuery && searchQuery.trim()) {
+            const searchResults = [];
+            for (const member of filtered) {
+                if (member.matches(searchQuery)) {
+                    searchResults.push(member);
                 }
+            }
+            filtered = searchResults;
+        }
+
+        // Apply sort if active
+        if (sort && sort.field) {
+            filtered = this.#sortMembers(filtered, sort.field, sort.direction);
+        }
+
+        this.#filteredMembers = filtered;
+
+    }
+
+    /**
+     * Sort an array of members by a field.
+     */
+    #sortMembers(members, field, direction) {
+
+        const sorted = [...members];
+
+        sorted.sort((a, b) => {
+            const valA = a.get(field) || '';
+            const valB = b.get(field) || '';
+
+            // Case-insensitive comparison
+            const compareResult = valA.localeCompare(valB, undefined, { sensitivity: 'base' });
+
+            return direction === 'asc' ? compareResult : -compareResult;
+        });
+
+        return sorted;
+
+    }
+
+    /**
+     * Render the current state to the DOM.
+     *
+     * This is the DOM update layer — it takes the filtered members
+     * and updates the DOM efficiently.
+     */
+    render() {
+
+        // Defensive: ensure filteredMembers is an array
+        if (!this.#filteredMembers || !Array.isArray(this.#filteredMembers)) {
+            this.#filteredMembers = this.#memberCollection.getAll();
+        }
+
+        // Get the filtered members in the correct order
+        const members = this.#filteredMembers;
+        const visibleIds = new Set(members.map(m => m.id));
+
+        // Get all member elements from the Registry
+        const memberElements = this.#registry.members;
+        const directory = this.#registry.directory;
+
+        // ----- Step 1: Update visibility -----
+        for (const element of memberElements) {
+            const member = element._atlasMember;
+            if (!member) continue;
+
+            const isVisible = visibleIds.has(member.id);
+
+            if (isVisible) {
+                element.hidden = false;
+                element.removeAttribute('data-hidden');
+            } else {
+                element.hidden = true;
+                element.setAttribute('data-hidden', 'true');
             }
         }
 
-        if (!needsReorder) {
+        // ----- Step 2: Reorder visible members -----
+        this.#reorderMembers();
+
+    }
+
+    /**
+     * Reorder members in the DOM to match the sorted order.
+     *
+     * Uses DocumentFragment for batch DOM operations.
+     * Preserves hidden members at the end.
+     */
+    #reorderMembers() {
+
+        const directory = this.#registry.directory;
+        const sortedMembers = this.#filteredMembers;
+
+        if (!directory || !sortedMembers) {
             return;
         }
 
-        // Get all elements that are in the new order
-        const elementsToKeep = new Set(newOrder);
-        const elementsToRemove = [];
+        // Get all current member elements (including hidden ones)
+        const currentElements = directory.querySelectorAll('[data-member]');
 
-        // Separate elements to keep and remove
+        // Create a Map of member ID → element for quick lookup
+        const elementMap = new Map();
+        const visibleIds = new Set(sortedMembers.map(m => m.id));
+
         for (const element of currentElements) {
-            const member = element._atlasMember;
-            if (member && elementsToKeep.has(member.id)) {
-                // Keep this element
-            } else {
-                elementsToRemove.push(element);
-            }
-        }
-
-        // Build the new order: visible members in sorted order
-        const newElements = [];
-
-        for (const id of newOrder) {
-            const element = newState.elements.get(id);
-            if (element) {
-                newElements.push(element);
-            }
-        }
-
-        // Remove all current member elements
-        for (const element of currentElements) {
-            element.remove();
-        }
-
-        // Append visible members in new order
-        for (const element of newElements) {
-            directory.appendChild(element);
-        }
-
-        // Append hidden members at the end (preserving their order)
-        for (const element of elementsToRemove) {
-            if (!newElements.includes(element)) {
-                directory.appendChild(element);
-            }
-        }
-
-    }
-
-    /**
-     * Update the internal state.
-     */
-    #updateInternalState(newState) {
-
-        // Store element references and visibility
-        for (const id of newState.order) {
-            const element = newState.elements.get(id);
-            if (element) {
-                this.#members.set(id, {
-                    element: element,
-                    visible: newState.visible.has(id)
-                });
-            }
-        }
-
-        // Remove any members that are no longer in the collection
-        const validIds = new Set(newState.order);
-        for (const [id] of this.#members) {
-            if (!validIds.has(id)) {
-                this.#members.delete(id);
-            }
-        }
-
-    }
-
-    /**
-     * Force a sync with the DOM (used after external changes).
-     */
-    sync() {
-        this.#syncWithDOM();
-    }
-
-    /**
-     * Get the current member order from the DOM.
-     */
-    getCurrentOrder() {
-
-        const order = [];
-        const elements = this.#directory.querySelectorAll('[data-member]');
-
-        for (const element of elements) {
             const member = element._atlasMember;
             if (member) {
-                order.push(member.id);
+                elementMap.set(member.id, element);
             }
         }
 
-        return order;
+        // Build the final order: visible (sorted) + hidden (preserved order)
+        const finalOrder = [];
+
+        // Add visible members in sorted order
+        for (const member of sortedMembers) {
+            const element = elementMap.get(member.id);
+            if (element) {
+                finalOrder.push(element);
+            }
+        }
+
+        // Add hidden members (preserving their current order)
+        for (const element of currentElements) {
+            const member = element._atlasMember;
+            if (member && !visibleIds.has(member.id)) {
+                finalOrder.push(element);
+            }
+        }
+
+        // ----- Batch DOM update using DocumentFragment -----
+        const fragment = document.createDocumentFragment();
+
+        for (const element of finalOrder) {
+            fragment.appendChild(element);
+        }
+
+        // Clear the directory and append the fragment in one operation
+        directory.innerHTML = '';
+        directory.appendChild(fragment);
 
     }
 
     /**
-     * Get the directory element.
+     * Get the currently filtered members.
      */
-    get directory() {
-        return this.#directory;
+    get filteredMembers() {
+        return [...this.#filteredMembers];
+    }
+
+    /**
+     * Get the count of visible members.
+     */
+    get visibleCount() {
+        return this.#filteredMembers ? this.#filteredMembers.length : 0;
+    }
+
+    /**
+     * Get the total number of members.
+     */
+    get totalCount() {
+        return this.#memberCollection.size;
     }
 
 }

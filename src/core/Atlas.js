@@ -22,6 +22,8 @@ import Registry from "./Registry.js";
 import Member from "./Member.js";
 import MemberCollection from "./MemberCollection.js";
 import Store from "./Store.js";
+import EventBus from "./EventBus.js";
+import Renderer from "./Renderer.js";
 import FilterGenerator from "../modules/FilterGenerator.js";
 import FilterChips from "../modules/FilterChips.js";
 import ResultCounter from "../modules/ResultCounter.js";
@@ -33,12 +35,9 @@ export default class Atlas {
     #registry = null;
     #memberCollection = null;
     #store = null;
-    #filterGenerator = null;
-    #filterChips = null;
-    #resultCounter = null;
-    #sortGenerator = null;
-    #layoutManager = null;
-    #filteredMembers = null;
+    #events = null;
+    #renderer = null;
+    #modules = {};
 
     /**
      * Create a new Atlas instance.
@@ -50,8 +49,6 @@ export default class Atlas {
         this.root = this.#findRoot();
 
         this.#initialise();
-
-        this.#bindEvents();
 
     }
 
@@ -96,63 +93,38 @@ export default class Atlas {
      */
     #initialise() {
 
-        this.#createRegistry();
-
-        this.#createMemberCollection();
-
-        this.#createStore();
-
-        this.#createFilterGenerator();
-
-        this.#createFilterChips();
-
-        this.#createResultCounter();
-
-        this.#createSortGenerator();
-
-        this.#createLayoutManager();
-
-        this.#applyFiltersAndSearch();
-
-        this.#ready();
-
-    }
-
-    /**
-     * Bind global event listeners.
-     */
-    #bindEvents() {
-
-        // Listen for filter changes
-        document.addEventListener('atlas:filtersChanged', () => {
-            this.#applyFiltersAndSearch();
-            this.#updateMemberVisibility();
+        // 1. Create the event bus
+        this.#events = new EventBus({
+            debug: this.options.debug
         });
 
-        // Listen for sort changes
-        document.addEventListener('atlas:sortChanged', () => {
-            this.#applyFiltersAndSearch();
-            this.#updateMemberVisibility();
-        });
-
-        // Listen for search input
-        const searchInput = this.root.querySelector('[data-search]');
-        if (searchInput) {
-            searchInput.addEventListener('input', (event) => {
-                this.#store.setSearch(event.target.value);
-                this.#applyFiltersAndSearch();
-                this.#updateMemberVisibility();
-            });
-        }
-
-    }
-
-    /**
-     * Create the Registry.
-     */
-    #createRegistry() {
-
+        // 2. Create the Registry (discovers the DOM)
         this.#registry = new Registry(this.root);
+
+        // 3. Create the MemberCollection
+        this.#memberCollection = this.#createMemberCollection();
+
+        // 4. Create the Store
+        this.#store = new Store({
+            events: this.#events,
+            initialState: {
+                layout: this.#loadLayout()
+            }
+        });
+
+        // 5. Create the Renderer (handles all DOM updates)
+        this.#renderer = new Renderer({
+            registry: this.#registry,
+            memberCollection: this.#memberCollection,
+            store: this.#store,
+            events: this.#events
+        });
+
+        // 6. Create all modules
+        this.#createModules();
+
+        // 7. Debug output (if enabled)
+        this.#ready();
 
     }
 
@@ -167,186 +139,111 @@ export default class Atlas {
             return new Member(element, index);
         });
 
-        this.#memberCollection = new MemberCollection(members);
+        return new MemberCollection(members);
 
     }
 
     /**
-     * Create the Store.
+     * Load saved layout from localStorage.
      */
-    #createStore() {
+    #loadLayout() {
 
-        this.#store = new Store();
-
-    }
-
-    /**
-     * Create the FilterGenerator.
-     */
-    #createFilterGenerator() {
-
-        const container = this.#findFilterContainer();
-
-        this.#filterGenerator = new FilterGenerator(
-            container,
-            this.#memberCollection,
-            this.#store
-        );
-
-    }
-
-    /**
-     * Create the FilterChips.
-     */
-    #createFilterChips() {
-
-        const container = this.#findChipsContainer();
-
-        if (!container) {
-            if (this.options.debug) {
-                console.warn('Atlas: No [data-chips] container found. Filter chips will not be displayed.');
+        try {
+            const saved = localStorage.getItem('atlas-layout');
+            if (saved === 'grid' || saved === 'list') {
+                return saved;
             }
-            return;
+        } catch (error) {
+            // Silently fail
         }
 
-        this.#filterChips = new FilterChips(
-            container,
-            this.#store,
-            this.#filterGenerator.fieldFilterMap
-        );
+        return 'grid';
 
     }
 
     /**
-     * Create the ResultCounter.
+     * Create all modules.
      */
-    #createResultCounter() {
+    #createModules() {
 
-        const container = this.#findResultsContainer();
-
-        if (!container) {
-            if (this.options.debug) {
-                console.warn('Atlas: No [data-results] container found. Result counter will not be displayed.');
-            }
-            return;
+        // Filter Generator
+        const filtersContainer = this.#registry.filtersContainer;
+        if (filtersContainer) {
+            this.#modules.filterGenerator = new FilterGenerator(
+                filtersContainer,
+                this.#memberCollection,
+                this.#store,
+                this.#events
+            );
+        } else if (this.options.debug) {
+            console.warn('Atlas: No [data-filters] container found. Filters will not be displayed.');
         }
 
-        this.#resultCounter = new ResultCounter(
-            container,
-            this.#memberCollection,
-            this.#store
-        );
+        // Filter Chips
+        const chipsContainer = this.#registry.chipsContainer;
+        if (chipsContainer) {
+            const fieldFilterMap = this.#modules.filterGenerator
+                ? this.#modules.filterGenerator.fieldFilterMap
+                : new Map();
 
-    }
-
-    /**
-     * Create the SortGenerator.
-     */
-    #createSortGenerator() {
-
-        const container = this.#findSortContainer();
-
-        if (!container) {
-            if (this.options.debug) {
-                console.warn('Atlas: No [data-sort] container found. Sort controls will not be displayed.');
-            }
-            return;
+            this.#modules.filterChips = new FilterChips(
+                chipsContainer,
+                this.#store,
+                fieldFilterMap,
+                this.#events
+            );
+        } else if (this.options.debug) {
+            console.warn('Atlas: No [data-chips] container found. Filter chips will not be displayed.');
         }
 
-        this.#sortGenerator = new SortGenerator(
-            container,
-            this.#memberCollection,
-            this.#store
-        );
+        // Result Counter
+        const resultsContainer = this.#registry.resultsContainer;
+        if (resultsContainer) {
+            this.#modules.resultCounter = new ResultCounter(
+                resultsContainer,
+                this.#memberCollection,
+                this.#store,
+                this.#events
+            );
+        } else if (this.options.debug) {
+            console.warn('Atlas: No [data-results] container found. Result counter will not be displayed.');
+        }
 
-    }
+        // Sort Generator
+        const sortContainer = this.#findSortContainer();
+        if (sortContainer) {
+            this.#modules.sortGenerator = new SortGenerator(
+                sortContainer,
+                this.#memberCollection,
+                this.#store,
+                this.#events
+            );
+        } else if (this.options.debug) {
+            console.warn('Atlas: No [data-sort] container found. Sort controls will not be displayed.');
+        }
 
-    /**
-     * Create the LayoutManager.
-     */
-    #createLayoutManager() {
-
+        // Layout Manager
         const directory = this.#registry.directory;
-
-        if (!directory) {
-            if (this.options.debug) {
-                console.warn('Atlas: No directory found. Layout switching will not be available.');
-            }
-            return;
+        if (directory) {
+            this.#modules.layoutManager = new LayoutManager(
+                this.root,
+                directory,
+                this.#store,
+                this.#events
+            );
+        } else if (this.options.debug) {
+            console.warn('Atlas: No directory found. Layout switching will not be available.');
         }
 
-        this.#layoutManager = new LayoutManager(
-            this.root,
-            directory,
-            this.#store
-        );
-
-    }
-
-    /**
-     * Find the filters container.
-     */
-    #findFilterContainer() {
-
-        // Check Registry first
-        const container = this.#registry.filtersContainer;
-
-        if (container) {
-            return container;
+        // Search input (special case — direct event binding)
+        const searchInput = this.root.querySelector('[data-search]');
+        if (searchInput) {
+            searchInput.addEventListener('input', (event) => {
+                this.#store.setSearch(event.target.value);
+            });
+        } else if (this.options.debug) {
+            console.warn('Atlas: No [data-search] input found. Search will not be available.');
         }
-
-        // Fallback: direct query
-        const fallback = this.root.querySelector('[data-filters]');
-
-        if (fallback) {
-            return fallback;
-        }
-
-        throw new Error(
-            'Atlas requires a [data-filters] container for filter placement.'
-        );
-
-    }
-
-    /**
-     * Find the chips container.
-     */
-    #findChipsContainer() {
-
-        const container = this.#registry.chipsContainer;
-
-        if (container) {
-            return container;
-        }
-
-        const fallback = this.root.querySelector('[data-chips]');
-
-        if (fallback) {
-            return fallback;
-        }
-
-        return null;
-
-    }
-
-    /**
-     * Find the results container.
-     */
-    #findResultsContainer() {
-
-        const container = this.#registry.resultsContainer;
-
-        if (container) {
-            return container;
-        }
-
-        const fallback = this.root.querySelector('[data-results]');
-
-        if (fallback) {
-            return fallback;
-        }
-
-        return null;
 
     }
 
@@ -355,7 +252,7 @@ export default class Atlas {
      */
     #findSortContainer() {
 
-        // Check Registry first (sorts is in controls)
+        // Check Registry first
         const container = this.#registry.controls.sorts[0];
 
         if (container) {
@@ -370,191 +267,6 @@ export default class Atlas {
         }
 
         return null;
-
-    }
-
-    /**
-     * Apply filters, search, and sort to the member collection.
-     */
-    #applyFiltersAndSearch() {
-
-        const filters = this.#store.filters;
-        const searchQuery = this.#store.search;
-        const sort = this.#store.sort;
-
-        if (this.options.debug) {
-            console.debug('Atlas: Applying filters:', filters);
-            console.debug('Atlas: Search query:', searchQuery);
-            console.debug('Atlas: Sort:', sort);
-        }
-
-        // Start with all members
-        let filtered = this.#memberCollection.getAll();
-
-        // Apply filters if any are active
-        const activeFilters = Object.keys(filters).filter(
-            fieldName => filters[fieldName] && filters[fieldName].length > 0
-        );
-
-        if (this.options.debug) {
-            console.debug('Atlas: Active filters:', activeFilters);
-        }
-
-        if (activeFilters.length > 0) {
-            filtered = this.#memberCollection.applyFilters(filters);
-            if (this.options.debug) {
-                console.debug(`Atlas: After filters: ${filtered.length} members`);
-            }
-        }
-
-        // Apply search if query exists
-        if (searchQuery && searchQuery.trim()) {
-            const searchResults = [];
-            for (const member of filtered) {
-                if (member.matches(searchQuery)) {
-                    searchResults.push(member);
-                }
-            }
-            filtered = searchResults;
-            if (this.options.debug) {
-                console.debug(`Atlas: After search: ${filtered.length} members`);
-            }
-        }
-
-        // Apply sort if active
-        if (sort && sort.field) {
-            filtered = this.#sortMembers(filtered, sort.field, sort.direction);
-            if (this.options.debug) {
-                console.debug(`Atlas: After sort: ${filtered.length} members (sorted by ${sort.field} ${sort.direction})`);
-            }
-        }
-
-        // Always wrap in MemberCollection
-        this.#filteredMembers = new MemberCollection(filtered);
-
-        if (this.options.debug) {
-            console.debug('Atlas: Final filtered member IDs:', this.#filteredMembers.getAll().map(m => m.id));
-        }
-
-    }
-
-    /**
-     * Sort an array of members by a field.
-     */
-    #sortMembers(members, field, direction) {
-
-        const sorted = [...members];
-
-        sorted.sort((a, b) => {
-            const valA = a.get(field) || '';
-            const valB = b.get(field) || '';
-
-            // Case-insensitive comparison
-            const compareResult = valA.localeCompare(valB, undefined, { sensitivity: 'base' });
-
-            return direction === 'asc' ? compareResult : -compareResult;
-        });
-
-        return sorted;
-
-    }
-
-    /**
-     * Update member visibility and order based on filter state.
-     */
-    #updateMemberVisibility() {
-
-        // Defensive: ensure #filteredMembers is a MemberCollection
-        if (!this.#filteredMembers || !(this.#filteredMembers instanceof MemberCollection)) {
-            console.warn('Atlas: #filteredMembers is not a MemberCollection, re-applying filters');
-            this.#applyFiltersAndSearch();
-        }
-
-        // Get the filtered members in the correct order
-        const members = this.#filteredMembers.getAll();
-        const visibleIds = new Set(members.map(m => m.id));
-
-        if (this.options.debug) {
-            console.debug('Filtered member IDs:', [...visibleIds]);
-        }
-
-        // Get all member elements from the Registry
-        const memberElements = this.#registry.members;
-
-        // Toggle visibility for each member element
-        for (const element of memberElements) {
-            const member = element._atlasMember;
-            if (!member) continue;
-            const isVisible = visibleIds.has(member.id);
-            if (isVisible) {
-                element.hidden = false;
-                element.removeAttribute('data-hidden');
-            } else {
-                element.hidden = true;
-                element.setAttribute('data-hidden', 'true');
-            }
-        }
-
-        // Reorder the DOM to match the sorted order (only for visible members)
-        this.#reorderMembers();
-
-        // Update result counter if it exists
-        if (this.#resultCounter) {
-            this.#resultCounter.render();
-        }
-
-        // Update filter chips if they exist
-        if (this.#filterChips) {
-            this.#filterChips.render();
-        }
-
-    }
-
-    /**
-     * Reorder members in the DOM to match the sorted order.
-     */
-    #reorderMembers() {
-
-        const directory = this.#registry.directory;
-        const sortedMembers = this.#filteredMembers.getAll();
-
-        // Get all current member elements (including hidden ones)
-        const currentElements = directory.querySelectorAll('[data-member]');
-
-        // Create a Map of member ID → element for quick lookup
-        const elementMap = new Map();
-        for (const element of currentElements) {
-            const member = element._atlasMember;
-            if (member) {
-                elementMap.set(member.id, element);
-            }
-        }
-
-        // Build the new order: first visible members in sorted order,
-        // then hidden members (preserving their original relative order)
-        const visibleIds = new Set(sortedMembers.map(m => m.id));
-        const hiddenMembers = [];
-
-        // Collect hidden members (not in visibleIds)
-        for (const element of currentElements) {
-            const member = element._atlasMember;
-            if (member && !visibleIds.has(member.id)) {
-                hiddenMembers.push(member);
-            }
-        }
-
-        // Create the final ordered list: visible (sorted) + hidden (preserved order)
-        const finalOrder = [...sortedMembers, ...hiddenMembers];
-
-        // Remove all current member elements from the directory
-        for (const element of currentElements) {
-            element.remove();
-        }
-
-        // Re-append in the final order
-        for (const member of finalOrder) {
-            directory.appendChild(member.element);
-        }
 
     }
 
@@ -609,9 +321,10 @@ export default class Atlas {
             `Layout controls: ${this.#registry.controls.layouts.length}`
         );
 
-        if (this.#layoutManager) {
+        const layoutManager = this.#modules.layoutManager;
+        if (layoutManager) {
             console.info(
-                `Current layout: ${this.#layoutManager.layout}`
+                `Current layout: ${layoutManager.layout}`
             );
         }
 
@@ -653,24 +366,24 @@ export default class Atlas {
     }
 
     /**
-     * Access the FilterGenerator.
+     * Access the EventBus.
      */
-    get filterGenerator() {
-        return this.#filterGenerator;
+    get events() {
+        return this.#events;
     }
 
     /**
-     * Access the SortGenerator.
+     * Access the Renderer.
      */
-    get sortGenerator() {
-        return this.#sortGenerator;
+    get renderer() {
+        return this.#renderer;
     }
 
     /**
-     * Access the LayoutManager.
+     * Access all modules.
      */
-    get layoutManager() {
-        return this.#layoutManager;
+    get modules() {
+        return { ...this.#modules };
     }
 
 }
