@@ -228,64 +228,54 @@ export default class Renderer {
     /**
      * Apply reordering to the DOM.
      *
-     * Uses insertion-based reordering to minimize DOM operations.
-     * Only moves elements that are out of place.
+     * Uses a simpler approach: remove all members and re-append in new order.
+     * This is more reliable than insertion-based reordering and still efficient
+     * for the typical directory size (up to 1000 members).
      */
     #applyReorder(newState) {
 
         const directory = this.#directory;
         const newOrder = newState.order;
 
-        // Get all current child elements
-        const children = Array.from(directory.children);
+        // Get current elements in the directory
+        const currentElements = Array.from(directory.children);
 
-        // For each position in the new order
-        for (let i = 0; i < newOrder.length; i++) {
-            const id = newOrder[i];
-            const element = newState.elements.get(id);
+        // Filter to only member elements
+        const memberElements = currentElements.filter(el => el.hasAttribute('data-member'));
 
-            if (!element) {
-                continue;
-            }
-
-            // Check if this element is already at the correct position
-            const currentIndex = children.indexOf(element);
-
-            if (currentIndex === -1) {
-                // Element not found in current children (shouldn't happen, but handle it)
-                directory.appendChild(element);
-            } else if (currentIndex !== i) {
-                // Element is in the wrong position — move it
-                // Find the reference element at position i
-                const refId = newOrder[i];
-                const refElement = newState.elements.get(refId);
-
-                if (refElement && refElement !== element) {
-                    // Insert before the reference element
-                    directory.insertBefore(element, refElement);
-                } else {
-                    // Fallback: append to end
-                    directory.appendChild(element);
-                }
-            }
-
-            // Update children array to reflect the new order
-            // (remove from current position, insert at correct position)
-            const idx = children.indexOf(element);
-            if (idx !== -1) {
-                children.splice(idx, 1);
-            }
-            children.splice(i, 0, element);
+        // If no member elements, nothing to reorder
+        if (memberElements.length === 0 && newOrder.length === 0) {
+            return;
         }
 
-        // Remove any remaining elements that shouldn't be in the directory
-        // (Shouldn't happen in normal operation, but handles edge cases)
-        const currentElements = directory.querySelectorAll('[data-member]');
-        const validIds = new Set(newOrder);
-        for (const element of currentElements) {
-            const member = element._atlasMember;
-            if (member && !validIds.has(member.id)) {
-                element.remove();
+        // Check if we need to reorder at all
+        let needsReorder = false;
+        const currentIds = memberElements.map(el => {
+            const member = el._atlasMember;
+            return member ? member.id : null;
+        });
+
+        for (let i = 0; i < newOrder.length; i++) {
+            if (currentIds[i] !== newOrder[i]) {
+                needsReorder = true;
+                break;
+            }
+        }
+
+        if (!needsReorder) {
+            return;
+        }
+
+        // Remove all member elements from the directory
+        for (const element of memberElements) {
+            element.remove();
+        }
+
+        // Re-append in new order
+        for (const id of newOrder) {
+            const element = newState.elements.get(id);
+            if (element) {
+                directory.appendChild(element);
             }
         }
 
