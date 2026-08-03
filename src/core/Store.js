@@ -143,7 +143,11 @@ export default class Store {
      * Set the sort configuration.
      */
     setSort(field, direction = 'asc') {
-        this.#state.sort = { field, direction };
+        if (field && direction) {
+            this.#state.sort = { field, direction };
+        } else {
+            this.#state.sort = null;
+        }
     }
 
     /**

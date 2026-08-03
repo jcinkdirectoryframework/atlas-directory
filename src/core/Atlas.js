@@ -26,6 +26,7 @@ import FilterGenerator from "../modules/FilterGenerator.js";
 import FilterChips from "../modules/FilterChips.js";
 import ResultCounter from "../modules/ResultCounter.js";
 import SortGenerator from "../modules/SortGenerator.js";
+import LayoutManager from "../modules/LayoutManager.js";
 
 export default class Atlas {
 
@@ -36,6 +37,7 @@ export default class Atlas {
     #filterChips = null;
     #resultCounter = null;
     #sortGenerator = null;
+    #layoutManager = null;
     #filteredMembers = null;
 
     /**
@@ -107,6 +109,8 @@ export default class Atlas {
         this.#createResultCounter();
 
         this.#createSortGenerator();
+
+        this.#createLayoutManager();
 
         this.#applyFiltersAndSearch();
 
@@ -252,6 +256,28 @@ export default class Atlas {
         this.#sortGenerator = new SortGenerator(
             container,
             this.#memberCollection,
+            this.#store
+        );
+
+    }
+
+    /**
+     * Create the LayoutManager.
+     */
+    #createLayoutManager() {
+
+        const directory = this.#registry.directory;
+
+        if (!directory) {
+            if (this.options.debug) {
+                console.warn('Atlas: No directory found. Layout switching will not be available.');
+            }
+            return;
+        }
+
+        this.#layoutManager = new LayoutManager(
+            this.root,
+            directory,
             this.#store
         );
 
@@ -550,8 +576,14 @@ export default class Atlas {
         );
 
         console.info(
-            `Layouts: ${this.#registry.controls.layouts.length}`
+            `Layout controls: ${this.#registry.controls.layouts.length}`
         );
+
+        if (this.#layoutManager) {
+            console.info(
+                `Current layout: ${this.#layoutManager.layout}`
+            );
+        }
 
         // Detailed member data for debugging
         console.group("Member data");
@@ -602,6 +634,13 @@ export default class Atlas {
      */
     get sortGenerator() {
         return this.#sortGenerator;
+    }
+
+    /**
+     * Access the LayoutManager.
+     */
+    get layoutManager() {
+        return this.#layoutManager;
     }
 
 }
