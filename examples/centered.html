@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centered Minimal — Atlas Example</title>
+    <title>Centered — Atlas Example</title>
     <style>
-        /* ─── Base ────────────────────────────────────── */
+        /* ─── Theme: Warm & Friendly (Orange/Cream) ───── */
 
         * {
             box-sizing: border-box;
@@ -14,26 +14,29 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8fafc;
-            color: #0f172a;
-            line-height: 1.6;
-            padding: 3rem 1.5rem;
+            font-family: 'Palatino', 'Georgia', serif;
+            background: #fdf6ed;
+            color: #2d1b0e;
+            line-height: 1.7;
+            padding: 2rem 1rem;
         }
 
         .example-header {
             max-width: 800px;
             margin: 0 auto 2rem auto;
             text-align: center;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #e8a87c;
         }
 
         .example-header h1 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
+            color: #c76b2e;
         }
 
         .example-header p {
-            color: #475569;
+            color: #7a5a44;
         }
 
         .example-header .nav-links {
@@ -41,7 +44,7 @@
         }
 
         .example-header .nav-links a {
-            color: #2563eb;
+            color: #c76b2e;
             text-decoration: none;
             margin: 0 0.75rem;
             font-size: 0.9rem;
@@ -56,24 +59,27 @@
         [data-atlas] {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
-            padding: 2rem 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            background: #fffaf5;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 30px rgba(199, 107, 46, 0.06);
+            border: 1px solid #f0e3d8;
             text-align: center;
         }
 
         [data-atlas] h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d1b0e;
             margin: 0 0 0.5rem 0;
+            font-family: 'Palatino', serif;
         }
 
         .controls-row {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 1rem;
+            gap: 1.5rem;
             margin: 1rem 0;
         }
 
@@ -82,122 +88,143 @@
             min-width: 200px;
         }
 
-        /* ─── Controls ────────────────────────────────── */
+        /* ─── Search ──────────────────────────────────── */
 
         [data-search] {
-            padding: 0.6rem 1rem;
+            padding: 0.7rem 1.2rem;
             font-size: 1rem;
-            border: none;
-            border-bottom: 2px solid #e2e8f0;
+            border: 2px solid #e8d5c4;
+            border-radius: 40px;
             width: 100%;
-            font-family: inherit;
-            background: transparent;
-            transition: border-color 0.2s;
+            font-family: 'Palatino', serif;
+            background: #fdf6ed;
+            color: #2d1b0e;
+            transition: all 0.3s;
             text-align: center;
+        }
+
+        [data-search]::placeholder {
+            color: #b8957a;
         }
 
         [data-search]:focus {
             outline: none;
-            border-bottom-color: #2563eb;
+            border-color: #c76b2e;
+            box-shadow: 0 0 0 4px rgba(199, 107, 46, 0.12);
+            background: white;
         }
+
+        /* ─── Filters ─────────────────────────────────── */
 
         [data-filters] {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 1.5rem;
-            padding: 0.75rem 1rem;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            padding: 1rem 1.25rem;
+            background: #fdf6ed;
+            border: 2px solid #f0e3d8;
+            border-radius: 16px;
             margin: 0.5rem 0;
         }
 
         [data-filter] {
             display: flex;
             flex-direction: column;
-            gap: 0.3rem;
+            gap: 0.4rem;
             align-items: center;
         }
 
         [data-filter] label {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.7rem;
-            color: #475569;
+            color: #7a5a44;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.08em;
         }
 
         [data-filter-options] {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.25rem;
+            gap: 0.3rem;
             justify-content: center;
         }
 
         [data-filter-options] button {
-            padding: 0.2rem 0.7rem;
-            border: 1px solid #d1d5db;
-            border-radius: 16px;
-            background: white;
+            padding: 0.25rem 0.9rem;
+            border: 2px solid #e8d5c4;
+            border-radius: 30px;
+            background: #fdf6ed;
             cursor: pointer;
             font-size: 0.8rem;
-            font-family: inherit;
-            color: #1e293b;
-            transition: all 0.15s;
+            font-family: 'Palatino', serif;
+            color: #5a3f2e;
+            transition: all 0.2s;
         }
 
         [data-filter-options] button:hover {
-            background: #f1f5f9;
+            background: #f5e8dc;
+            border-color: #c76b2e;
         }
 
         [data-filter-options] button.active {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
+            background: #c76b2e;
+            color: #fdf6ed;
+            border-color: #c76b2e;
         }
+
+        [data-filter-options] button.active:hover {
+            background: #a85d2b;
+            border-color: #a85d2b;
+        }
+
+        /* ─── Sort ────────────────────────────────────── */
 
         [data-sort] {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.3rem;
+            gap: 0.4rem;
             padding: 0.5rem 0;
             align-items: center;
             justify-content: center;
         }
 
         [data-sort] button {
-            padding: 0.3rem 0.9rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
+            padding: 0.35rem 1.1rem;
+            border: 2px solid #e8d5c4;
+            border-radius: 30px;
+            background: #fdf6ed;
             cursor: pointer;
             font-size: 0.85rem;
-            font-family: inherit;
-            transition: all 0.15s;
+            font-family: 'Palatino', serif;
+            color: #5a3f2e;
+            transition: all 0.2s;
         }
 
         [data-sort] button:hover {
-            background: #f1f5f9;
+            background: #f5e8dc;
+            border-color: #c76b2e;
         }
 
         [data-sort] button.active {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
+            background: #c76b2e;
+            color: #fdf6ed;
+            border-color: #c76b2e;
         }
 
         [data-sort] button.asc {
-            background: #22c55e;
-            color: white;
-            border-color: #22c55e;
+            background: #7a9a5a;
+            color: #fdf6ed;
+            border-color: #7a9a5a;
         }
 
         [data-sort] button.desc {
-            background: #ef4444;
-            color: white;
-            border-color: #ef4444;
+            background: #b55a4a;
+            color: #fdf6ed;
+            border-color: #b55a4a;
         }
+
+        /* ─── Chips ───────────────────────────────────── */
 
         [data-chips] {
             display: flex;
@@ -210,7 +237,7 @@
         }
 
         .atlas-chips-empty {
-            color: #94a3b8;
+            color: #b8957a;
             font-style: italic;
             font-size: 0.9rem;
         }
@@ -218,12 +245,14 @@
         .atlas-chip {
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
-            background: #f1f5f9;
-            border-radius: 20px;
-            padding: 0.2rem 0.5rem 0.2rem 0.8rem;
+            gap: 0.3rem;
+            background: #f5e8dc;
+            border-radius: 30px;
+            padding: 0.2rem 0.5rem 0.2rem 0.9rem;
             font-size: 0.85rem;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #e8d5c4;
+            color: #2d1b0e;
+            font-family: 'Palatino', serif;
         }
 
         .atlas-chip-remove {
@@ -231,7 +260,7 @@
             border: none;
             cursor: pointer;
             font-size: 1rem;
-            color: #64748b;
+            color: #c76b2e;
             border-radius: 50%;
             width: 20px;
             height: 20px;
@@ -242,53 +271,60 @@
         }
 
         .atlas-chip-remove:hover {
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
+            color: #b55a4a;
+            background: rgba(181, 90, 74, 0.1);
         }
 
         .atlas-clear-all {
             background: none;
-            border: 1px solid #ef4444;
-            color: #ef4444;
-            border-radius: 20px;
-            padding: 0.2rem 0.8rem;
+            border: 2px solid #b55a4a;
+            color: #b55a4a;
+            border-radius: 30px;
+            padding: 0.2rem 0.9rem;
             font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.15s;
-            font-family: inherit;
+            transition: all 0.2s;
+            font-family: 'Palatino', serif;
         }
 
         .atlas-clear-all:hover {
-            background: #ef4444;
-            color: white;
+            background: #b55a4a;
+            color: #fdf6ed;
         }
+
+        /* ─── Result Counter ──────────────────────────── */
 
         .atlas-result-counter {
             display: block;
             padding: 0.5rem 0;
-            font-size: 0.9rem;
-            color: #64748b;
+            font-size: 0.95rem;
+            color: #7a5a44;
+            font-style: italic;
         }
 
+        /* ─── Layout Controls ─────────────────────────── */
+
         [data-layout] {
-            padding: 0.3rem 0.9rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
+            padding: 0.35rem 1.1rem;
+            border: 2px solid #e8d5c4;
+            border-radius: 30px;
+            background: #fdf6ed;
             cursor: pointer;
             font-size: 0.85rem;
-            font-family: inherit;
-            transition: all 0.15s;
+            font-family: 'Palatino', serif;
+            color: #5a3f2e;
+            transition: all 0.2s;
         }
 
         [data-layout]:hover {
-            background: #f1f5f9;
+            background: #f5e8dc;
+            border-color: #c76b2e;
         }
 
         [data-layout].active {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
+            background: #c76b2e;
+            color: #fdf6ed;
+            border-color: #c76b2e;
         }
 
         .layout-buttons {
@@ -305,15 +341,16 @@
         }
 
         [data-member] {
-            padding: 0.75rem 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
-            transition: box-shadow 0.2s;
+            padding: 1rem 1.25rem;
+            border: 2px solid #f0e3d8;
+            border-radius: 16px;
+            background: #fdf6ed;
+            transition: all 0.2s;
         }
 
         [data-member]:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-color: #c76b2e;
+            box-shadow: 0 4px 20px rgba(199, 107, 46, 0.06);
         }
 
         [data-field] {
@@ -321,16 +358,33 @@
         }
 
         [data-field="name"] {
-            font-weight: 600;
-            font-size: 1.05rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #2d1b0e;
+        }
+
+        [data-field="faceclaim"] {
+            font-size: 0.85rem;
+            color: #b8957a;
+            font-style: italic;
+            margin-top: 0.1rem;
         }
 
         [data-field="species"],
         [data-field="occupation"],
-        [data-field="district"] {
+        [data-field="faction"],
+        [data-field="homeworld"],
+        [data-field="status"] {
             font-size: 0.85rem;
-            color: #475569;
+            color: #7a5a44;
         }
+
+        [data-field="species"]::before {
+            content: "✦ ";
+            color: #c76b2e;
+        }
+
+        /* ─── Grid ────────────────────────────────────── */
 
         [data-directory].atlas-layout-grid {
             display: grid;
@@ -338,6 +392,8 @@
             gap: 1rem;
             padding: 0.5rem 0;
         }
+
+        /* ─── List ────────────────────────────────────── */
 
         [data-directory].atlas-layout-list {
             display: flex;
@@ -350,7 +406,7 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1rem;
         }
 
         [data-directory].atlas-layout-list [data-field] {
@@ -360,6 +416,17 @@
         [data-directory].atlas-layout-list [data-field="name"] {
             min-width: 140px;
         }
+
+        [data-directory].atlas-layout-list [data-field]::before {
+            content: "";
+        }
+
+        [data-directory].atlas-layout-list [data-field="faceclaim"] {
+            min-width: 100px;
+            color: #b8957a;
+        }
+
+        /* ─── Hidden ──────────────────────────────────── */
 
         [data-member][hidden],
         [data-member][data-hidden] {
@@ -371,14 +438,14 @@
         .code-section {
             max-width: 800px;
             margin: 2rem auto 0 auto;
-            background: #1e293b;
-            border-radius: 12px;
+            background: #2d1b0e;
+            border-radius: 20px;
             padding: 1.5rem 2rem;
-            color: #e2e8f0;
+            color: #f0e3d8;
         }
 
         .code-section h2 {
-            color: #e2e8f0;
+            color: #e8d5c4;
             font-size: 1.1rem;
             margin: 0 0 0.5rem 0;
         }
@@ -390,15 +457,16 @@
         }
 
         .code-section .code-box {
-            background: #0f172a;
+            background: #1f120a;
             border-radius: 8px;
             padding: 1rem;
             overflow: auto;
             max-height: 400px;
+            border: 1px solid #3d2a1a;
         }
 
         .code-section .code-box h3 {
-            color: #94a3b8;
+            color: #b8957a;
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -408,7 +476,7 @@
         .code-section .code-box pre {
             font-family: 'JetBrains Mono', 'Fira Code', monospace;
             font-size: 0.75rem;
-            color: #e2e8f0;
+            color: #d4c5b8;
             white-space: pre-wrap;
             word-break: break-word;
             margin: 0;
@@ -416,7 +484,7 @@
 
         @media (max-width: 640px) {
             [data-atlas] {
-                padding: 1rem;
+                padding: 1.5rem;
             }
             .controls-row {
                 flex-direction: column;
@@ -433,8 +501,8 @@
 <body>
 
     <div class="example-header">
-        <h1>Centered Minimal Layout</h1>
-        <p>Clean, centered design with minimal controls. Focus on the content.</p>
+        <h1>Centered Minimal</h1>
+        <p>Warm &amp; friendly with orange and cream tones. Focus on the content.</p>
         <div class="nav-links">
             <a href="index.html">← All Examples</a>
             <a href="../index.html">Main Demo</a>
@@ -462,7 +530,97 @@
             <button data-layout="list">List</button>
         </div>
 
-        <div data-directory id="directory"></div>
+        <div data-directory>
+
+            <!-- ─── Din Djarin ──────────────────────────── -->
+            <article data-member>
+                <span data-field="name" data-searchable="true" data-sortable="true">Din Djarin</span>
+                <span data-field="faceclaim" data-searchable="true" data-sortable="true">Pedro Pascal</span>
+                <span data-field="species" data-filterable="true" data-sortable="true">Human</span>
+                <span data-field="occupation" data-filterable="true" data-sortable="true">Bounty Hunter</span>
+                <span data-field="faction" data-filterable="true" data-sortable="true">Mandalorian</span>
+                <span data-field="homeworld" data-filterable="true" data-sortable="true">Aq Vetina</span>
+                <span data-field="status" data-filterable="true" data-sortable="true">Active</span>
+            </article>
+
+            <!-- ─── Grogu ────────────────────────────────── -->
+            <article data-member>
+                <span data-field="name" data-searchable="true" data-sortable="true">Grogu</span>
+                <span data-field="faceclaim" data-searchable="true" data-sortable="true">—</span>
+                <span data-field="species" data-filterable="true" data-sortable="true">Unknown</span>
+                <span data-field="occupation" data-filterable="true" data-sortable="true">Force User</span>
+                <span data-field="faction" data-filterable="true" data-sortable="true">Mandalorian</span>
+                <span data-field="homeworld" data-filterable="true" data-sortable="true">Unknown</span>
+                <span data-field="status" data-filterable="true" data-sortable="true">Active</span>
+            </article>
+
+            <!-- ─── Cara Dune ───────────────────────────── -->
+            <article data-member>
+                <span data-field="name" data-searchable="true" data-sortable="true">Cara Dune</span>
+                <span data-field="faceclaim" data-searchable="true" data-sortable="true">Gina Carano</span>
+                <span data-field="species" data-filterable="true" data-sortable="true">Human</span>
+                <span data-field="occupation" data-filterable="true" data-sortable="true">Marshal</span>
+                <span data-field="faction" data-filterable="true" data-sortable="true">Rebellion</span>
+                <span data-field="homeworld" data-filterable="true" data-sortable="true">Alderaan</span>
+                <span data-field="status" data-filterable="true" data-sortable="true">Active</span>
+            </article>
+
+            <!-- ─── Bo-Katan Kryze ──────────────────────── -->
+            <article data-member>
+                <span data-field="name" data-searchable="true" data-sortable="true">Bo-Katan Kryze</span>
+                <span data-field="faceclaim" data-searchable="true" data-sortable="true">Katee Sackhoff</span>
+                <span data-field="species" data-filterable="true" data-sortable="true">Human</span>
+                <span data-field="occupation" data-filterable="true" data-sortable="true">Leader</span>
+                <span data-field="faction" data-filterable="true" data-sortable="true">Mandalorian</span>
+                <span data-field="homeworld" data-filterable="true" data-sortable="true">Kalevala</span>
+                <span data-field="status" data-filterable="true" data-sortable="true">Active</span>
+            </article>
+
+            <!-- ─── Moff Gideon ──────────────────────────── -->
+            <article data-member>
+                <span data-field="name" data-searchable="true" data-sortable="true">Moff Gideon</span>
+                <span data-field="faceclaim" data-searchable="true" data-sortable="true">Giancarlo Esposito</span>
+                <span data-field="species" data-filterable="true" data-sortable="true">Human</span>
+                <span data-field="occupation" data-filterable="true" data-sortable="true">Imperial Officer</span>
+                <span data-field="faction" data-filterable="true" data-sortable="true">Empire</span>
+                <span data-field="homeworld" data-filterable="true" data-sortable="true">Unknown</span>
+                <span data-field="status" data-filterable="true" data-sortable="true">Active</span>
+            </article>
+
+            <!-- ─── Ahsoka Tano ──────────────────────────── -->
+            <article data-member>
+                <span data-field="name" data-searchable="true" data-sortable="true">Ahsoka Tano</span>
+                <span data-field="faceclaim" data-searchable="true" data-sortable="true">Rosario Dawson</span>
+                <span data-field="species" data-filterable="true" data-sortable="true">Togruta</span>
+                <span data-field="occupation" data-filterable="true" data-sortable="true">Jedi</span>
+                <span data-field="faction" data-filterable="true" data-sortable="true">Rebellion</span>
+                <span data-field="homeworld" data-filterable="true" data-sortable="true">Shili</span>
+                <span data-field="status" data-filterable="true" data-sortable="true">Active</span>
+            </article>
+
+            <!-- ─── Boba Fett ────────────────────────────── -->
+            <article data-member>
+                <span data-field="name" data-searchable="true" data-sortable="true">Boba Fett</span>
+                <span data-field="faceclaim" data-searchable="true" data-sortable="true">Temuera Morrison</span>
+                <span data-field="species" data-filterable="true" data-sortable="true">Human</span>
+                <span data-field="occupation" data-filterable="true" data-sortable="true">Bounty Hunter</span>
+                <span data-field="faction" data-filterable="true" data-sortable="true">Independent</span>
+                <span data-field="homeworld" data-filterable="true" data-sortable="true">Kamino</span>
+                <span data-field="status" data-filterable="true" data-sortable="true">Active</span>
+            </article>
+
+            <!-- ─── Fennec Shand ─────────────────────────── -->
+            <article data-member>
+                <span data-field="name" data-searchable="true" data-sortable="true">Fennec Shand</span>
+                <span data-field="faceclaim" data-searchable="true" data-sortable="true">Ming-Na Wen</span>
+                <span data-field="species" data-filterable="true" data-sortable="true">Human</span>
+                <span data-field="occupation" data-filterable="true" data-sortable="true">Assassin</span>
+                <span data-field="faction" data-filterable="true" data-sortable="true">Independent</span>
+                <span data-field="homeworld" data-filterable="true" data-sortable="true">Unknown</span>
+                <span data-field="status" data-filterable="true" data-sortable="true">Active</span>
+            </article>
+
+        </div>
 
     </div>
 
@@ -483,8 +641,38 @@
     </div>
 
     <script type="module">
-        import { initExample, displayCode } from './assets/js/examples.js';
-        initExample('directory');
+        function displayCode(htmlSelector, cssSelector) {
+            const htmlEl = document.querySelector(htmlSelector);
+            const cssEl = document.querySelector(cssSelector);
+
+            if (htmlEl) {
+                const atlasContainer = document.querySelector('[data-atlas]');
+                if (atlasContainer) {
+                    const clone = atlasContainer.cloneNode(true);
+                    const codeSections = clone.querySelectorAll('.code-section');
+                    codeSections.forEach(el => el.remove());
+                    htmlEl.textContent = clone.outerHTML;
+                }
+            }
+
+            if (cssEl) {
+                const styles = [];
+                document.querySelectorAll('style').forEach(el => {
+                    styles.push(el.textContent);
+                });
+                cssEl.textContent = styles.join('\n\n');
+            }
+        }
+
+        import('../../src/core/Atlas.js')
+            .then(module => {
+                const Atlas = module.default;
+                new Atlas({ debug: false });
+            })
+            .catch(err => {
+                console.error('Failed to load Atlas:', err);
+            });
+
         displayCode('#html-code', '#css-code');
     </script>
 
