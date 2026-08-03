@@ -1,5 +1,35 @@
 # Changelog
 
+## [M0.9] — 2026-08-03
+
+### Added
+
+- **LayoutManager module** (`src/modules/LayoutManager.js`)
+  - Manages grid/list layout switching
+  - Discovers `[data-layout]` buttons automatically
+  - Persists layout preference to localStorage
+  - Applies `.atlas-layout-grid` or `.atlas-layout-list` class to directory container
+  - CSS handles member styling via descendant selectors
+
+- **Layout integration in Atlas**
+  - Layout combines with filters, search, and sort
+  - Debug output shows current layout
+  - Default layout is `grid`
+
+### Changed
+
+- **Store class**
+  - Added `setLayout()` method
+  - Layout state stored in Store
+
+- **demo.css**
+  - Added grid and list layout styles
+  - Member styles use CSS descendant selectors from directory container
+
+### Fixed
+
+- Layout persists across page refreshes via localStorage
+
 ## [M0.8] — 2026-08-03
 
 ### Added
