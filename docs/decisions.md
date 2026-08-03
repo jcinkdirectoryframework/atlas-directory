@@ -181,3 +181,130 @@ Atlas validates its required HTML structure during discovery and throws descript
 ### Reason
 
 Failing during initialisation is preferable to silently ignoring invalid markup, as it makes configuration errors easier to diagnose.
+
+---
+
+## ADR-012 — Event-Driven Communication
+
+Status: Accepted
+
+Atlas uses an EventBus for communication between modules instead of direct coupling.
+
+### Context
+
+Previously, Atlas coordinated everything directly:
+- Atlas knew about every module
+- Modules called each other's methods
+- Adding new features required changing Atlas
+- Testing was difficult
+
+### Decision
+
+Implement an EventBus with publish/subscribe pattern:
+
+class EventBus {
+    subscribe(event, callback) { ... }
+    publish(event, data) { ... }
+    unsubscribe(event, callback) { ... }
+}
+
+### Consequences
+
+Positive:
+- Modules are decoupled
+- Atlas is simplified
+- Adding new features doesn't require changing Atlas
+- Testing is easier
+- Events can be logged for debugging
+
+Negative:
+- Slightly more complex mental model
+- Events need to be documented
+
+### Alternatives Considered
+
+CustomEvent on document — Used previously but was too global and uncontrolled.
+
+Direct module references — Led to Atlas becoming a god class.
+
+---
+
+## ADR-013 — Renderer Responsibilities
+
+Status: Accepted
+
+Atlas uses a dedicated Renderer class for all DOM updates instead of having Atlas handle them directly.
+
+### Context
+
+Previously, Atlas handled DOM updates directly:
+- Atlas#updateMemberVisibility()
+- Atlas#reorderMembers()
+- Atlas had 350+ lines of code
+
+### Decision
+
+Create a Renderer class that:
+- Listens to Store events
+- Updates member visibility
+- Reorders members (sort)
+- Batch updates using DocumentFragment
+- Manages loading state
+
+### Consequences
+
+Positive:
+- Atlas is simplified
+- DOM logic is isolated
+- Performance improvements (batch updates)
+- Loading state prevents flicker
+- Renderer can be optimised independently
+
+Negative:
+- One additional class to maintain
+
+### Alternatives Considered
+
+Atlas handling DOM updates — Made Atlas a god class.
+
+Virtual DOM — Too complex, unnecessary dependencies.
+
+Direct DOM manipulation — Inefficient, causes flicker.
+
+---
+
+## ADR-014 — Loading State
+
+Status: Accepted
+
+Atlas uses a data-atlas-loading attribute to prevent flicker during initialisation.
+
+### Context
+
+When Atlas loads, members are visible before filters are applied, causing a visual flash.
+
+### Decision
+
+1. HTML starts with data-atlas-loading attribute
+2. CSS hides the directory while loading
+3. Atlas renders members after initialisation
+4. Atlas removes the loading attribute
+5. CSS fades in the directory
+
+### Consequences
+
+Positive:
+- No flicker on load
+- Smooth user experience
+- CSS handles transitions
+
+Negative:
+- CSS required for loading state
+
+### Alternatives Considered
+
+JavaScript flash hiding — Visible delay before hiding, still flickers.
+
+Initial display: none — Requires JavaScript to show, fails if JS disabled.
+
+Server-side rendering — Not applicable for client-side Atlas.

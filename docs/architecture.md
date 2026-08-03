@@ -1,129 +1,275 @@
 # Atlas Architecture
 
-## High-Level Flow
+## Overview
 
-```text
-Atlas
-    ↓
-Registry
-    ↓
-MemberCollection
-    ↓
-Store
-    ↓
-Renderer
-    ↓
-Modules
-    ↓
-Ready
-```
+Atlas is built around an event-driven architecture with clear separation of responsibilities.
+
+The core philosophy is that Atlas coordinates, but does not control. Modules communicate through events rather than direct coupling.
 
 ---
 
-# Core Classes
+## Architecture Flow
 
-## Atlas
+ATLAS (Public entry point — new Atlas())
+    |
+    | Responsibilities:
+    | - Create core services
+    | - Initialise modules
+    | - Expose public API
+    |
+    | Does NOT:
+    | - Search, filter, sort, or render
+    | - Manage state directly
+    | - Update the DOM
+    |
+    v
+EVENTBUS (Central communication hub)
+    |
+    | Responsibilities:
+    | - Publish events (pub/sub)
+    | - Decouple modules from each other
+    | - Enable extensibility
+    |
+    v
++-----------+  +-----------+  +---------------+
+| REGISTRY  |  |   STORE   |  | MEMBER COLL   |
+|           |  |           |  |               |
+| Discover  |  | State     |  | Data          |
+| Validate  |  | Persist   |  | Query         |
+| Cache     |  | Publish   |  | Filter        |
++-----------+  +-----------+  +---------------+
+                    |
+                    v
+              +-----------+
+              | RENDERER  |
+              |           |
+              | Listen to |
+              | events    |
+              | Update    |
+              | DOM       |
+              | Batch     |
+              | Loading   |
+              +-----------+
+                    |
+                    v
+              +-----------+
+              |  MODULES  |
+              |           |
+              | FilterGen |
+              | SortGen   |
+              | Filter    |
+              | Chips     |
+              | Result    |
+              | Counter   |
+              | Layout    |
+              | Manager   |
+              +-----------+
+
+---
+
+## Core Classes
+
+### Atlas
 
 The public entry point.
 
-Responsible for coordinating the application.
+- Creates all core services
+- Initialises modules
+- Exposes a minimal public API
 
----
+Does NOT:
+- Search, filter, sort, or render
+- Manage state directly
+- Update the DOM
 
-## Registry
+### EventBus
 
-Discovers:
+Central communication hub.
 
-* members
-* fields
-* controls
+- Publish/subscribe pattern
+- Decouples modules
+- Enables extensibility
 
-Builds an internal registry describing the page.
+Events:
+- store:filtersChanged
+- store:searchChanged
+- store:sortChanged
+- store:layoutChanged
 
-* Receives the Atlas root from Atlas.
-* Performs a single discovery pass.
-* Discovers the directory, members and controls.
-* Stores DOM references only.
-* Exposes a read-only API.
+### Registry
 
-### Public API
+Discovers and validates HTML.
 
-- `root`
-- `directory`
-- `members`
-- `controls`
+- Finds [data-directory]
+- Finds [data-member]
+- Finds controls ([data-search], [data-filters], etc.)
+- Validates required structure
+- Exposes read-only API
 
-All properties are read-only.
+### Store
 
----
+Manages application state.
 
-## Store
+- Filter state ({ field: [values] })
+- Search query
+- Sort configuration ({ field, direction })
+- Layout preference ('grid' | 'list')
 
-Maintains application state.
+Publishes events when state changes.
 
-Examples:
+### MemberCollection
 
-* search query
-* active filters
-* current sort
-* layout
-* visibility
+Manages member data.
 
----
+- Adds/removes members
+- Queries fields
+- Filters members
+- Sorts members
+- Gets unique values
 
-## Renderer
+### Renderer
 
 Updates the DOM.
 
-Responsibilities include:
+- Listens to Store events
+- Batch updates using DocumentFragment
+- Toggles member visibility
+- Reorders members (sort)
+- Manages loading state (no flicker)
 
-* showing and hiding members
-* reordering members after sorting
-* updating counters
-* updating active chips
-
----
-
-## Events
-
-Provides communication between modules.
-
-Modules should communicate through events rather than directly referencing one another.
+Does NOT contain business logic.
 
 ---
 
-# Modules
+## Modules
 
-The initial modules will include:
+### FilterGenerator
 
-* Search
-* Filters
-* Sorting
-* Alphabet
-* Layout
-* Active Chips
-* Counters
+Generates filter interfaces from member data.
 
-Modules should be independent and reusable.
+- Discovers filterable fields
+- Creates buttons for unique values
+- Handles selection events
+- Updates Store
+
+### FilterChips
+
+Displays active filters as removable chips.
+
+- Renders chips for active filters
+- Handles individual removal
+- Provides "Clear All" button
+
+### ResultCounter
+
+Shows "Showing X of Y members".
+
+- Listens to all state changes
+- Updates count in real-time
+
+### SortGenerator
+
+Generates sort controls.
+
+- Discovers sortable fields
+- Three-state toggle (asc -> desc -> off)
+- Updates Store
+
+### LayoutManager
+
+Manages layout switching.
+
+- Discovers layout buttons
+- Applies CSS classes
+- Persists to localStorage
 
 ---
 
-# Adapters
+## Event Flow Example
 
-Platform-specific logic belongs in adapters.
+### User clicks a filter button:
 
-The first adapter will be:
+1. FilterGenerator detects click
+2. FilterGenerator calls Store.toggleFilter()
+3. Store publishes 'store:filtersChanged'
+4. Renderer listens -> re-renders members
+5. ResultCounter listens -> updates count
+6. FilterChips listens -> updates chips
 
-* JCinkAdapter
+### User types a search query:
 
-The adapter translates platform-specific HTML into Atlas's semantic model.
+1. Search input fires 'input' event
+2. Atlas calls Store.setSearch()
+3. Store publishes 'store:searchChanged'
+4. Renderer listens -> re-renders members
+5. ResultCounter listens -> updates count
 
 ---
 
-# Rendering Philosophy
+## Rendering Philosophy
 
-* Avoid rebuilding HTML.
-* Cache DOM references.
-* Toggle visibility.
-* Reorder elements only when necessary.
-* Batch DOM writes where appropriate.
+Atlas uses a batch rendering approach:
+
+1. State changes -> Store publishes event
+2. Renderer receives -> computes new state
+3. DocumentFragment -> builds DOM updates in memory
+4. Single DOM write -> appends fragment
+
+This minimises reflows and repaints.
+
+### Loading State
+
+To prevent flicker:
+
+1. HTML starts with data-atlas-loading attribute
+2. CSS hides the directory
+3. Atlas initialises and renders members
+4. Atlas removes data-atlas-loading
+5. CSS fades in the directory
+
+---
+
+## Design Principles
+
+Atlas follows these core principles:
+
+1. HTML First — Configure through HTML, not JavaScript
+2. Everything Is Data — Members are structured data
+3. HTML Is The Database — Read once, cache everything
+4. Semantic Names — No platform-specific identifiers in core
+5. Separation of Responsibilities — One class, one job
+6. CSS Owns Presentation — CSS decides appearance
+7. JavaScript Owns Behaviour — Search, filter, sort, state
+8. Discovery Over Configuration — Infer from markup
+9. Small Public API — new Atlas() is the normal experience
+10. Zero Dependencies — No third-party libraries
+11. Modern JavaScript — ES modules, classes, private fields
+12. Performance Is A Design Requirement — ~1,000 members
+13. Accessibility Matters — Keyboard, screen reader, reduced-motion
+14. Extensibility Without Modification — Add features via HTML
+15. Fail Fast — Clear errors during initialisation
+
+See DESIGN_PRINCIPLES.md for full details.
+
+---
+
+## File Structure
+
+src/
+├── index.js                 # Public API exports
+├── core/
+│   ├── Atlas.js            # Public entry point
+│   ├── EventBus.js         # Communication hub
+│   ├── Registry.js         # DOM discovery
+│   ├── Store.js            # State management
+│   ├── Member.js           # Member model
+│   ├── MemberCollection.js # Member collection
+│   └── Renderer.js         # DOM updates
+├── modules/
+│   ├── FilterGenerator.js  # Filter UI
+│   ├── FilterChips.js      # Active chips
+│   ├── ResultCounter.js    # Result counter
+│   ├── SortGenerator.js    # Sort UI
+│   └── LayoutManager.js    # Layout switching
+└── adapters/
+    └── JCinkAdapter.js     # JCink platform adapter
