@@ -518,19 +518,42 @@ export default class Atlas {
         const directory = this.#registry.directory;
         const sortedMembers = this.#filteredMembers.getAll();
 
-        // Get all current member elements
+        // Get all current member elements (including hidden ones)
         const currentElements = directory.querySelectorAll('[data-member]');
 
-        // Remove all members from the directory
+        // Create a Map of member ID → element for quick lookup
+        const elementMap = new Map();
+        for (const element of currentElements) {
+            const member = element._atlasMember;
+            if (member) {
+                elementMap.set(member.id, element);
+            }
+        }
+
+        // Build the new order: first visible members in sorted order,
+        // then hidden members (preserving their original relative order)
+        const visibleIds = new Set(sortedMembers.map(m => m.id));
+        const hiddenMembers = [];
+
+        // Collect hidden members (not in visibleIds)
+        for (const element of currentElements) {
+            const member = element._atlasMember;
+            if (member && !visibleIds.has(member.id)) {
+                hiddenMembers.push(member);
+            }
+        }
+
+        // Create the final ordered list: visible (sorted) + hidden (preserved order)
+        const finalOrder = [...sortedMembers, ...hiddenMembers];
+
+        // Remove all current member elements from the directory
         for (const element of currentElements) {
             element.remove();
         }
 
-        // Re-append in sorted order (only visible members)
-        for (const member of sortedMembers) {
-            if (!member.element.hidden) {
-                directory.appendChild(member.element);
-            }
+        // Re-append in the final order
+        for (const member of finalOrder) {
+            directory.appendChild(member.element);
         }
 
     }
