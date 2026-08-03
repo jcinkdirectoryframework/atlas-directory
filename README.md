@@ -37,7 +37,7 @@ Atlas transforms static HTML member lists into interactive, searchable directori
     <div data-chips></div>
     <div data-results></div>
 
-    <!-- Layout buttons -->
+    <!-- Layout buttons (optional — default is grid) -->
     <button data-layout="grid">Grid</button>
     <button data-layout="list">List</button>
 
@@ -46,7 +46,8 @@ Atlas transforms static HTML member lists into interactive, searchable directori
         <article data-member>
             <span data-field="name">Katniss Everdeen</span>
             <span data-field="species">Human</span>
-            <span data-field="occupation">Victor</span>
+            <span data-field="occupation">Hunter</span>
+            <span data-field="district">12</span>
         </article>
         <!-- More members... -->
     </div>
@@ -54,7 +55,13 @@ Atlas transforms static HTML member lists into interactive, searchable directori
 
 ### 2. Add CSS
 
-<link rel="stylesheet" href="atlas.css">
+Atlas provides minimal core CSS for functionality. You can customise everything else.
+
+<link rel="stylesheet" href="src/styles/atlas.css">
+
+Or copy the contents into your own stylesheet.
+
+For custom styling, see the CSS Customisation section in docs/html-api.md.
 
 ### 3. Add JavaScript
 
@@ -94,7 +101,7 @@ That's it. Atlas discovers everything automatically.
 | data-sort | Container where Atlas generates sort buttons |
 | data-chips | Container where Atlas displays filter chips |
 | data-results | Container where Atlas displays result counter |
-| data-layout | Layout toggle button (grid or list) |
+| data-layout | Layout toggle button (grid or list) — optional |
 
 See docs/html-api.md for full documentation.
 

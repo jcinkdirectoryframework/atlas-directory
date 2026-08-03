@@ -253,11 +253,11 @@ See DESIGN_PRINCIPLES.md for full details.
 
 ---
 
-## File Structure
+## Folder Structure
 
 src/
 ├── index.js                 # Public API exports
-├── core/
+├── core/                    # Core engine classes
 │   ├── Atlas.js            # Public entry point
 │   ├── EventBus.js         # Communication hub
 │   ├── Registry.js         # DOM discovery
@@ -265,11 +265,41 @@ src/
 │   ├── Member.js           # Member model
 │   ├── MemberCollection.js # Member collection
 │   └── Renderer.js         # DOM updates
-├── modules/
-│   ├── FilterGenerator.js  # Filter UI
-│   ├── FilterChips.js      # Active chips
+├── modules/                 # Feature modules
+│   ├── FilterGenerator.js  # Filter UI generation
+│   ├── FilterChips.js      # Active filter chips
 │   ├── ResultCounter.js    # Result counter
-│   ├── SortGenerator.js    # Sort UI
+│   ├── SortGenerator.js    # Sort UI generation
 │   └── LayoutManager.js    # Layout switching
-└── adapters/
-    └── JCinkAdapter.js     # JCink platform adapter
+├── adapters/                # Platform adapters
+│   └── JCinkAdapter.js     # JCink-specific mapping (currently empty)
+├── models/                  # Data models (currently empty)
+├── utils/                   # Utility functions (currently empty)
+└── styles/                  # CSS files
+    └── atlas.css           # Minimal core styles
+
+docs/                       # Documentation
+├── architecture.md
+├── atlas-specification.md
+├── decisions.md
+├── html-api.md
+└── roadmap.md
+
+dist/                       # Production builds (currently empty)
+examples/                   # Example implementations
+tests/                      # Test files (currently empty)
+
+### Folder Descriptions
+
+| Folder | Purpose |
+|--------|---------|
+| src/core/ | Core engine classes — Atlas, EventBus, Registry, Store, Member, MemberCollection, Renderer |
+| src/modules/ | Feature modules — FilterGenerator, FilterChips, ResultCounter, SortGenerator, LayoutManager |
+| src/adapters/ | Platform adapters — JCinkAdapter (currently empty, for future platform-specific mapping) |
+| src/models/ | Data models — Currently empty (Member and MemberCollection handle data) |
+| src/utils/ | Utility functions — Currently empty (will contain debounce, throttle, normalize, etc.) |
+| src/styles/ | CSS — atlas.css (minimal core styles for functionality) |
+| dist/ | Production builds — Generated when preparing for deployment |
+| tests/ | Test files — Unit and integration tests (currently empty) |
+| examples/ | Example implementations — Demo and usage examples |
+| docs/ | Documentation — All project documentation |

@@ -1,0 +1,49 @@
+/**
+ * Atlas — Core Styles
+ *
+ * This is the minimal CSS required for Atlas to function.
+ * It provides only:
+ * - Loading state (prevent flicker)
+ * - Visibility toggles
+ * - Layout container classes
+ *
+ * All visual styling (buttons, chips, filters, member cards, etc.)
+ * should be provided by the user.
+ */
+
+/* ─── Loading State ────────────────────────────────── */
+
+/* Hide directory while Atlas is loading */
+[data-atlas-loading] [data-directory] {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* Fade in when ready */
+[data-directory] {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+/* ─── Visibility ──────────────────────────────────── */
+
+/* Hidden members — supports both [hidden] and [data-hidden] */
+[data-member][hidden],
+[data-member][data-hidden] {
+    display: none !important;
+}
+
+/* ─── Layout Containers ───────────────────────────── */
+
+/* Grid layout (default) */
+[data-directory].atlas-layout-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+/* List layout */
+[data-directory].atlas-layout-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
