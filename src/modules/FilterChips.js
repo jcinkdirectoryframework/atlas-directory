@@ -154,35 +154,25 @@ export default class FilterChips {
 
     /**
      * Remove a single filter value.
+     * 
+     * Uses Store.toggleFilter() which properly publishes events.
      */
     #removeFilter(fieldName, value) {
 
-        // Get current filters for this field
-        const currentValues = this.#store.filters[fieldName] || [];
-
-        // Remove the value from the array
-        const index = currentValues.indexOf(value);
-        if (index === -1) {
-            // Value not found, nothing to do
-            return;
+        // Check if the value is active
+        const isActive = this.#store.isFilterActive(fieldName, value);
+        
+        if (isActive) {
+            // This will remove the value and publish a 'store:filtersChanged' event
+            this.#store.toggleFilter(fieldName, value);
+            
+            // Update the "All" button state for this field
+            this.#updateFilterGeneratorUI(fieldName);
+            
+            // Re-render chips (the event listener will also trigger this,
+            // but we do it explicitly to ensure immediate UI update)
+            this.render();
         }
-
-        currentValues.splice(index, 1);
-
-        // If no values left, clear the field entirely
-        if (currentValues.length === 0) {
-            delete this.#store.filters[fieldName];
-        } else {
-            this.#store.filters[fieldName] = currentValues;
-        }
-
-        // Store publishes the event automatically via the setter/delete
-
-        // Update the "All" button state for this field
-        this.#updateFilterGeneratorUI(fieldName);
-
-        // Re-render chips (this will show "No active filters" if all are removed)
-        this.render();
 
     }
 
@@ -191,6 +181,7 @@ export default class FilterChips {
      */
     #clearAllFilters() {
 
+        // Store publishes the event automatically
         this.#store.clearAllFilters();
 
         // Update all filter generator UIs
