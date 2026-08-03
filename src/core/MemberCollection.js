@@ -265,12 +265,19 @@ export default class MemberCollection {
     applyFilters(filters) {
 
         // If no filters, return all members
-        const activeFields = Object.keys(filters);
+        const activeFields = Object.keys(filters).filter(
+            fieldName => filters[fieldName] && filters[fieldName].length > 0
+        );
+
         if (activeFields.length === 0) {
             return this.getAll();
         }
 
-        return this.filter(member => {
+        const results = [];
+
+        for (const member of this.#members.values()) {
+
+            let matches = true;
 
             for (const [fieldName, values] of Object.entries(filters)) {
 
@@ -283,24 +290,30 @@ export default class MemberCollection {
 
                 // If member doesn't have this field, they don't match
                 if (!memberValue) {
-                    return false;
+                    matches = false;
+                    break;
                 }
 
                 // Check if member's value matches any of the selected values
                 const normalizedMemberValue = memberValue.toLowerCase();
-                const matches = values.some(value =>
+                const matchFound = values.some(value =>
                     value.toLowerCase() === normalizedMemberValue
                 );
 
-                if (!matches) {
-                    return false;
+                if (!matchFound) {
+                    matches = false;
+                    break;
                 }
 
             }
 
-            return true;
+            if (matches) {
+                results.push(member);
+            }
 
-        });
+        }
+
+        return results;
 
     }
 
