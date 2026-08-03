@@ -404,16 +404,29 @@ export default class Atlas {
         const searchQuery = this.#store.search;
         const sort = this.#store.sort;
 
+        if (this.options.debug) {
+            console.debug('Atlas: Applying filters:', filters);
+            console.debug('Atlas: Search query:', searchQuery);
+            console.debug('Atlas: Sort:', sort);
+        }
+
         // Start with all members
         let filtered = this.#memberCollection.getAll();
 
-        // Apply filters if any are active
+        // Apply filters if any are active (check for non-empty arrays)
         const activeFilters = Object.keys(filters).filter(
             fieldName => filters[fieldName] && filters[fieldName].length > 0
         );
 
+        if (this.options.debug) {
+            console.debug('Atlas: Active filters:', activeFilters);
+        }
+
         if (activeFilters.length > 0) {
             filtered = this.#memberCollection.applyFilters(filters);
+            if (this.options.debug) {
+                console.debug(`Atlas: After filters: ${filtered.length} members`);
+            }
         }
 
         // Apply search if query exists
@@ -425,15 +438,25 @@ export default class Atlas {
                 }
             }
             filtered = searchResults;
+            if (this.options.debug) {
+                console.debug(`Atlas: After search: ${filtered.length} members`);
+            }
         }
 
         // Apply sort if active
         if (sort && sort.field) {
             filtered = this.#sortMembers(filtered, sort.field, sort.direction);
+            if (this.options.debug) {
+                console.debug(`Atlas: After sort: ${filtered.length} members (sorted by ${sort.field} ${sort.direction})`);
+            }
         }
 
         // Always wrap in MemberCollection
         this.#filteredMembers = new MemberCollection(filtered);
+
+        if (this.options.debug) {
+            console.debug('Atlas: Final filtered member IDs:', this.#filteredMembers.getAll().map(m => m.id));
+        }
 
     }
 
