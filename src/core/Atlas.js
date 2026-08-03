@@ -10,12 +10,10 @@
  * - Expose the public API
  *
  * Deliberately does NOT:
- * - Search
- * - Filter
- * - Render
+ * - Search, filter, sort, or render
  * - Parse members
- *
- * Those responsibilities belong to specialised classes.
+ * - Manage state directly
+ * - Update the DOM
  */
 
 import Registry from "./Registry.js";
@@ -41,31 +39,21 @@ export default class Atlas {
 
     /**
      * Create a new Atlas instance.
+     *
+     * @param {Object} options - Configuration options
+     * @param {string} options.root - CSS selector for the Atlas root (default: '[data-atlas]')
+     * @param {boolean} options.debug - Enable debug logging (default: false)
      */
     constructor(options = {}) {
 
-        this.options = this.#createOptions(options);
+        this.options = {
+            root: '[data-atlas]',
+            debug: false,
+            ...options
+        };
 
         this.root = this.#findRoot();
-
         this.#initialise();
-
-    }
-
-    /**
-     * Merge user options with defaults.
-     */
-    #createOptions(options) {
-
-        return {
-
-            root: '[data-atlas]',
-
-            debug: false,
-
-            ...options
-
-        };
 
     }
 
@@ -77,11 +65,9 @@ export default class Atlas {
         const root = document.querySelector(this.options.root);
 
         if (!root) {
-
             throw new Error(
                 `Atlas could not find "${this.options.root}".`
             );
-
         }
 
         return root;
@@ -124,7 +110,7 @@ export default class Atlas {
         this.#createModules();
 
         // 7. Debug output (if enabled)
-        this.#ready();
+        this.#debug();
 
     }
 
@@ -271,117 +257,71 @@ export default class Atlas {
     }
 
     /**
-     * Atlas is ready.
+     * Debug output.
      */
-    #ready() {
+    #debug() {
 
         if (!this.options.debug) {
             return;
         }
 
-        console.group("Atlas");
+        console.group('Atlas');
 
-        console.info(
-            `Members: ${this.#registry.members.length}`
-        );
-
-        console.info(
-            `Member fields: ${this.#memberCollection.getAllFieldNames().join(', ') || '(none)'}`
-        );
-
-        console.info(
-            `Filterable fields: ${this.#memberCollection.getFilterableFields().join(', ') || '(none)'}`
-        );
-
-        console.info(
-            `Sortable fields: ${this.#memberCollection.getSortableFields().join(', ') || '(none)'}`
-        );
-
-        console.info(
-            `Search controls: ${this.#registry.controls.search.length}`
-        );
-
-        console.info(
-            `Filter containers: ${this.#registry.filtersContainer ? 1 : 0}`
-        );
-
-        console.info(
-            `Chips container: ${this.#registry.chipsContainer ? 1 : 0}`
-        );
-
-        console.info(
-            `Results container: ${this.#registry.resultsContainer ? 1 : 0}`
-        );
-
-        console.info(
-            `Sort containers: ${this.#registry.controls.sorts.length}`
-        );
-
-        console.info(
-            `Layout controls: ${this.#registry.controls.layouts.length}`
-        );
+        console.info(`Members: ${this.#registry.members.length}`);
+        console.info(`Member fields: ${this.#memberCollection.getAllFieldNames().join(', ') || '(none)'}`);
+        console.info(`Filterable fields: ${this.#memberCollection.getFilterableFields().join(', ') || '(none)'}`);
+        console.info(`Sortable fields: ${this.#memberCollection.getSortableFields().join(', ') || '(none)'}`);
+        console.info(`Search controls: ${this.#registry.controls.search.length}`);
+        console.info(`Filter containers: ${this.#registry.filtersContainer ? 1 : 0}`);
+        console.info(`Chips container: ${this.#registry.chipsContainer ? 1 : 0}`);
+        console.info(`Results container: ${this.#registry.resultsContainer ? 1 : 0}`);
+        console.info(`Sort containers: ${this.#registry.controls.sorts.length}`);
+        console.info(`Layout controls: ${this.#registry.controls.layouts.length}`);
 
         const layoutManager = this.#modules.layoutManager;
         if (layoutManager) {
-            console.info(
-                `Current layout: ${layoutManager.layout}`
-            );
+            console.info(`Current layout: ${layoutManager.layout}`);
         }
 
-        // Detailed member data for debugging
-        console.group("Member data");
-
+        // Detailed member data
+        console.group('Member data');
         for (const member of this.#memberCollection) {
-            console.log(
-                `[${member.id}]`,
-                member.toObject()
-            );
+            console.log(`[${member.id}]`, member.toObject());
         }
-
         console.groupEnd();
 
         console.groupEnd();
 
     }
 
-    /**
-     * Access the Registry.
-     */
+    // ─── Public API ───────────────────────────────────
+
+    /** The Registry instance. */
     get registry() {
         return this.#registry;
     }
 
-    /**
-     * Access the MemberCollection.
-     */
+    /** The MemberCollection instance. */
     get memberCollection() {
         return this.#memberCollection;
     }
 
-    /**
-     * Access the Store.
-     */
+    /** The Store instance. */
     get store() {
         return this.#store;
     }
 
-    /**
-     * Access the EventBus.
-     */
+    /** The EventBus instance. */
     get events() {
         return this.#events;
     }
 
-    /**
-     * Access the Renderer.
-     */
+    /** The Renderer instance. */
     get renderer() {
         return this.#renderer;
     }
 
-    /**
-     * Access all modules.
-     */
+    /** All modules. */
     get modules() {
         return { ...this.#modules };
     }
