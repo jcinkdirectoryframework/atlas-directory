@@ -9,7 +9,7 @@
  * - Store sort state
  * - Store layout state
  * - Provide getters and setters
- * - Notify observers of changes (future)
+ * - Publish events when state changes
  *
  * Deliberately does NOT:
  * - Know about the DOM
@@ -27,13 +27,34 @@ export default class Store {
         layout: 'grid'    // 'grid' or 'list'
     };
 
+    #events = null;
+
     /**
      * Create a Store.
      *
-     * @param {Object} initialState - Optional initial state
+     * @param {Object} options
+     * @param {EventBus} options.events - The EventBus instance for publishing events
+     * @param {Object} options.initialState - Optional initial state
      */
-    constructor(initialState = {}) {
-        this.#state = { ...this.#state, ...initialState };
+    constructor(options = {}) {
+
+        this.#events = options.events || null;
+
+        if (options.initialState) {
+            this.#state = { ...this.#state, ...options.initialState };
+        }
+
+    }
+
+    /**
+     * Publish an event if EventBus is available.
+     */
+    #publish(event, data) {
+
+        if (this.#events) {
+            this.#events.publish(event, data);
+        }
+
     }
 
     /**
@@ -62,10 +83,12 @@ export default class Store {
         const values = this.#state.filters[fieldName];
         const index = values.indexOf(value);
 
+        let isActive;
+
         if (index === -1) {
             // Add the value
             values.push(value);
-            return true;
+            isActive = true;
         } else {
             // Remove the value
             values.splice(index, 1);
@@ -73,8 +96,18 @@ export default class Store {
             if (values.length === 0) {
                 delete this.#state.filters[fieldName];
             }
-            return false;
+            isActive = false;
         }
+
+        // Publish event
+        this.#publish('store:filtersChanged', {
+            filters: this.filters,
+            field: fieldName,
+            value: value,
+            active: isActive
+        });
+
+        return isActive;
 
     }
 
@@ -109,6 +142,12 @@ export default class Store {
      */
     clearFieldFilters(fieldName) {
         delete this.#state.filters[fieldName];
+
+        this.#publish('store:filtersChanged', {
+            filters: this.filters,
+            field: fieldName,
+            action: 'clearField'
+        });
     }
 
     /**
@@ -116,6 +155,11 @@ export default class Store {
      */
     clearAllFilters() {
         this.#state.filters = {};
+
+        this.#publish('store:filtersChanged', {
+            filters: this.filters,
+            action: 'clearAll'
+        });
     }
 
     /**
@@ -127,9 +171,19 @@ export default class Store {
 
     /**
      * Set the search query.
+     *
+     * @param {string} query - The search query
      */
     setSearch(query) {
-        this.#state.search = query.trim();
+        const trimmed = query.trim();
+        if (this.#state.search === trimmed) {
+            return; // No change
+        }
+        this.#state.search = trimmed;
+
+        this.#publish('store:searchChanged', {
+            search: this.#state.search
+        });
     }
 
     /**
@@ -141,13 +195,30 @@ export default class Store {
 
     /**
      * Set the sort configuration.
+     *
+     * @param {string|null} field - The field to sort by, or null to clear
+     * @param {string|null} direction - 'asc' or 'desc', or null to clear
      */
     setSort(field, direction = 'asc') {
+        let newSort = null;
+
         if (field && direction) {
-            this.#state.sort = { field, direction };
-        } else {
-            this.#state.sort = null;
+            newSort = { field, direction };
         }
+
+        // Check if anything changed
+        const currentSort = this.#state.sort;
+        const hasChanged = JSON.stringify(currentSort) !== JSON.stringify(newSort);
+
+        if (!hasChanged) {
+            return; // No change
+        }
+
+        this.#state.sort = newSort;
+
+        this.#publish('store:sortChanged', {
+            sort: this.sort
+        });
     }
 
     /**
@@ -159,11 +230,23 @@ export default class Store {
 
     /**
      * Set the layout.
+     *
+     * @param {string} layout - 'grid' or 'list'
      */
     setLayout(layout) {
-        if (layout === 'grid' || layout === 'list') {
-            this.#state.layout = layout;
+        if (layout !== 'grid' && layout !== 'list') {
+            return;
         }
+
+        if (this.#state.layout === layout) {
+            return; // No change
+        }
+
+        this.#state.layout = layout;
+
+        this.#publish('store:layoutChanged', {
+            layout: this.#state.layout
+        });
     }
 
     /**
