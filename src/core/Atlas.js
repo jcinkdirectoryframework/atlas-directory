@@ -27,6 +27,7 @@ import FilterChips from "../modules/FilterChips.js";
 import ResultCounter from "../modules/ResultCounter.js";
 import SortGenerator from "../modules/SortGenerator.js";
 import LayoutManager from "../modules/LayoutManager.js";
+import Renderer from "./Renderer.js";
 
 export default class Atlas {
 
@@ -38,6 +39,7 @@ export default class Atlas {
     #resultCounter = null;
     #sortGenerator = null;
     #layoutManager = null;
+    #renderer = null;
     #filteredMembers = null;
 
     /**
@@ -111,6 +113,8 @@ export default class Atlas {
         this.#createSortGenerator();
 
         this.#createLayoutManager();
+
+        this.#createRenderer();
 
         this.#applyFiltersAndSearch();
 
@@ -284,6 +288,24 @@ export default class Atlas {
     }
 
     /**
+     * Create the Renderer.
+     */
+    #createRenderer() {
+
+        const directory = this.#registry.directory;
+
+        if (!directory) {
+            if (this.options.debug) {
+                console.warn('Atlas: No directory found. Renderer will not be available.');
+            }
+            return;
+        }
+
+        this.#renderer = new Renderer(directory);
+
+    }
+
+    /**
      * Find the filters container.
      */
     #findFilterContainer() {
@@ -447,49 +469,21 @@ export default class Atlas {
             this.#applyFiltersAndSearch();
         }
 
-        // Get all member elements from the Registry
-        const memberElements = this.#registry.members;
-
-        // Create a Set of member IDs that pass the filters
-        const visibleIds = new Set(
-            this.#filteredMembers.getAll().map(member => member.id)
-        );
+        // Get the filtered members in the correct order
+        const members = this.#filteredMembers.getAll();
 
         if (this.options.debug) {
-            console.debug('Filtered member IDs:', [...visibleIds]);
+            const visibleIds = members.map(m => m.id);
+            console.debug('Filtered member IDs:', visibleIds);
         }
 
-        // Toggle visibility for each member element
-        for (const element of memberElements) {
-
-            // Get the Member instance stored on the element
-            const member = element._atlasMember;
-
-            if (!member) {
-                if (this.options.debug) {
-                    console.warn('Member element has no _atlasMember reference:', element);
-                }
-                continue;
-            }
-
-            const isVisible = visibleIds.has(member.id);
-
-            if (this.options.debug) {
-                console.debug(`[${member.id}] visible: ${isVisible}`);
-            }
-
-            if (isVisible) {
-                element.hidden = false;
-                element.removeAttribute('data-hidden');
-            } else {
-                element.hidden = true;
-                element.setAttribute('data-hidden', 'true');
-            }
-
+        // Use the Renderer to update the DOM efficiently
+        if (this.#renderer) {
+            this.#renderer.render(members);
+        } else {
+            // Fallback: direct DOM manipulation
+            this.#updateMemberVisibilityFallback();
         }
-
-        // Reorder the DOM to match the sorted order (only for visible members)
-        this.#reorderMembers();
 
         // Update result counter if it exists
         if (this.#resultCounter) {
@@ -504,9 +498,37 @@ export default class Atlas {
     }
 
     /**
-     * Reorder members in the DOM to match the sorted order.
+     * Fallback visibility update (if Renderer is not available).
      */
-    #reorderMembers() {
+    #updateMemberVisibilityFallback() {
+
+        const memberElements = this.#registry.members;
+        const visibleIds = new Set(
+            this.#filteredMembers.getAll().map(member => member.id)
+        );
+
+        for (const element of memberElements) {
+            const member = element._atlasMember;
+            if (!member) continue;
+            const isVisible = visibleIds.has(member.id);
+            if (isVisible) {
+                element.hidden = false;
+                element.removeAttribute('data-hidden');
+            } else {
+                element.hidden = true;
+                element.setAttribute('data-hidden', 'true');
+            }
+        }
+
+        // Fallback reordering
+        this.#reorderMembersFallback();
+
+    }
+
+    /**
+     * Fallback reordering (if Renderer is not available).
+     */
+    #reorderMembersFallback() {
 
         const directory = this.#registry.directory;
         const sortedMembers = this.#filteredMembers.getAll();
@@ -585,6 +607,10 @@ export default class Atlas {
             );
         }
 
+        console.info(
+            `Renderer: ${this.#renderer ? 'Available' : 'Not available'}`
+        );
+
         // Detailed member data for debugging
         console.group("Member data");
 
@@ -641,6 +667,13 @@ export default class Atlas {
      */
     get layoutManager() {
         return this.#layoutManager;
+    }
+
+    /**
+     * Access the Renderer.
+     */
+    get renderer() {
+        return this.#renderer;
     }
 
 }
