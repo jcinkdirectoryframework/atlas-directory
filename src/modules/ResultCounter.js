@@ -18,6 +18,7 @@ export default class ResultCounter {
     #container;
     #memberCollection;
     #store;
+    #events;
 
     /**
      * Create a ResultCounter instance.
@@ -25,8 +26,9 @@ export default class ResultCounter {
      * @param {HTMLElement} container - The [data-results] container
      * @param {MemberCollection} memberCollection - The member collection
      * @param {Store} store - The application store
+     * @param {EventBus} events - The EventBus instance
      */
-    constructor(container, memberCollection, store) {
+    constructor(container, memberCollection, store, events) {
 
         if (!container) {
             throw new Error('ResultCounter requires a container element');
@@ -40,12 +42,30 @@ export default class ResultCounter {
             throw new Error('ResultCounter requires a Store');
         }
 
+        if (!events) {
+            throw new Error('ResultCounter requires an EventBus');
+        }
+
         this.#container = container;
         this.#memberCollection = memberCollection;
         this.#store = store;
+        this.#events = events;
 
         // Initial render
         this.render();
+
+        // Listen for state changes
+        this.#events.subscribe('store:filtersChanged', () => {
+            this.render();
+        });
+
+        this.#events.subscribe('store:searchChanged', () => {
+            this.render();
+        });
+
+        this.#events.subscribe('store:sortChanged', () => {
+            this.render();
+        });
 
     }
 

@@ -22,6 +22,7 @@ export default class FilterGenerator {
     #container;
     #memberCollection;
     #store;
+    #events;
     #fieldFilterMap = new Map(); // fieldName → { container, allButton, valueButtons }
 
     /**
@@ -30,8 +31,9 @@ export default class FilterGenerator {
      * @param {HTMLElement} container - The [data-filters] container
      * @param {MemberCollection} memberCollection - The member collection
      * @param {Store} store - The application store
+     * @param {EventBus} events - The EventBus instance
      */
-    constructor(container, memberCollection, store) {
+    constructor(container, memberCollection, store, events) {
 
         if (!container) {
             throw new Error('FilterGenerator requires a container element');
@@ -45,11 +47,21 @@ export default class FilterGenerator {
             throw new Error('FilterGenerator requires a Store');
         }
 
+        if (!events) {
+            throw new Error('FilterGenerator requires an EventBus');
+        }
+
         this.#container = container;
         this.#memberCollection = memberCollection;
         this.#store = store;
+        this.#events = events;
 
         this.#generate();
+
+        // Listen for external filter changes (e.g., from chips)
+        this.#events.subscribe('store:filtersChanged', () => {
+            this.syncWithStore();
+        });
 
     }
 
@@ -189,16 +201,7 @@ export default class FilterGenerator {
             }
         }
 
-        // Dispatch event to notify Atlas
-        const event = new CustomEvent('atlas:filtersChanged', {
-            detail: {
-                field: fieldName,
-                action: 'clear',
-                filters: this.#store.filters
-            }
-        });
-
-        document.dispatchEvent(event);
+        // Store publishes the event automatically via clearFieldFilters
 
     }
 
@@ -216,26 +219,11 @@ export default class FilterGenerator {
             return;
         }
 
-        // Add the value to the Store
-        this.#store.toggleFilter(fieldName, value); // This adds it since it's not active
-
-        // Update the UI for this value
-        this.#updateButtonState(fieldName, value, true);
+        // Add the value to the Store (Store publishes the event)
+        this.#store.toggleFilter(fieldName, value);
 
         // Update the "All" button state for this field
         this.#updateAllButtonState(fieldName);
-
-        // Dispatch event to notify Atlas
-        const event = new CustomEvent('atlas:filtersChanged', {
-            detail: {
-                field: fieldName,
-                value: value,
-                action: 'select',
-                filters: this.#store.filters
-            }
-        });
-
-        document.dispatchEvent(event);
 
     }
 

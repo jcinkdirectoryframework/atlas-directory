@@ -21,6 +21,7 @@ export default class LayoutManager {
     #container;
     #directory;
     #store;
+    #events;
     #buttons = [];
     #currentLayout = 'grid';
     #storageKey = 'atlas-layout';
@@ -31,8 +32,9 @@ export default class LayoutManager {
      * @param {HTMLElement} container - The Atlas root element
      * @param {HTMLElement} directory - The [data-directory] container
      * @param {Store} store - The application store
+     * @param {EventBus} events - The EventBus instance
      */
-    constructor(container, directory, store) {
+    constructor(container, directory, store, events) {
 
         if (!container) {
             throw new Error('LayoutManager requires a container element');
@@ -46,9 +48,14 @@ export default class LayoutManager {
             throw new Error('LayoutManager requires a Store');
         }
 
+        if (!events) {
+            throw new Error('LayoutManager requires an EventBus');
+        }
+
         this.#container = container;
         this.#directory = directory;
         this.#store = store;
+        this.#events = events;
 
         this.#discoverButtons();
 
@@ -66,9 +73,12 @@ export default class LayoutManager {
         this.#updateUI();
 
         // Listen for layout changes from other sources
-        document.addEventListener('atlas:layoutChanged', () => {
-            this.#applyLayout();
-            this.#updateUI();
+        this.#events.subscribe('store:layoutChanged', (data) => {
+            if (data && data.layout) {
+                this.#currentLayout = data.layout;
+                this.#applyLayout();
+                this.#updateUI();
+            }
         });
 
     }
@@ -118,7 +128,7 @@ export default class LayoutManager {
 
         this.#currentLayout = layout;
 
-        // Update store
+        // Update store (store publishes the event)
         this.#store.setLayout(layout);
 
         // Save to localStorage
@@ -129,15 +139,6 @@ export default class LayoutManager {
 
         // Update button UI
         this.#updateUI();
-
-        // Dispatch event for other components
-        const event = new CustomEvent('atlas:layoutChanged', {
-            detail: {
-                layout: layout
-            }
-        });
-
-        document.dispatchEvent(event);
 
     }
 

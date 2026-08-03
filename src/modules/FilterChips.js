@@ -20,6 +20,7 @@ export default class FilterChips {
     #container;
     #store;
     #fieldFilterMap;
+    #events;
 
     /**
      * Create a FilterChips instance.
@@ -27,8 +28,9 @@ export default class FilterChips {
      * @param {HTMLElement} container - The [data-chips] container
      * @param {Store} store - The application store
      * @param {Map} fieldFilterMap - Map of fieldName → { allButton, valueButtons, container }
+     * @param {EventBus} events - The EventBus instance
      */
-    constructor(container, store, fieldFilterMap) {
+    constructor(container, store, fieldFilterMap, events) {
 
         if (!container) {
             throw new Error('FilterChips requires a container element');
@@ -42,15 +44,20 @@ export default class FilterChips {
             throw new Error('FilterChips requires a fieldFilterMap');
         }
 
+        if (!events) {
+            throw new Error('FilterChips requires an EventBus');
+        }
+
         this.#container = container;
         this.#store = store;
         this.#fieldFilterMap = fieldFilterMap;
+        this.#events = events;
 
         // Initial render
         this.render();
 
         // Listen for filter changes
-        document.addEventListener('atlas:filtersChanged', () => {
+        this.#events.subscribe('store:filtersChanged', () => {
             this.render();
         });
 
@@ -169,20 +176,10 @@ export default class FilterChips {
             this.#store.filters[fieldName] = currentValues;
         }
 
+        // Store publishes the event automatically via the setter/delete
+
         // Update the "All" button state for this field
         this.#updateFilterGeneratorUI(fieldName);
-
-        // Dispatch event to trigger Atlas update
-        const event = new CustomEvent('atlas:filtersChanged', {
-            detail: {
-                field: fieldName,
-                value: value,
-                action: 'remove',
-                filters: this.#store.filters
-            }
-        });
-
-        document.dispatchEvent(event);
 
         // Re-render chips (this will show "No active filters" if all are removed)
         this.render();
@@ -200,16 +197,6 @@ export default class FilterChips {
         for (const [fieldName] of this.#fieldFilterMap) {
             this.#updateFilterGeneratorUI(fieldName);
         }
-
-        // Dispatch event
-        const event = new CustomEvent('atlas:filtersChanged', {
-            detail: {
-                action: 'clearAll',
-                filters: this.#store.filters
-            }
-        });
-
-        document.dispatchEvent(event);
 
         // Re-render chips (this will show "No active filters")
         this.render();

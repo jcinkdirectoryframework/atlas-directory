@@ -21,6 +21,7 @@ export default class SortGenerator {
     #container;
     #memberCollection;
     #store;
+    #events;
 
     /**
      * Create a SortGenerator.
@@ -28,8 +29,9 @@ export default class SortGenerator {
      * @param {HTMLElement} container - The [data-sort] container
      * @param {MemberCollection} memberCollection - The member collection
      * @param {Store} store - The application store
+     * @param {EventBus} events - The EventBus instance
      */
-    constructor(container, memberCollection, store) {
+    constructor(container, memberCollection, store, events) {
 
         if (!container) {
             throw new Error('SortGenerator requires a container element');
@@ -43,14 +45,19 @@ export default class SortGenerator {
             throw new Error('SortGenerator requires a Store');
         }
 
+        if (!events) {
+            throw new Error('SortGenerator requires an EventBus');
+        }
+
         this.#container = container;
         this.#memberCollection = memberCollection;
         this.#store = store;
+        this.#events = events;
 
         this.#generate();
 
         // Listen for sort state changes (from chips or other sources)
-        document.addEventListener('atlas:filtersChanged', () => {
+        this.#events.subscribe('store:sortChanged', () => {
             this.#updateUI();
         });
 
@@ -128,17 +135,10 @@ export default class SortGenerator {
             this.#store.setSort(field, 'asc');
         }
 
+        // Store publishes the event automatically via setSort
+
         // Update UI
         this.#updateUI();
-
-        // Dispatch event to trigger Atlas update
-        const event = new CustomEvent('atlas:sortChanged', {
-            detail: {
-                sort: this.#store.sort
-            }
-        });
-
-        document.dispatchEvent(event);
 
     }
 
