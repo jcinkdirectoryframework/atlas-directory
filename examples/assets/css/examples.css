@@ -1,0 +1,395 @@
+/* ─── Shared Example Styles ──────────────────────────
+   These styles are used across all example pages.
+   Each example can override or extend these.
+   ───────────────────────────────────────────────────── */
+
+/* ─── Reset & Base ──────────────────────────────────── */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f1f5f9;
+    color: #0f172a;
+    line-height: 1.6;
+    padding: 2rem 1rem;
+}
+
+/* ─── Example Header ───────────────────────────────── */
+
+.example-header {
+    max-width: 1200px;
+    margin: 0 auto 2rem auto;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.example-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.example-header p {
+    color: #475569;
+}
+
+.example-header .nav-links {
+    margin-top: 0.5rem;
+}
+
+.example-header .nav-links a {
+    color: #2563eb;
+    text-decoration: none;
+    margin-right: 1rem;
+    font-size: 0.9rem;
+}
+
+.example-header .nav-links a:hover {
+    text-decoration: underline;
+}
+
+/* ─── Atlas Container ───────────────────────────────── */
+
+[data-atlas] {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* ─── Search ────────────────────────────────────────── */
+
+[data-search] {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+[data-search]:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ─── Filter Controls ───────────────────────────────── */
+
+[data-filters] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+[data-filter] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+[data-filter] label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+[data-filter-options] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+[data-filter-options] button {
+    padding: 0.2rem 0.7rem;
+    border: 1px solid #d1d5db;
+    border-radius: 16px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #1e293b;
+    transition: all 0.15s;
+}
+
+[data-filter-options] button:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+[data-filter-options] button.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+[data-filter-options] button.active:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+/* ─── Sort Controls ────────────────────────────────── */
+
+[data-sort] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    align-items: center;
+}
+
+[data-sort] button {
+    padding: 0.3rem 0.9rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+[data-sort] button:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+[data-sort] button.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+[data-sort] button.active:hover {
+    background: #1d4ed8;
+}
+
+[data-sort] button.asc {
+    background: #22c55e;
+    color: white;
+    border-color: #22c55e;
+}
+
+[data-sort] button.asc:hover {
+    background: #16a34a;
+}
+
+[data-sort] button.desc {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+[data-sort] button.desc:hover {
+    background: #dc2626;
+}
+
+/* ─── Chips ─────────────────────────────────────────── */
+
+[data-chips] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    min-height: 2.5rem;
+}
+
+.atlas-chips-empty {
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.atlas-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #f1f5f9;
+    border-radius: 16px;
+    padding: 0.2rem 0.5rem 0.2rem 0.7rem;
+    font-size: 0.85rem;
+    border: 1px solid #e2e8f0;
+}
+
+.atlas-chip-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #64748b;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.15s;
+}
+
+.atlas-chip-remove:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.atlas-clear-all {
+    background: none;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    border-radius: 16px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.atlas-clear-all:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* ─── Result Counter ───────────────────────────────── */
+
+.atlas-result-counter {
+    display: block;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+/* ─── Layout Controls ──────────────────────────────── */
+
+[data-layout] {
+    padding: 0.3rem 0.9rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+[data-layout]:hover {
+    background: #f1f5f9;
+}
+
+[data-layout].active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+[data-layout].active:hover {
+    background: #1d4ed8;
+}
+
+/* ─── Member Cards ──────────────────────────────────── */
+
+[data-member] {
+    padding: 1rem 1.25rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+[data-member]:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-color: #cbd5e1;
+}
+
+[data-field] {
+    display: block;
+}
+
+[data-field="name"] {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #0f172a;
+}
+
+[data-field="species"],
+[data-field="occupation"],
+[data-field="district"] {
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+/* ─── Grid Layout (default) ────────────────────────── */
+
+[data-directory].atlas-layout-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+/* ─── List Layout ──────────────────────────────────── */
+
+[data-directory].atlas-layout-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+[data-directory].atlas-layout-list [data-member] {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+}
+
+[data-directory].atlas-layout-list [data-field] {
+    display: inline;
+}
+
+[data-directory].atlas-layout-list [data-field="name"] {
+    min-width: 120px;
+}
+
+[data-directory].atlas-layout-list [data-field="species"],
+[data-directory].atlas-layout-list [data-field="occupation"],
+[data-directory].atlas-layout-list [data-field="district"] {
+    font-size: 0.85rem;
+}
+
+/* ─── Member Data (hidden) ─────────────────────────── */
+
+[data-member][hidden],
+[data-member][data-hidden] {
+    display: none !important;
+}
+
+/* ─── Responsive ────────────────────────────────────── */
+
+@media (max-width: 640px) {
+    [data-atlas] {
+        padding: 1rem;
+    }
+
+    [data-filters] {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    [data-directory].atlas-layout-list [data-member] {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    [data-directory].atlas-layout-list [data-field="name"] {
+        min-width: auto;
+        width: 100%;
+    }
+}

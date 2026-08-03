@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide-out Top Bar — Atlas Example</title>
+    <style>
+        /* ─── Base ────────────────────────────────────── */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            line-height: 1.6;
+            padding: 0;
+        }
+
+        .example-header {
+            max-width: 1200px;
+            margin: 0 auto 2rem auto;
+            padding: 2rem 1rem 1rem 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .example-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .example-header p {
+            color: #475569;
+        }
+
+        .example-header .nav-links {
+            margin-top: 0.5rem;
+        }
+
+        .example-header .nav-links a {
+            color: #2563eb;
+            text-decoration: none;
+            margin-right: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .example-header .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* ─── Atlas Container ─────────────────────────── */
+
+        [data-atlas] {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ─── Top Bar (slide-out) ────────────────────── */
+
+        .topbar-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #1e293b;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .topbar-toggle:hover {
+            background: #334155;
+        }
+
+        .topbar-toggle .arrow {
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .topbar-toggle .arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .topbar-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            padding: 0 1.5rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .topbar-content.open {
+            max-height: 800px;
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+        }
+
+        .topbar-inner {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .topbar-inner > * {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        /* ─── Directory Area ─────────────────────────── */
+
+        .directory-area {
+            padding: 1.5rem;
+        }
+
+        /* ─── Controls ────────────────────────────────── */
+
+        [data-search] {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.95rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            width: 100%;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        [data-search]:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        [data-filters] {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        [data-filter] {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        [data-filter] label {
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        [data-filter-options] {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        [data-filter-options] button {
+            padding: 0.2rem 0.7rem;
+            border: 1px solid #d1d5db;
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: inherit;
+            color: #1e293b;
+            transition: all 0.15s;
+        }
+
+        [data-filter-options] button:hover {
+            background: #f1f5f9;
+        }
+
+        [data-filter-options] button.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        [data-sort] {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            padding: 0.3rem 0;
+            align-items: center;
+        }
+
+        [data-sort] button {
+            padding: 0.3rem 0.8rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        [data-sort] button:hover {
+            background: #f1f5f9;
+        }
+
+        [data-sort] button.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        [data-sort] button.asc {
+            background: #22c55e;
+            color: white;
+            border-color: #22c55e;
+        }
+
+        [data-sort] button.desc {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        [data-chips] {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0;
+            min-height: 2rem;
+        }
+
+        .atlas-chips-empty {
+            color: #94a3b8;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+
+        .atlas-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 0.15rem 0.4rem 0.15rem 0.7rem;
+            font-size: 0.8rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .atlas-chip-remove {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #64748b;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .atlas-chip-remove:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .atlas-clear-all {
+            background: none;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            border-radius: 16px;
+            padding: 0.15rem 0.7rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .atlas-clear-all:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .atlas-result-counter {
+            display: block;
+            padding: 0.3rem 0;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        [data-layout] {
+            padding: 0.3rem 0.8rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        [data-layout]:hover {
+            background: #f1f5f9;
+        }
+
+        [data-layout].active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .layout-row {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* ─── Members ────────────────────────────────── */
+
+        [data-member] {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            transition: box-shadow 0.2s;
+        }
+
+        [data-member]:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-field] {
+            display: block;
+        }
+
+        [data-field="name"] {
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        [data-field="species"],
+        [data-field="occupation"],
+        [data-field="district"] {
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        [data-directory].atlas-layout-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        [data-directory].atlas-layout-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        [data-directory].atlas-layout-list [data-member] {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+        }
+
+        [data-directory].atlas-layout-list [data-field] {
+            display: inline;
+        }
+
+        [data-directory].atlas-layout-list [data-field="name"] {
+            min-width: 130px;
+        }
+
+        [data-member][hidden],
+        [data-member][data-hidden] {
+            display: none !important;
+        }
+
+        /* ─── Code Display ────────────────────────────── */
+
+        .code-section {
+            max-width: 1200px;
+            margin: 2rem auto 0 auto;
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            color: #e2e8f0;
+        }
+
+        .code-section h2 {
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .code-section .code-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .code-section .code-box {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow: auto;
+            max-height: 400px;
+        }
+
+        .code-section .code-box h3 {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .code-section .code-box pre {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .topbar-inner {
+                flex-direction: column;
+            }
+            .topbar-inner > * {
+                min-width: auto;
+                width: 100%;
+            }
+            .code-section .code-grid {
+                grid-template-columns: 1fr;
+            }
+            .directory-area {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="example-header">
+        <h1>Slide-out Top Bar</h1>
+        <p>Controls hidden in a collapsible top bar. Clean and mobile-friendly.</p>
+        <div class="nav-links">
+            <a href="index.html">← All Examples</a>
+            <a href="../index.html">Main Demo</a>
+        </div>
+    </div>
+
+    <!-- ─── Atlas ────────────────────────────────────── -->
+
+    <div data-atlas>
+
+        <!-- ─── Top Bar (slide-out) ───────────────────── -->
+
+        <button class="topbar-toggle" id="topbarToggle" aria-expanded="false">
+            <span>☰ Controls</span>
+            <span class="arrow" id="arrowIcon">▼</span>
+        </button>
+
+        <div class="topbar-content" id="topbarContent">
+            <div class="topbar-inner">
+                <div data-filters></div>
+                <div>
+                    <div data-sort></div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                        <button data-layout="grid">Grid</button>
+                        <button data-layout="list">List</button>
+                    </div>
+                </div>
+                <div>
+                    <input data-search placeholder="Search members...">
+                    <div data-chips></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── Directory Area ────────────────────────── -->
+
+        <div class="directory-area">
+            <div data-results></div>
+            <div data-directory id="directory"></div>
+        </div>
+
+    </div>
+
+    <!-- ─── Code Display ────────────────────────────── -->
+
+    <div class="code-section">
+        <h2>📄 Code Used in This Example</h2>
+        <div class="code-grid">
+            <div class="code-box">
+                <h3>HTML</h3>
+                <pre id="html-code"></pre>
+            </div>
+            <div class="code-box">
+                <h3>CSS</h3>
+                <pre id="css-code"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initExample, displayCode } from './assets/js/examples.js';
+
+        // ─── Slide-out Toggle ──────────────────────────
+
+        const toggle = document.getElementById('topbarToggle');
+        const content = document.getElementById('topbarContent');
+        const arrow = document.getElementById('arrowIcon');
+
+        if (toggle && content) {
+            toggle.addEventListener('click', () => {
+                const isOpen = content.classList.toggle('open');
+                toggle.setAttribute('aria-expanded', isOpen);
+                if (arrow) {
+                    arrow.classList.toggle('open', isOpen);
+                }
+            });
+        }
+
+        // ─── Initialise Atlas ──────────────────────────
+
+        initExample('directory');
+
+        // Display the code used
+        displayCode('#html-code', '#css-code');
+    </script>
+
+</body>
+</html>
