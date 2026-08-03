@@ -167,29 +167,8 @@ export default class Renderer {
         // 1. Handle visibility changes
         this.#applyVisibilityChanges(currentState, newState);
 
-        // 2. Handle reordering (only if order changed)
-        const currentOrder = currentState.order;
-        const newOrder = newState.order;
-
-        // Check if order actually changed
-        if (currentOrder.length !== newOrder.length) {
-            // Length changed, reorder
-            this.#applyReorder(newState);
-            return;
-        }
-
-        // Check if order is the same
-        let orderChanged = false;
-        for (let i = 0; i < currentOrder.length; i++) {
-            if (currentOrder[i] !== newOrder[i]) {
-                orderChanged = true;
-                break;
-            }
-        }
-
-        if (orderChanged) {
-            this.#applyReorder(newState);
-        }
+        // 2. Handle reordering
+        this.#applyReorder(newState);
 
     }
 
@@ -228,37 +207,41 @@ export default class Renderer {
     /**
      * Apply reordering to the DOM.
      *
-     * Uses a simpler approach: remove all members and re-append in new order.
-     * This is more reliable than insertion-based reordering and still efficient
-     * for the typical directory size (up to 1000 members).
+     * Handles both full reorders (no filters) and partial reorders (with filters).
+     * For filtered views, only visible members are in the order array.
      */
     #applyReorder(newState) {
 
         const directory = this.#directory;
         const newOrder = newState.order;
 
-        // Get current elements in the directory
-        const currentElements = Array.from(directory.children);
+        // Get current member elements in the directory
+        const currentElements = Array.from(directory.querySelectorAll('[data-member]'));
 
-        // Filter to only member elements
-        const memberElements = currentElements.filter(el => el.hasAttribute('data-member'));
-
-        // If no member elements, nothing to reorder
-        if (memberElements.length === 0 && newOrder.length === 0) {
+        // If no members, nothing to do
+        if (currentElements.length === 0 && newOrder.length === 0) {
             return;
         }
 
-        // Check if we need to reorder at all
-        let needsReorder = false;
-        const currentIds = memberElements.map(el => {
+        // Get current IDs in DOM order (including hidden members)
+        const currentIds = currentElements.map(el => {
             const member = el._atlasMember;
             return member ? member.id : null;
         });
 
-        for (let i = 0; i < newOrder.length; i++) {
-            if (currentIds[i] !== newOrder[i]) {
-                needsReorder = true;
-                break;
+        // Check if the order of VISIBLE members has changed
+        // We need to compare only the members that are in newOrder
+        let needsReorder = false;
+        const visibleCurrentIds = currentIds.filter(id => newOrder.includes(id));
+
+        if (visibleCurrentIds.length !== newOrder.length) {
+            needsReorder = true;
+        } else {
+            for (let i = 0; i < newOrder.length; i++) {
+                if (visibleCurrentIds[i] !== newOrder[i]) {
+                    needsReorder = true;
+                    break;
+                }
             }
         }
 
@@ -266,15 +249,43 @@ export default class Renderer {
             return;
         }
 
-        // Remove all member elements from the directory
-        for (const element of memberElements) {
-            element.remove();
+        // Get all elements that are in the new order
+        const elementsToKeep = new Set(newOrder);
+        const elementsToRemove = [];
+
+        // Separate elements to keep and remove
+        for (const element of currentElements) {
+            const member = element._atlasMember;
+            if (member && elementsToKeep.has(member.id)) {
+                // Keep this element
+            } else {
+                elementsToRemove.push(element);
+            }
         }
 
-        // Re-append in new order
+        // Build the new order: visible members in sorted order
+        const newElements = [];
+
         for (const id of newOrder) {
             const element = newState.elements.get(id);
             if (element) {
+                newElements.push(element);
+            }
+        }
+
+        // Remove all current member elements
+        for (const element of currentElements) {
+            element.remove();
+        }
+
+        // Append visible members in new order
+        for (const element of newElements) {
+            directory.appendChild(element);
+        }
+
+        // Append hidden members at the end (preserving their order)
+        for (const element of elementsToRemove) {
+            if (!newElements.includes(element)) {
                 directory.appendChild(element);
             }
         }
