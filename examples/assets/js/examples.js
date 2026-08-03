@@ -77,16 +77,21 @@ export function initExample(containerId = 'directory') {
         return;
     }
 
+    // Render members into the DOM
     renderMembers(directory);
 
-    import('../../src/core/Atlas.js')
-        .then(module => {
-            const Atlas = module.default;
-            new Atlas({ debug: false });
-        })
-        .catch(err => {
-            console.error('Failed to load Atlas:', err);
-        });
+    // Wait for the next frame to ensure DOM is fully updated
+    // This prevents Atlas from trying to discover members before they're rendered
+    requestAnimationFrame(() => {
+        import('../../src/core/Atlas.js')
+            .then(module => {
+                const Atlas = module.default;
+                new Atlas({ debug: false });
+            })
+            .catch(err => {
+                console.error('Failed to load Atlas:', err);
+            });
+    });
 }
 
 // ─── Code Display Helper ─────────────────────────────
@@ -108,6 +113,7 @@ export function displayCode(htmlSelector, cssSelector) {
     if (cssEl) {
         const styles = [];
         document.querySelectorAll('style').forEach(el => {
+            // Skip if it's the code section styles (they're not part of the example)
             if (el.id !== 'code-section-styles') {
                 styles.push(el.textContent);
             }
