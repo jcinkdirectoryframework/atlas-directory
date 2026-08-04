@@ -22,9 +22,17 @@
             padding-top: 70px;
         }
 
-        .page-header {
+        /* ─── [data-atlas] as wrapper ────────────────── */
+
+        [data-atlas] {
+            /* No layout styles — let the page control itself */
             max-width: 1100px;
-            margin: 0 auto 2rem auto;
+            margin: 0 auto;
+        }
+
+        /* ─── Page Header ────────────────────────────── */
+
+        .page-header {
             padding: 1rem 1.5rem 1rem 1.5rem;
             border-bottom: 2px solid #e2e8f0;
         }
@@ -365,8 +373,6 @@
         /* ─── Directory Area ──────────────────────────── */
 
         .directory-area {
-            max-width: 1100px;
-            margin: 0 auto;
             padding: 0 1.5rem 2rem 1.5rem;
         }
 
@@ -466,68 +472,67 @@
 </head>
 <body>
 
-    <!-- ─── Fixed Top Bar ─────────────────────────────── -->
-
-    <div class="topbar-wrapper" id="topbarWrapper">
-        <div class="topbar-inner-wrapper">
-
-            <button class="topbar-toggle" id="topbarToggle" aria-expanded="false">
-                <span>☰ Atlas Controls</span>
-                <span class="badge">Click to expand</span>
-                <span class="arrow" id="arrowIcon">▼</span>
-            </button>
-
-            <div class="topbar-content" id="topbarContent">
-                <!-- Controls are inside [data-atlas] below -->
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ─── Page Header ───────────────────────────────── -->
-
-    <div class="page-header">
-        <h1>Slide-out Top Bar</h1>
-        <p>Controls are fixed to the top of the page and follow as you scroll.</p>
-        <div class="nav-links">
-            <a href="index.html">← All Examples</a>
-            <a href="../index.html">Main Demo</a>
-        </div>
-    </div>
-
-    <!-- ─── Atlas ────────────────────────────────────── -->
+    <!-- ─── Atlas Wraps Everything ──────────────────── -->
 
     <div data-atlas>
-        <div class="directory-area">
 
-            <!-- ─── Slide-out Controls ───────────────────── -->
-            <div class="topbar-grid" id="slideoutControls" style="display: none;">
+        <!-- ─── Fixed Top Bar ─────────────────────────────── -->
+        <div class="topbar-wrapper" id="topbarWrapper">
+            <div class="topbar-inner-wrapper">
 
-                <div>
-                    <div data-filters></div>
-                </div>
+                <button class="topbar-toggle" id="topbarToggle" aria-expanded="false">
+                    <span>☰ Atlas Controls</span>
+                    <span class="badge">Click to expand</span>
+                    <span class="arrow" id="arrowIcon">▼</span>
+                </button>
 
-                <div>
-                    <div data-sort></div>
-                    <div style="margin-top: 0.5rem;">
-                        <input data-search placeholder="Search members...">
+                <div class="topbar-content" id="topbarContent">
+
+                    <!-- ─── Slide-out Controls ───────────────────── -->
+                    <div class="topbar-grid" id="slideoutControls" style="display: none;">
+
+                        <div>
+                            <div data-filters></div>
+                        </div>
+
+                        <div>
+                            <div data-sort></div>
+                            <div style="margin-top: 0.5rem;">
+                                <input data-search placeholder="Search members...">
+                            </div>
+                            <div style="margin-top: 0.5rem;" class="layout-row">
+                                <button data-layout="grid">Grid</button>
+                                <button data-layout="list">List</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div data-chips></div>
+                            <div class="results-row">
+                                <div data-results></div>
+                            </div>
+                        </div>
+
                     </div>
-                    <div style="margin-top: 0.5rem;" class="layout-row">
-                        <button data-layout="grid">Grid</button>
-                        <button data-layout="list">List</button>
-                    </div>
-                </div>
 
-                <div>
-                    <div data-chips></div>
-                    <div class="results-row">
-                        <div data-results></div>
-                    </div>
                 </div>
 
             </div>
+        </div>
 
-            <!-- ─── Directory ───────────────────────────────── -->
+        <!-- ─── Page Header ───────────────────────────────── -->
+        <div class="page-header">
+            <h1>Slide-out Top Bar</h1>
+            <p>Controls are fixed to the top of the page and follow as you scroll.</p>
+            <div class="nav-links">
+                <a href="index.html">← All Examples</a>
+                <a href="../index.html">Main Demo</a>
+            </div>
+        </div>
+
+        <!-- ─── Directory Area ─────────────────────────────── -->
+        <div class="directory-area">
+
             <div data-directory>
 
                 <!-- ─── Din Djarin ──────────────────────────── -->
@@ -619,8 +624,11 @@
                 </article>
 
             </div>
+
         </div>
+
     </div>
+    <!-- ─── End Atlas ────────────────────────────────── -->
 
     <script type="module">
         // ─── Slide-out Toggle ──────────────────────────────
