@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Test — Atlas</title>
+
+    <!-- Use the same styles as the demo -->
+    <style>
+        /* ─── Copy the demo.css styles here ────────────────── */
+        /* I'll provide the full CSS in the next message */
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+            line-height: 1.6;
+            padding: 1rem;
+        }
+
+        .test-header {
+            max-width: 1200px;
+            margin: 0 auto 1rem auto;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .test-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .test-header .controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .test-header .controls button {
+            padding: 0.3rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        .test-header .controls button:hover {
+            background: #f1f5f9;
+        }
+
+        .test-header .controls button.primary {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .test-header .controls button.primary:hover {
+            background: #1d4ed8;
+        }
+
+        .test-header .controls button.danger {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .test-header .controls button.danger:hover {
+            background: #dc2626;
+        }
+
+        .results-panel {
+            max-width: 1200px;
+            margin: 0 auto 1rem auto;
+            padding: 0.75rem 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .results-panel.visible {
+            display: grid;
+        }
+
+        .results-panel .metric {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .results-panel .metric .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .results-panel .metric .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .results-panel .metric .value.good {
+            color: #22c55e;
+        }
+
+        .results-panel .metric .value.warning {
+            color: #f59e0b;
+        }
+
+        .results-panel .metric .value.bad {
+            color: #ef4444;
+        }
+
+        /* ─── Atlas Styles ──────────────────────────────────── */
+        /* Same as the demo styles */
+    </style>
+</head>
+<body>
+
+    <div class="test-header">
+        <div>
+            <h1>⚡ Atlas Performance Test</h1>
+            <span id="memberCount" style="color: #64748b; font-size: 0.9rem;">0 members loaded</span>
+        </div>
+        <div class="controls">
+            <button class="primary" id="loadBtn">Load 1,000 Members</button>
+            <button class="danger" id="clearBtn">Clear</button>
+            <button id="runBenchmarkBtn">Run Benchmark</button>
+        </div>
+    </div>
+
+    <!-- ─── Results Panel ────────────────────────────────── -->
+    <div class="results-panel" id="resultsPanel">
+        <div class="metric">
+            <span class="label">Init Time</span>
+            <span class="value" id="initTime">—</span>
+        </div>
+        <div class="metric">
+            <span class="label">Filter Time</span>
+            <span class="value" id="filterTime">—</span>
+        </div>
+        <div class="metric">
+            <span class="label">Search Time</span>
+            <span class="value" id="searchTime">—</span>
+        </div>
+        <div class="metric">
+            <span class="label">Sort Time</span>
+            <span class="value" id="sortTime">—</span>
+        </div>
+        <div class="metric">
+            <span class="label">Total Members</span>
+            <span class="value" id="totalMembers">—</span>
+        </div>
+        <div class="metric">
+            <span class="label">Unique Species</span>
+            <span class="value" id="uniqueSpecies">—</span>
+        </div>
+        <div class="metric">
+            <span class="label">Unique Factions</span>
+            <span class="value" id="uniqueFactions">—</span>
+        </div>
+        <div class="metric">
+            <span class="label">DOM Nodes</span>
+            <span class="value" id="domNodes">—</span>
+        </div>
+    </div>
+
+    <!-- ─── Atlas ──────────────────────────────────────────── -->
+    <div data-atlas>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+            <input data-search placeholder="Search 1,000 members..." style="flex: 1; min-width: 200px; padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem;">
+        </div>
+
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <div data-filters></div>
+                <div data-sort></div>
+            </div>
+            <div style="flex: 2; min-width: 300px;">
+                <div data-chips></div>
+                <div data-results></div>
+                <button data-layout="grid">Grid</button>
+                <button data-layout="list">List</button>
+                <div data-directory id="directory"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ─── Imports ──────────────────────────────────────────
+        import Atlas from '../src/core/Atlas.js';
+        import { renderMembers } from '../src/utils/memberGenerator.js';
+
+        // ─── DOM References ──────────────────────────────────
+        const directory = document.getElementById('directory');
+        const loadBtn = document.getElementById('loadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const runBenchmarkBtn = document.getElementById('runBenchmarkBtn');
+        const memberCount = document.getElementById('memberCount');
+        const resultsPanel = document.getElementById('resultsPanel');
+
+        // ─── State ────────────────────────────────────────────
+        let atlas = null;
+        let membersLoaded = false;
+
+        // ─── Load Members ──────────────────────────────────────
+
+        function loadMembers() {
+            // Clear any existing Atlas instance
+            if (atlas) {
+                // Remove the data-atlas attribute to clean up
+                const root = document.querySelector('[data-atlas]');
+                if (root) {
+                    // We need to re-create the DOM structure
+                }
+            }
+
+            // Clear the directory
+            directory.innerHTML = '';
+
+            // Start timing
+            const startTime = performance.now();
+
+            // Render 1,000 members
+            renderMembers(directory, 1000);
+
+            const renderTime = performance.now() - startTime;
+            console.log(`[Performance] Member render time: ${renderTime.toFixed(2)}ms`);
+
+            // Initialise Atlas
+            const initStart = performance.now();
+            atlas = new Atlas({ debug: false });
+            const initTime = performance.now() - initStart;
+            console.log(`[Performance] Atlas init time: ${initTime.toFixed(2)}ms`);
+
+            membersLoaded = true;
+            memberCount.textContent = '1,000 members loaded';
+
+            // Update results
+            document.getElementById('initTime').textContent = initTime.toFixed(2) + 'ms';
+
+            // Count DOM nodes
+            const allNodes = document.querySelectorAll('*').length;
+            document.getElementById('domNodes').textContent = allNodes;
+
+            resultsPanel.classList.add('visible');
+
+            // Auto-run benchmark after a short delay
+            setTimeout(runBenchmark, 500);
+        }
+
+        // ─── Clear Members ────────────────────────────────────
+
+        function clearMembers() {
+            directory.innerHTML = '';
+            membersLoaded = false;
+            memberCount.textContent = '0 members loaded';
+            resultsPanel.classList.remove('visible');
+
+            // Reset Atlas
+            if (atlas) {
+                // Remove the Atlas instance
+                atlas = null;
+            }
+        }
+
+        // ─── Run Benchmark ────────────────────────────────────
+
+        function runBenchmark() {
+            if (!membersLoaded) {
+                alert('Please load members first!');
+                return;
+            }
+
+            console.log('=== Atlas Performance Benchmark ===');
+
+            // 1. Filter Test
+            const filterStart = performance.now();
+            const filters = document.querySelector('[data-filters]');
+            if (filters) {
+                const buttons = filters.querySelectorAll('[data-filter-options] button');
+                // Click the first non-"All" button
+                for (const btn of buttons) {
+                    if (btn.dataset.value !== 'all') {
+                        btn.click();
+                        break;
+                    }
+                }
+            }
+            const filterTime = performance.now() - filterStart;
+            console.log(`Filter time: ${filterTime.toFixed(2)}ms`);
+            document.getElementById('filterTime').textContent = filterTime.toFixed(2) + 'ms';
+
+            // 2. Search Test
+            const searchStart = performance.now();
+            const searchInput = document.querySelector('[data-search]');
+            if (searchInput) {
+                searchInput.value = 'Skywalker';
+                searchInput.dispatchEvent(new Event('input'));
+            }
+            const searchTime = performance.now() - searchStart;
+            console.log(`Search time: ${searchTime.toFixed(2)}ms`);
+            document.getElementById('searchTime').textContent = searchTime.toFixed(2) + 'ms';
+
+            // 3. Sort Test
+            const sortStart = performance.now();
+            const sortContainer = document.querySelector('[data-sort]');
+            if (sortContainer) {
+                const sortBtn = sortContainer.querySelector('button');
+                if (sortBtn) {
+                    sortBtn.click();
+                }
+            }
+            const sortTime = performance.now() - sortStart;
+            console.log(`Sort time: ${sortTime.toFixed(2)}ms`);
+            document.getElementById('sortTime').textContent = sortTime.toFixed(2) + 'ms';
+
+            // 4. Get total members from Atlas
+            if (atlas && atlas.memberCollection) {
+                document.getElementById('totalMembers').textContent = atlas.memberCollection.size;
+
+                // Count unique species
+                const species = atlas.memberCollection.getUniqueValues('species');
+                document.getElementById('uniqueSpecies').textContent = species.length;
+
+                const factions = atlas.memberCollection.getUniqueValues('faction');
+                document.getElementById('uniqueFactions').textContent = factions.length;
+            }
+
+            // 5. DOM nodes
+            const allNodes = document.querySelectorAll('*').length;
+            document.getElementById('domNodes').textContent = allNodes;
+
+            console.log('=== Benchmark Complete ===');
+        }
+
+        // ─── Event Listeners ──────────────────────────────────
+
+        loadBtn.addEventListener('click', loadMembers);
+        clearBtn.addEventListener('click', clearMembers);
+        runBenchmarkBtn.addEventListener('click', runBenchmark);
+
+        // ─── Load on page load ──────────────────────────────
+
+        // Auto-load when the page loads
+        window.addEventListener('load', () => {
+            setTimeout(loadMembers, 100);
+        });
+
+        // ─── Keyboard shortcut: Ctrl+B for benchmark ────────
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'b') {
+                e.preventDefault();
+                runBenchmark();
+            }
+        });
+    </script>
+
+</body>
+</html>
