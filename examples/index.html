@@ -90,8 +90,13 @@
             color: white;
         }
 
-        .example-card .badge.advanced {
-            background: #7c3aed;
+        .example-card .badge.dark {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .example-card .badge.warm {
+            background: #f97316;
             color: white;
         }
 
@@ -100,149 +105,9 @@
             color: #475569;
         }
 
-        .example-card .preview {
-            width: 100%;
-            height: 80px;
-            border-radius: 6px;
-            margin-bottom: 0.75rem;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            color: #94a3b8;
-            overflow: hidden;
-            background: #f8fafc;
-            position: relative;
-        }
-
-        .example-card .preview .layout-diagram {
-            display: flex;
-            gap: 0.3rem;
-            width: 90%;
-            height: 70%;
-            align-items: center;
-        }
-
-        .example-card .preview .layout-diagram .block {
-            background: #dbeafe;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.5rem;
-            color: #2563eb;
-            font-weight: 500;
-        }
-
-        .example-card .preview .layout-diagram .block.dark {
-            background: #1e293b;
-            color: #94a3b8;
-        }
-
-        .example-card .preview .layout-diagram .block.orange {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .example-card .preview .layout-diagram .block.green {
-            background: #d1fae5;
-            color: #059669;
-        }
-
-        .example-card .preview .layout-diagram .block.gray {
-            background: #f1f5f9;
-            color: #64748b;
-        }
-
-        .preview-standard .layout-diagram {
-            flex-direction: column;
-        }
-        .preview-standard .block {
-            width: 100%;
-            height: 100%;
-        }
-        .preview-standard .block.controls {
-            height: 25%;
-        }
-        .preview-standard .block.directory {
-            height: 75%;
-        }
-
-        .preview-sidebar .layout-diagram {
-            flex-direction: row;
-        }
-        .preview-sidebar .block.sidebar {
-            width: 25%;
-            height: 100%;
-        }
-        .preview-sidebar .block.main {
-            width: 75%;
-            height: 100%;
-        }
-
-        .preview-centered .layout-diagram {
-            flex-direction: column;
-            align-items: center;
-        }
-        .preview-centered .block {
-            width: 70%;
-            height: 100%;
-        }
-        .preview-centered .block.controls {
-            height: 30%;
-        }
-        .preview-centered .block.directory {
-            height: 70%;
-        }
-
-        .preview-twocolumn .layout-diagram {
-            flex-direction: column;
-        }
-        .preview-twocolumn .block.search {
-            width: 100%;
-            height: 20%;
-        }
-        .preview-twocolumn .block.row {
-            display: flex;
-            width: 100%;
-            height: 80%;
-            gap: 0.3rem;
-        }
-        .preview-twocolumn .block.row .sidebar {
-            width: 25%;
-            height: 100%;
-        }
-        .preview-twocolumn .block.row .main {
-            width: 75%;
-            height: 100%;
-        }
-
-        .preview-slideout .layout-diagram {
-            flex-direction: column;
-        }
-        .preview-slideout .block.topbar {
-            width: 100%;
-            height: 15%;
-            background: #1e293b;
-            color: #94a3b8;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.5rem;
-        }
-        .preview-slideout .block.directory {
-            width: 100%;
-            height: 85%;
-            background: #f8fafc;
-            border: 1px dashed #e2e8f0;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.5rem;
-            color: #94a3b8;
+        .example-card .badge.slideout {
+            background: #1a202c;
+            color: #e2e8f0;
         }
 
         .example-card h2 {
@@ -273,7 +138,7 @@
 
     <div class="page-header">
         <h1>Atlas — Layout Examples</h1>
-        <p>Live, interactive examples showing different ways to arrange your directory.</p>
+        <p>Live examples showing different ways to arrange your Atlas directory.</p>
         <div class="nav-links">
             <a href="../index.html">← Main Demo</a>
             <a href="../docs/">Documentation</a>
@@ -283,76 +148,38 @@
 
     <div class="examples-grid">
 
-        <!-- Example 1: Standard -->
         <div class="example-card">
             <span class="badge popular">Most Common</span>
-            <div class="preview preview-standard">
-                <div class="layout-diagram">
-                    <div class="block controls">Controls</div>
-                    <div class="block directory">Directory</div>
-                </div>
-            </div>
             <h2>Standard Layout</h2>
             <p>Controls stacked at the top, directory below. Simple and familiar.</p>
             <a href="standard.html">View Example →</a>
         </div>
 
-        <!-- Example 2: Sidebar -->
         <div class="example-card">
-            <span class="badge">Sidebar</span>
-            <div class="preview preview-sidebar">
-                <div class="layout-diagram">
-                    <div class="block sidebar dark">Filters<br>Sort</div>
-                    <div class="block main">Directory</div>
-                </div>
-            </div>
+            <span class="badge dark">Dark</span>
             <h2>Sidebar Layout</h2>
             <p>Controls in a left sidebar, directory on the right. Great for wide screens.</p>
             <a href="sidebar.html">View Example →</a>
         </div>
 
-        <!-- Example 3: Centered Minimal -->
         <div class="example-card">
-            <span class="badge minimal">Minimal</span>
-            <div class="preview preview-centered">
-                <div class="layout-diagram">
-                    <div class="block controls orange">Search + Filters</div>
-                    <div class="block directory">Directory</div>
-                </div>
-            </div>
+            <span class="badge warm">Warm</span>
             <h2>Centered Minimal</h2>
             <p>Clean, centered design with minimal controls. Focus on the content.</p>
             <a href="centered.html">View Example →</a>
         </div>
 
-        <!-- Example 4: Two-Column -->
         <div class="example-card">
-            <span class="badge advanced">Advanced</span>
-            <div class="preview preview-twocolumn">
-                <div class="layout-diagram">
-                    <div class="block search green">Search Bar</div>
-                    <div class="block row">
-                        <div class="block sidebar dark">Filters<br>Sort</div>
-                        <div class="block main">Directory</div>
-                    </div>
-                </div>
-            </div>
-            <h2>Two-Column with Search Bar</h2>
+            <span class="badge minimal">Minimal</span>
+            <h2>Two-Column</h2>
             <p>Search bar spans full width, filters and directory side by side.</p>
             <a href="two-column.html">View Example →</a>
         </div>
 
-        <!-- Example 5: Slide-out Top Bar -->
         <div class="example-card">
-            <span class="badge">Slide-out</span>
-            <div class="preview preview-slideout">
-                <div class="layout-diagram">
-                    <div class="block topbar">☰ Controls (slide-out)</div>
-                    <div class="block directory">Directory</div>
-                </div>
-            </div>
+            <span class="badge slideout">Slide-out</span>
             <h2>Slide-out Top Bar</h2>
-            <p>Controls hidden in a collapsible top bar. Clean and mobile-friendly.</p>
+            <p>Controls in a collapsible top bar. Clean and mobile-friendly.</p>
             <a href="slideout.html">View Example →</a>
         </div>
 
