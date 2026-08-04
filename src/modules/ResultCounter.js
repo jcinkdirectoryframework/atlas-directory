@@ -6,6 +6,7 @@
  * Responsibilities:
  * - Show "Showing X of Y members"
  * - Update when filters or search change
+ * - Accessibility: ARIA live region for screen readers
  *
  * Deliberately does NOT:
  * - Manage application state (delegates to Store)
@@ -51,6 +52,11 @@ export default class ResultCounter {
         this.#store = store;
         this.#events = events;
 
+        // Set ARIA role for live announcements
+        this.#container.setAttribute('role', 'status');
+        this.#container.setAttribute('aria-live', 'polite');
+        this.#container.setAttribute('aria-atomic', 'true');
+
         // Initial render
         this.render();
 
@@ -92,8 +98,9 @@ export default class ResultCounter {
 
             if (hasSearch) {
                 const searchResults = [];
+                const query = searchQuery.trim().toLowerCase();
                 for (const member of filtered) {
-                    if (member.matches(searchQuery)) {
+                    if (member.matches(query)) {
                         searchResults.push(member);
                     }
                 }

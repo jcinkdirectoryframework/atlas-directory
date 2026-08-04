@@ -9,6 +9,7 @@
  * - Insert generated UI into the [data-sort] container
  * - Handle sort click events
  * - Update button UI state (active, asc, desc)
+ * - Accessibility: ARIA attributes, keyboard navigation
  *
  * Deliberately does NOT:
  * - Manage sort state (delegates to Store)
@@ -54,9 +55,13 @@ export default class SortGenerator {
         this.#store = store;
         this.#events = events;
 
+        // Set ARIA role for the container
+        this.#container.setAttribute('role', 'toolbar');
+        this.#container.setAttribute('aria-label', 'Sort controls');
+
         this.#generate();
 
-        // Listen for sort state changes (from chips or other sources)
+        // Listen for sort state changes
         this.#events.subscribe('store:sortChanged', () => {
             this.#updateUI();
         });
@@ -98,6 +103,9 @@ export default class SortGenerator {
         const button = document.createElement('button');
         button.dataset.sort = fieldName;
         button.type = 'button';
+        button.setAttribute('role', 'button');
+        button.setAttribute('aria-pressed', 'false');
+        button.setAttribute('aria-label', `Sort by ${fieldName}`);
 
         // Format the label: "primary-residence" → "Primary Residence"
         const label = fieldName
@@ -109,6 +117,14 @@ export default class SortGenerator {
 
         button.addEventListener('click', () => {
             this.#handleSortClick(fieldName);
+        });
+
+        // Keyboard support for Enter/Space
+        button.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.#handleSortClick(fieldName);
+            }
         });
 
         this.#container.appendChild(button);
@@ -155,20 +171,28 @@ export default class SortGenerator {
 
             // Remove all sort classes
             button.classList.remove('active', 'asc', 'desc');
+            button.setAttribute('aria-pressed', 'false');
 
             // Remove any existing arrow text
             const originalText = button.textContent.replace(/[↑↓]/g, '').trim();
             button.textContent = originalText;
 
+            // Reset aria-label
+            button.setAttribute('aria-label', `Sort by ${field}`);
+
             // If this is the active sort field
             if (currentSort && currentSort.field === field) {
                 button.classList.add('active');
+                button.setAttribute('aria-pressed', 'true');
+
                 if (currentSort.direction === 'asc') {
                     button.classList.add('asc');
                     button.textContent += ' ↑';
+                    button.setAttribute('aria-label', `Sort by ${field} (ascending)`);
                 } else if (currentSort.direction === 'desc') {
                     button.classList.add('desc');
                     button.textContent += ' ↓';
+                    button.setAttribute('aria-label', `Sort by ${field} (descending)`);
                 }
             }
         }

@@ -9,6 +9,7 @@
  * - Batch DOM updates for performance
  * - Handle loading state (flicker prevention)
  * - Lazy rendering for large directories (>300 members)
+ * - Accessibility: ARIA roles for member lists
  * - No business logic — only DOM operations
  *
  * Deliberately does NOT:
@@ -27,7 +28,7 @@ export default class Renderer {
     #filteredMembers = [];
     #visibleMembers = [];
     #observer = null;
-    #lazyRenderThreshold = 300;
+    #lazyRenderThreshold = 300; // Only enable lazy rendering above 300 members
     #batchSize = 25;
     #sentinelTop = null;
     #sentinelBottom = null;
@@ -274,6 +275,9 @@ export default class Renderer {
         const directory = this.#registry.directory;
         const members = this.#filteredMembers;
 
+        // Ensure directory has list role (accessibility)
+        directory.setAttribute('role', 'list');
+
         // Clear the directory
         directory.innerHTML = '';
 
@@ -284,6 +288,8 @@ export default class Renderer {
             // Remove any hidden state
             element.hidden = false;
             element.removeAttribute('data-hidden');
+            // Add ARIA role for accessibility
+            element.setAttribute('role', 'listitem');
             fragment.appendChild(element);
         }
 
@@ -300,6 +306,9 @@ export default class Renderer {
     #renderLazy(totalMembers) {
 
         const directory = this.#registry.directory;
+
+        // Ensure directory has list role (accessibility)
+        directory.setAttribute('role', 'list');
 
         // ─── Set up lazy rendering if not already active ──
         if (!this.#isLazyRendering) {
@@ -378,6 +387,8 @@ export default class Renderer {
                     element.removeAttribute('data-hidden');
                     // Store reference to the member on the element
                     element._atlasMember = member;
+                    // Add ARIA role for accessibility
+                    element.setAttribute('role', 'listitem');
                     fragment.appendChild(element);
                     inserted++;
                 }
@@ -401,7 +412,6 @@ export default class Renderer {
                     }
                 } else {
                     // Find where to insert: after the last rendered member that's before our start index
-                    let insertAfter = null;
                     let insertBefore = null;
 
                     // Find the first rendered member that's after our range

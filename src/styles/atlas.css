@@ -6,6 +6,8 @@
  * - Loading state (prevent flicker)
  * - Visibility toggles
  * - Layout container classes
+ * - Focus states (accessibility)
+ * - Reduced motion support (accessibility)
  *
  * All visual styling (buttons, chips, filters, member cards, etc.)
  * should be provided by the user.
@@ -46,4 +48,69 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+}
+
+/* ─── Focus States (Accessibility) ────────────────── */
+
+/* Keyboard-only focus indicator */
+[data-atlas] button:focus-visible,
+[data-atlas] .atlas-chip:focus-visible,
+[data-atlas] [data-search]:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Focus ring for filter buttons */
+[data-filter-options] button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Focus ring for sort buttons */
+[data-sort] button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Focus ring for chips */
+.atlas-chip:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Focus ring for Clear All button */
+.atlas-clear-all:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ─── Reduced Motion (Accessibility) ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+
+    /* Disable all transitions */
+    [data-atlas] *,
+    [data-atlas] *::before,
+    [data-atlas] *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Loading state — instant fade */
+    [data-atlas-loading] [data-directory] {
+        opacity: 0;
+        transition: none;
+    }
+
+    [data-directory] {
+        opacity: 1;
+        transition: none;
+    }
+
 }

@@ -10,10 +10,12 @@
  * - Expose the public API
  *
  * Deliberately does NOT:
- * - Search, filter, sort, or render
+ * - Search
+ * - Filter
+ * - Render
  * - Parse members
- * - Manage state directly
- * - Update the DOM
+ *
+ * Those responsibilities belong to specialised classes.
  */
 
 import Registry from "./Registry.js";
@@ -224,6 +226,10 @@ export default class Atlas {
         // Search input (special case — direct event binding)
         const searchInput = this.root.querySelector('[data-search]');
         if (searchInput) {
+            // Add ARIA label if not already present (accessibility)
+            if (!searchInput.hasAttribute('aria-label') && !searchInput.hasAttribute('aria-labelledby')) {
+                searchInput.setAttribute('aria-label', 'Search members');
+            }
             searchInput.addEventListener('input', (event) => {
                 this.#store.setSearch(event.target.value);
             });

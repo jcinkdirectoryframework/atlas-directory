@@ -8,6 +8,7 @@
  * - Remove individual filters when chip is clicked
  * - Provide "Clear All" button
  * - Update Store when chips are removed
+ * - Accessibility: ARIA attributes, keyboard navigation
  *
  * Deliberately does NOT:
  * - Manage application state (delegates to Store)
@@ -53,6 +54,10 @@ export default class FilterChips {
         this.#fieldFilterMap = fieldFilterMap;
         this.#events = events;
 
+        // Set ARIA role for the container
+        this.#container.setAttribute('role', 'toolbar');
+        this.#container.setAttribute('aria-label', 'Active filters');
+
         // Initial render
         this.render();
 
@@ -90,6 +95,7 @@ export default class FilterChips {
             const message = document.createElement('span');
             message.className = 'atlas-chips-empty';
             message.textContent = 'No active filters';
+            message.setAttribute('aria-live', 'polite');
             this.#container.appendChild(message);
             return;
         }
@@ -111,6 +117,9 @@ export default class FilterChips {
                 chip.className = 'atlas-chip';
                 chip.dataset.field = fieldName;
                 chip.dataset.value = value;
+                chip.setAttribute('role', 'button');
+                chip.setAttribute('tabindex', '0');
+                chip.setAttribute('aria-label', `Remove ${fieldName} filter: ${value}`);
 
                 // Chip text: show field name + value
                 const text = document.createElement('span');
@@ -125,6 +134,7 @@ export default class FilterChips {
                 removeBtn.textContent = '×';
                 removeBtn.type = 'button';
                 removeBtn.setAttribute('aria-label', `Remove ${value} filter`);
+                removeBtn.setAttribute('tabindex', '-1'); // Keyboard navigation is on the chip itself
 
                 removeBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -132,6 +142,20 @@ export default class FilterChips {
                 });
 
                 chip.appendChild(removeBtn);
+
+                // Click on the chip removes the filter
+                chip.addEventListener('click', () => {
+                    this.#removeFilter(fieldName, value);
+                });
+
+                // Keyboard support: Enter/Space to remove
+                chip.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.#removeFilter(fieldName, value);
+                    }
+                });
+
                 this.#container.appendChild(chip);
 
             }
@@ -143,35 +167,51 @@ export default class FilterChips {
         clearAllBtn.className = 'atlas-clear-all';
         clearAllBtn.textContent = 'Clear All';
         clearAllBtn.type = 'button';
+        clearAllBtn.setAttribute('aria-label', 'Clear all active filters');
 
         clearAllBtn.addEventListener('click', () => {
             this.#clearAllFilters();
         });
 
+        // Keyboard support for Enter/Space
+        clearAllBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.#clearAllFilters();
+            }
+        });
+
         this.#container.appendChild(clearAllBtn);
+
+        // Announce the number of active filters
+        const chipCount = this.#container.querySelectorAll('.atlas-chip').length;
+        this.#container.setAttribute('aria-label', `${chipCount} active filters`);
 
     }
 
     /**
      * Remove a single filter value.
-     * 
+     *
      * Uses Store.toggleFilter() which properly publishes events.
      */
     #removeFilter(fieldName, value) {
 
         // Check if the value is active
         const isActive = this.#store.isFilterActive(fieldName, value);
-        
+
         if (isActive) {
             // This will remove the value and publish a 'store:filtersChanged' event
             this.#store.toggleFilter(fieldName, value);
-            
+
             // Update the "All" button state for this field
             this.#updateFilterGeneratorUI(fieldName);
-            
+
             // Re-render chips (the event listener will also trigger this,
             // but we do it explicitly to ensure immediate UI update)
             this.render();
+
+            // Move focus back to the container if needed
+            this.#container.focus();
         }
 
     }
@@ -215,8 +255,10 @@ export default class FilterChips {
             const hasActiveFilters = this.#store.hasFieldFilters(fieldName);
             if (hasActiveFilters) {
                 allButton.classList.remove('active');
+                allButton.setAttribute('aria-pressed', 'false');
             } else {
                 allButton.classList.add('active');
+                allButton.setAttribute('aria-pressed', 'true');
             }
         }
 
@@ -225,8 +267,10 @@ export default class FilterChips {
         for (const button of fieldInfo.valueButtons) {
             if (activeValues.includes(button.dataset.value)) {
                 button.classList.add('active');
+                button.setAttribute('aria-pressed', 'true');
             } else {
                 button.classList.remove('active');
+                button.setAttribute('aria-pressed', 'false');
             }
         }
 

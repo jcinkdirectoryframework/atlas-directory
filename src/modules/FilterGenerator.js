@@ -9,6 +9,7 @@
  * - Insert generated UI into the [data-filters] container
  * - Handle filter selection events
  * - Update Store when filters change
+ * - Accessibility: ARIA attributes, keyboard navigation
  *
  * Deliberately does NOT:
  * - Manage application state (delegates to Store)
@@ -115,6 +116,8 @@ export default class FilterGenerator {
         const group = document.createElement('div');
         group.dataset.filter = '';
         group.dataset.field = fieldName;
+        group.setAttribute('role', 'group');
+        group.setAttribute('aria-label', `Filter by ${fieldName}`);
 
         // Create label
         const label = document.createElement('label');
@@ -124,6 +127,8 @@ export default class FilterGenerator {
         // Create options container
         const optionsContainer = document.createElement('div');
         optionsContainer.dataset.filterOptions = '';
+        optionsContainer.setAttribute('role', 'toolbar');
+        optionsContainer.setAttribute('aria-label', `${fieldName} filter options`);
 
         // Create "All" button (always first)
         const allButton = document.createElement('button');
@@ -131,6 +136,9 @@ export default class FilterGenerator {
         allButton.textContent = 'All';
         allButton.type = 'button';
         allButton.classList.add('active'); // Active by default
+        allButton.setAttribute('role', 'button');
+        allButton.setAttribute('aria-pressed', 'true');
+        allButton.setAttribute('aria-label', `Show all ${fieldName} values`);
         optionsContainer.appendChild(allButton);
 
         // Create buttons for each unique value
@@ -141,6 +149,9 @@ export default class FilterGenerator {
             button.dataset.value = value;
             button.textContent = value;
             button.type = 'button';
+            button.setAttribute('role', 'button');
+            button.setAttribute('aria-pressed', 'false');
+            button.setAttribute('aria-label', `Filter by ${fieldName}: ${value}`);
             valueButtons.push(button);
             optionsContainer.appendChild(button);
         }
@@ -170,11 +181,28 @@ export default class FilterGenerator {
             this.#handleAllClick(fieldName);
         });
 
+        // Keyboard support for Enter/Space on "All" button
+        allButton.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.#handleAllClick(fieldName);
+            }
+        });
+
         // Value buttons select a value (no toggle)
         for (const button of valueButtons) {
             button.addEventListener('click', () => {
                 const value = button.dataset.value;
                 this.#handleValueSelect(fieldName, value);
+            });
+
+            // Keyboard support for Enter/Space
+            button.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const value = button.dataset.value;
+                    this.#handleValueSelect(fieldName, value);
+                }
             });
         }
 
@@ -198,10 +226,14 @@ export default class FilterGenerator {
         if (fieldData) {
             for (const button of fieldData.valueButtons) {
                 button.classList.remove('active');
+                button.setAttribute('aria-pressed', 'false');
             }
         }
 
         // Store publishes the event automatically via clearFieldFilters
+
+        // Move focus back to the "All" button
+        fieldData.allButton.focus();
 
     }
 
@@ -242,8 +274,10 @@ export default class FilterGenerator {
             if (button.dataset.value === value) {
                 if (isActive) {
                     button.classList.add('active');
+                    button.setAttribute('aria-pressed', 'true');
                 } else {
                     button.classList.remove('active');
+                    button.setAttribute('aria-pressed', 'false');
                 }
                 break;
             }
@@ -269,8 +303,10 @@ export default class FilterGenerator {
 
         if (hasActiveFilters) {
             fieldData.allButton.classList.remove('active');
+            fieldData.allButton.setAttribute('aria-pressed', 'false');
         } else {
             fieldData.allButton.classList.add('active');
+            fieldData.allButton.setAttribute('aria-pressed', 'true');
         }
 
     }
@@ -297,6 +333,7 @@ export default class FilterGenerator {
             // Reset all value buttons
             for (const button of fieldData.valueButtons) {
                 button.classList.remove('active');
+                button.setAttribute('aria-pressed', 'false');
             }
 
             // Apply active states from the Store
@@ -304,6 +341,7 @@ export default class FilterGenerator {
             for (const button of fieldData.valueButtons) {
                 if (activeValues.includes(button.dataset.value)) {
                     button.classList.add('active');
+                    button.setAttribute('aria-pressed', 'true');
                 }
             }
 
