@@ -10,7 +10,7 @@
 
 <div class="docs-wrapper">
 
-    <!-- ─── Sidebar ─────────────────────────────────── -->
+    <!-- Sidebar -->
     <aside class="docs-sidebar">
         <a href="index.html" class="logo">Atlas</a>
         <span class="subtitle">HTML-driven directory engine</span>
@@ -35,7 +35,7 @@
         <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
     </aside>
 
-    <!-- ─── Main Content ────────────────────────────── -->
+    <!-- Main Content -->
     <main class="docs-content">
 
         <h1>Getting Started</h1>
@@ -45,6 +45,29 @@
             Atlas is designed to be as simple as possible. You configure it through HTML,
             style it with CSS, and initialise it with a single line of JavaScript.
         </p>
+
+        <div class="tip">
+            <strong>Quick Start:</strong> Use the CDN links below — no files to download or upload!
+            <a href="installation/jcink.html">→ JCink users, see the full guide</a>
+        </div>
+
+        <h2>CDN Installation (Recommended)</h2>
+
+        <p>The quickest way to get started — no files to upload!</p>
+
+        <pre><code>&lt;!-- CSS --&gt;
+&lt;link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css"&gt;
+
+&lt;!-- JavaScript --&gt;
+&lt;script type="module"&gt;
+    import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
+    new Atlas();
+&lt;/script&gt;</code></pre>
+
+        <div class="tip">
+            <strong>Tip:</strong> That's it! No files to download or upload.
+            See the <a href="installation/jcink.html">JCink Installation Guide</a> for JCink-specific instructions.
+        </div>
 
         <h2>Step 1: Add HTML</h2>
 
@@ -88,6 +111,10 @@
 
         <p>Atlas provides minimal core CSS. You can customise everything else.</p>
 
+        <p><strong>Option A: CDN (Recommended)</strong></p>
+        <pre><code>&lt;link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css"&gt;</code></pre>
+
+        <p><strong>Option B: Self-Host</strong></p>
         <pre><code>&lt;link rel="stylesheet" href="path/to/atlas.css"&gt;</code></pre>
 
         <p>
@@ -97,8 +124,13 @@
 
         <h2>Step 3: Add JavaScript</h2>
 
-        <p>Import Atlas and initialise it.</p>
+        <p><strong>Option A: CDN (Recommended)</strong></p>
+        <pre><code>&lt;script type="module"&gt;
+    import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
+    new Atlas();
+&lt;/script&gt;</code></pre>
 
+        <p><strong>Option B: Self-Host</strong></p>
         <pre><code>&lt;script type="module"&gt;
     import Atlas from './dist/atlas.js';
     new Atlas();

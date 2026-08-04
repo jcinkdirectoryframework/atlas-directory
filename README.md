@@ -23,22 +23,16 @@ Atlas transforms static HTML member lists into interactive, searchable directori
 
 ---
 
-## Performance
+## CDN Installation
 
-Atlas is optimised for directories of up to ~1,000 members.
+The quickest way to get started — no files to upload!
 
-**Key optimisations:**
-- **Set lookups** for O(1) filter matching
-- **Filter caching** — repeated filters are instant
-- **Lazy rendering** — automatically activates at 300+ members
-- **Intersection Observer** — only renders visible members
-- **Intl.Collator** — faster locale-aware sorting
+<link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css">
 
-**Benchmarks with 1,000 members:**
-- Init time: ~150ms
-- Filter time: ~0.4ms (first), instant (cached)
-- Sort time: ~1.2ms
-- Visible DOM nodes: ~700 (vs 22,000 without lazy rendering)
+<script type="module">
+    import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
+    new Atlas();
+</script>
 
 ---
 
@@ -79,20 +73,48 @@ Atlas is optimised for directories of up to ~1,000 members.
 
 Atlas provides minimal core CSS for functionality. You can customise everything else.
 
-<link rel="stylesheet" href="src/styles/atlas.css">
+Option A: CDN (Recommended)
+<link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css">
 
-Or copy the contents into your own stylesheet.
+Option B: Self-Host
+<link rel="stylesheet" href="src/styles/atlas.css">
 
 For custom styling, see the CSS Customisation section in docs/html-api.md.
 
 ### 3. Add JavaScript
 
+Option A: CDN (Recommended)
+<script type="module">
+    import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
+    new Atlas();
+</script>
+
+Option B: Self-Host
 <script type="module">
     import Atlas from './dist/atlas.js';
     new Atlas();
 </script>
 
 That's it. Atlas discovers everything automatically.
+
+---
+
+## Performance
+
+Atlas is optimised for directories of up to ~1,000 members.
+
+Key optimisations:
+- Set lookups for O(1) filter matching
+- Filter caching — repeated filters are instant
+- Lazy rendering — automatically activates at 300+ members
+- Intersection Observer — only renders visible members
+- Intl.Collator — faster locale-aware sorting
+
+Benchmarks with 1,000 members:
+- Init time: ~150ms
+- Filter time: ~0.4ms (first), instant (cached)
+- Sort time: ~1.2ms
+- Visible DOM nodes: ~700 (vs 22,000 without lazy rendering)
 
 ---
 
@@ -133,10 +155,10 @@ See docs/html-api.md for full documentation.
 
 For JCink forums, Atlas is installed across two templates:
 
-- **Member List Header** — Contains the Atlas wrapper, controls, and directory
-- **Member List Row** — Contains each member card
+- Member List Header — Contains the Atlas wrapper, controls, and directory
+- Member List Row — Contains each member card
 
-See the [JCink Installation Guide](docs/installation/jcink.html) for step-by-step instructions.
+See the JCink Installation Guide (docs/installation/jcink.html) for step-by-step instructions.
 
 ---
 
@@ -144,13 +166,13 @@ See the [JCink Installation Guide](docs/installation/jcink.html) for step-by-ste
 
 See Atlas in action with different layouts:
 
-- [Standard Layout](examples/standard.html)
-- [Sidebar Layout](examples/sidebar.html)
-- [Centered Minimal Layout](examples/centered.html)
-- [Two-Column Layout](examples/two-column.html)
-- [Slide-out Top Bar](examples/slideout.html)
+- Standard Layout (examples/standard.html)
+- Sidebar Layout (examples/sidebar.html)
+- Centered Minimal Layout (examples/centered.html)
+- Two-Column Layout (examples/two-column.html)
+- Slide-out Top Bar (examples/slideout.html)
 
-[View all layout examples](docs/examples/layout-examples.html)
+View all layout examples (docs/examples/layout-examples.html)
 
 ---
 

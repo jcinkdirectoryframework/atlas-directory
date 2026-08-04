@@ -57,14 +57,14 @@
         <h2>Option A: Use CDN (Recommended)</h2>
 
         <p>
-            The easiest way to install Atlas is to link to the files hosted on a CDN.
-            You don't need to upload any files to your forum — just link to them.
+            The easiest way to install Atlas is to link to the CDN version.
+            No files to upload — just copy and paste!
         </p>
 
         <p>Add this to your <strong>Member List Header</strong> template:</p>
 
-        <pre><code>&lt;!-- CSS — link to the Atlas core styles --&gt;
-&lt;link rel="stylesheet" href="https://cdn.yourdomain.com/atlas/dist/atlas.css"&gt;
+        <pre><code>&lt;!-- CSS — CDN version --&gt;
+&lt;link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css"&gt;
 
 &lt;!-- HTML — your Atlas directory --&gt;
 &lt;div data-atlas&gt;
@@ -81,15 +81,14 @@
     &lt;/div&gt;
 &lt;/div&gt;
 
-&lt;!-- JavaScript — import and initialise Atlas --&gt;
+&lt;!-- JavaScript — CDN version --&gt;
 &lt;script type="module"&gt;
-    import Atlas from 'https://cdn.yourdomain.com/atlas/dist/atlas.js';
+    import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
     new Atlas();
 &lt;/script&gt;</code></pre>
 
-        <div class="note">
-            <strong>Note:</strong> Replace <code>cdn.yourdomain.com</code> with your actual CDN URL.
-            If you're using Cloudflare, this would be your Cloudflare Pages or R2 URL.
+        <div class="tip">
+            <strong>Tip:</strong> No files to upload — just copy and paste these links!
         </div>
 
         <hr>
@@ -156,7 +155,7 @@
         </p>
 
         <pre><code>&lt;!-- CSS — link to Atlas styles (adjust path as needed) --&gt;
-&lt;link rel="stylesheet" href="https://cdn.yourdomain.com/atlas/dist/atlas.css"&gt;
+&lt;link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css"&gt;
 
 &lt;div data-atlas&gt;
 
@@ -185,7 +184,7 @@
 
 &lt;!-- JavaScript — import and initialise Atlas --&gt;
 &lt;script type="module"&gt;
-    import Atlas from 'https://cdn.yourdomain.com/atlas/dist/atlas.js';
+    import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
     new Atlas();
 &lt;/script&gt;</code></pre>
 
@@ -325,9 +324,9 @@
         <h2>Next Steps</h2>
 
         <ul>
-            <li>🎨 <a href="../css-customisation.html">CSS Customisation</a> — Style your directory</li>
-            <li>📐 <a href="../examples/layout-examples.html">Layout Examples</a> — See different layouts</li>
-            <li>📖 <a href="../html-api.html">HTML API Reference</a> — All available attributes</li>
+            <li><a href="../css-customisation.html">CSS Customisation</a> — Style your directory</li>
+            <li><a href="../examples/layout-examples.html">Layout Examples</a> — See different layouts</li>
+            <li><a href="../html-api.html">HTML API Reference</a> — All available attributes</li>
         </ul>
 
     </main>
