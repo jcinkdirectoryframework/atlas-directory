@@ -1,5 +1,39 @@
 # Changelog
 
+## [M0.10] — 2026-08-04
+
+### Added
+
+- **EventBus** (`src/core/EventBus.js`)
+  - Central publish/subscribe communication system
+  - Decouples modules from each other
+  - Enables extensibility without modifying core
+
+- **Renderer** (`src/core/Renderer.js`)
+  - Dedicated DOM update manager
+  - Batch updates using DocumentFragment
+  - Loading state management (no flicker)
+
+- **Documentation**
+  - JCink Installation Guide (`docs/installation/jcink.html`)
+  - CSS Reference section in `docs/css-customisation.html`
+  - Live layout examples linked from documentation
+  - Updated all examples to use Star Wars characters
+
+### Changed
+
+- **Atlas class** — Simplified, god class eliminated
+- **Store class** — Now publishes events via EventBus
+- **All modules** — Now use EventBus instead of CustomEvent
+- **README.md** — Updated examples, added JCink and examples links
+- **All documentation** — Updated to reflect new architecture
+
+### Fixed
+
+- No flicker on page load
+- All features combine correctly (filters + search + sort + layout)
+- Examples now work with live member data
+
 ## [M0.9] — 2026-08-03
 
 ### Added

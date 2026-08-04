@@ -5,6 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Layout Examples — Atlas Documentation</title>
     <link rel="stylesheet" href="../assets/css/docs.css">
+    <style>
+        .example-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .example-link-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #0f172a;
+            display: block;
+        }
+
+        .example-link-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .example-link-card .badge {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 0.1rem 0.6rem;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.4rem;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .example-link-card .badge.popular {
+            background: #2563eb;
+            color: white;
+        }
+
+        .example-link-card .badge.dark {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .example-link-card .badge.warm {
+            background: #f97316;
+            color: white;
+        }
+
+        .example-link-card .badge.minimal {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .example-link-card .badge.slideout {
+            background: #1a202c;
+            color: #e2e8f0;
+        }
+
+        .example-link-card h3 {
+            margin: 0 0 0.2rem 0;
+            font-size: 1rem;
+        }
+
+        .example-link-card p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .example-link-card .arrow {
+            color: #2563eb;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        .code-snippets {
+            margin-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 2rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -24,6 +111,9 @@
         <a href="../architecture.html">Architecture</a>
         <a href="../css-customisation.html">CSS Customisation</a>
 
+        <span class="nav-label">Installation</span>
+        <a href="../installation/jcink.html">JCink Setup</a>
+
         <span class="nav-label">Examples</span>
         <a href="layout-examples.html" class="active">Layout Examples</a>
 
@@ -36,18 +126,68 @@
     <main class="docs-content">
 
         <h1>Layout Examples</h1>
-        <p class="page-subtitle">Different ways to arrange your directory</p>
+        <p class="page-subtitle">Live examples showing different ways to arrange your directory</p>
 
         <p>
             Atlas controls can be placed anywhere within <code>data-atlas</code>.
-            Here are some common layout patterns you can use.
+            Click any example below to see it in action with live member data.
         </p>
 
-        <h2>Example 1: Standard Layout</h2>
+        <h2>Live Examples</h2>
 
-        <p>Controls at the top, directory below.</p>
+        <div class="example-links">
 
-        <pre><code>&lt;div data-atlas&gt;
+            <a href="../../examples/standard.html" class="example-link-card" target="_blank">
+                <span class="badge popular">Most Common</span>
+                <h3>Standard Layout</h3>
+                <p>Controls at the top, directory below. Simple and familiar.</p>
+                <span class="arrow">View Example →</span>
+            </a>
+
+            <a href="../../examples/sidebar.html" class="example-link-card" target="_blank">
+                <span class="badge dark">Dark</span>
+                <h3>Sidebar Layout</h3>
+                <p>Controls in a left sidebar, directory on the right. Great for wide screens.</p>
+                <span class="arrow">View Example →</span>
+            </a>
+
+            <a href="../../examples/centered.html" class="example-link-card" target="_blank">
+                <span class="badge warm">Warm</span>
+                <h3>Centered Minimal</h3>
+                <p>Clean, centered design with minimal controls. Focus on the content.</p>
+                <span class="arrow">View Example →</span>
+            </a>
+
+            <a href="../../examples/two-column.html" class="example-link-card" target="_blank">
+                <span class="badge minimal">Minimal</span>
+                <h3>Two-Column</h3>
+                <p>Search bar spans full width, filters and directory side by side.</p>
+                <span class="arrow">View Example →</span>
+            </a>
+
+            <a href="../../examples/slideout.html" class="example-link-card" target="_blank">
+                <span class="badge slideout">Slide-out</span>
+                <h3>Slide-out Top Bar</h3>
+                <p>Controls in a collapsible top bar. Clean and mobile-friendly.</p>
+                <span class="arrow">View Example →</span>
+            </a>
+
+        </div>
+
+        <div class="tip">
+            <strong>Tip:</strong> Each example uses the same member data but shows a different
+            layout and visual theme. This demonstrates how flexible Atlas can be.
+        </div>
+
+        <!-- ─── Code Snippets (preserved from original) ──── -->
+        <div class="code-snippets">
+
+            <h2>Code Snippets</h2>
+            <p>Here are the HTML structures for each layout pattern:</p>
+
+            <h3>Example 1: Standard Layout</h3>
+            <p>Controls at the top, directory below.</p>
+            <pre><code>&lt;div data-atlas&gt;
     &lt;input data-search placeholder="Search..."&gt;
     &lt;div data-filters&gt;&lt;/div&gt;
     &lt;div data-sort&gt;&lt;/div&gt;
@@ -61,11 +201,9 @@
     &lt;/div&gt;
 &lt;/div&gt;</code></pre>
 
-        <h2>Example 2: Sidebar Layout</h2>
-
-        <p>Filters and controls in a sidebar, directory in the main area.</p>
-
-        <pre><code>&lt;div data-atlas style="display: flex; gap: 2rem;"&gt;
+            <h3>Example 2: Sidebar Layout</h3>
+            <p>Filters and controls in a sidebar, directory in the main area.</p>
+            <pre><code>&lt;div data-atlas style="display: flex; gap: 2rem;"&gt;
     &lt;aside style="width: 250px;"&gt;
         &lt;div data-filters&gt;&lt;/div&gt;
         &lt;div data-sort&gt;&lt;/div&gt;
@@ -84,11 +222,9 @@
     &lt;/main&gt;
 &lt;/div&gt;</code></pre>
 
-        <h2>Example 3: Centered Minimal Layout</h2>
-
-        <p>Clean, centered design with minimal controls.</p>
-
-        <pre><code>&lt;div data-atlas style="max-width: 800px; margin: 0 auto; text-align: center;"&gt;
+            <h3>Example 3: Centered Minimal Layout</h3>
+            <p>Clean, centered design with minimal controls.</p>
+            <pre><code>&lt;div data-atlas style="max-width: 800px; margin: 0 auto; text-align: center;"&gt;
     &lt;h2&gt;Our Members&lt;/h2&gt;
 
     &lt;input data-search placeholder="Search..." style="width: 100%;"&gt;
@@ -106,11 +242,9 @@
     &lt;/div&gt;
 &lt;/div&gt;</code></pre>
 
-        <h2>Example 4: Two-Column Layout with Search Bar</h2>
-
-        <p>Search bar spanning full width, filters and directory side by side.</p>
-
-        <pre><code>&lt;div data-atlas&gt;
+            <h3>Example 4: Two-Column Layout with Search Bar</h3>
+            <p>Search bar spanning full width, filters and directory side by side.</p>
+            <pre><code>&lt;div data-atlas&gt;
     &lt;input data-search placeholder="Search..." style="width: 100%;"&gt;
 
     &lt;div style="display: flex; gap: 2rem;"&gt;
@@ -131,6 +265,29 @@
         &lt;/div&gt;
     &lt;/div&gt;
 &lt;/div&gt;</code></pre>
+
+            <h3>Example 5: Slide-out Top Bar</h3>
+            <p>Controls hidden in a collapsible top bar. Clean and mobile-friendly.</p>
+            <pre><code>&lt;div data-atlas&gt;
+    &lt;div class="topbar"&gt;
+        &lt;button class="topbar-toggle"&gt;☰ Controls&lt;/button&gt;
+        &lt;div class="topbar-content"&gt;
+            &lt;div data-filters&gt;&lt;/div&gt;
+            &lt;div data-sort&gt;&lt;/div&gt;
+            &lt;input data-search placeholder="Search..."&gt;
+            &lt;div data-chips&gt;&lt;/div&gt;
+            &lt;div data-results&gt;&lt;/div&gt;
+            &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+            &lt;button data-layout="list"&gt;List&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div data-directory&gt;
+        &lt;article data-member&gt;...&lt;/article&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+        </div>
 
         <h2>Layout Tips</h2>
 

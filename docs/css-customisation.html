@@ -57,6 +57,74 @@
             <tr><td><code>[data-member][data-hidden]</code></td><td>Hidden member</td></tr>
         </table>
 
+                <h2>Atlas CSS Reference</h2>
+
+        <p>
+            Atlas provides a small set of CSS classes that are applied to elements
+            during runtime. You can use these classes to style Atlas-generated elements.
+        </p>
+
+        <h3>Layout Classes</h3>
+
+        <table>
+            <tr><th>Class</th><th>Applied To</th><th>Description</th></tr>
+            <tr><td><code>.atlas-layout-grid</code></td><td><code>[data-directory]</code></td><td>Applied when grid layout is active</td></tr>
+            <tr><td><code>.atlas-layout-list</code></td><td><code>[data-directory]</code></td><td>Applied when list layout is active</td></tr>
+        </table>
+
+        <h3>Chip Classes</h3>
+
+        <table>
+            <tr><th>Class</th><th>Applied To</th><th>Description</th></tr>
+            <tr><td><code>.atlas-chip</code></td><td><code>[data-chips]</code> children</td><td>Each individual filter chip</td></tr>
+            <tr><td><code>.atlas-chip-remove</code></td><td>Button inside <code>.atlas-chip</code></td><td>The × button to remove a chip</td></tr>
+            <tr><td><code>.atlas-chip-text</code></td><td>Span inside <code>.atlas-chip</code></td><td>The text label of the chip</td></tr>
+            <tr><td><code>.atlas-chips-empty</code></td><td>Span inside <code>[data-chips]</code></td><td>Displayed when no chips are active</td></tr>
+        </table>
+
+        <h3>Button Classes</h3>
+
+        <table>
+            <tr><th>Class</th><th>Applied To</th><th>Description</th></tr>
+            <tr><td><code>.atlas-clear-all</code></td><td>Button inside <code>[data-chips]</code></td><td>Clears all active filters</td></tr>
+        </table>
+
+        <h3>Counter Classes</h3>
+
+        <table>
+            <tr><th>Class</th><th>Applied To</th><th>Description</th></tr>
+            <tr><td><code>.atlas-result-counter</code></td><td>Span inside <code>[data-results]</code></td><td>Displays "Showing X of Y members"</td></tr>
+        </table>
+
+        <h3>Filter Classes</h3>
+
+        <table>
+            <tr><th>Class</th><th>Applied To</th><th>Description</th></tr>
+            <tr><td><code>.active</code></td><td>Filter buttons (<code>[data-filter-options] button</code>)</td><td>Applied when a filter value is selected</td></tr>
+        </table>
+
+        <h3>Sort Classes</h3>
+
+        <table>
+            <tr><th>Class</th><th>Applied To</th><th>Description</th></tr>
+            <tr><td><code>.active</code></td><td>Sort buttons (<code>[data-sort] button</code>)</td><td>Applied to the currently active sort field</td></tr>
+            <tr><td><code>.asc</code></td><td>Sort buttons (<code>[data-sort] button</code>)</td><td>Applied when sorting ascending (↑)</td></tr>
+            <tr><td><code>.desc</code></td><td>Sort buttons (<code>[data-sort] button</code>)</td><td>Applied when sorting descending (↓)</td></tr>
+        </table>
+
+        <h3>Visibility Classes</h3>
+
+        <table>
+            <tr><th>Class/Attribute</th><th>Applied To</th><th>Description</th></tr>
+            <tr><td><code>[hidden]</code></td><td>Individual <code>[data-member]</code></td><td>Applied when a member is hidden by filters/search</td></tr>
+            <tr><td><code>[data-hidden]</code></td><td>Individual <code>[data-member]</code></td><td>Alternate attribute for hidden members</td></tr>
+        </table>
+
+        <div class="tip">
+            <strong>Tip:</strong> You can override any of these classes in your own CSS.
+            Atlas uses minimal specificity, so your styles will take precedence.
+        </div>
+
         <h2>What You Should Style</h2>
 
         <table>

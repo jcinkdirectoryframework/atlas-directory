@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCink Installation — Atlas Documentation</title>
+    <link rel="stylesheet" href="../assets/css/docs.css">
+</head>
+<body>
+
+<div class="docs-wrapper">
+
+    <!-- ─── Sidebar ─────────────────────────────────── -->
+    <aside class="docs-sidebar">
+        <a href="../index.html" class="logo">Atlas</a>
+        <span class="subtitle">HTML-driven directory engine</span>
+        <hr>
+
+        <span class="nav-label">Getting Started</span>
+        <a href="../getting-started.html">Quick Start</a>
+        <a href="../html-api.html">HTML API</a>
+
+        <span class="nav-label">Guides</span>
+        <a href="../architecture.html">Architecture</a>
+        <a href="../css-customisation.html">CSS Customisation</a>
+
+        <span class="nav-label">Installation</span>
+        <a href="jcink.html" class="active">JCink Setup</a>
+
+        <span class="nav-label">Examples</span>
+        <a href="../examples/layout-examples.html">Layout Examples</a>
+
+        <hr>
+        <a href="../../index.html" class="external">← Live Demo</a>
+        <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
+    </aside>
+
+    <!-- ─── Main Content ────────────────────────────── -->
+    <main class="docs-content">
+
+        <h1>JCink Installation Guide</h1>
+        <p class="page-subtitle">How to install Atlas on your JCink forum</p>
+
+        <p>
+            This guide walks you through installing Atlas on your JCink forum.
+            You'll need access to your forum's <strong>Administration Control Panel (ACP)</strong>
+            and the ability to edit the <strong>Member List</strong> templates.
+        </p>
+
+        <div class="tip">
+            <strong>Tip:</strong> If you're not comfortable editing templates, ask your forum administrator
+            for help — the changes are simple but need to be placed in the correct templates.
+        </div>
+
+        <hr>
+
+        <h2>Option A: Use CDN (Recommended)</h2>
+
+        <p>
+            The easiest way to install Atlas is to link to the files hosted on a CDN.
+            You don't need to upload any files to your forum — just link to them.
+        </p>
+
+        <p>Add this to your <strong>Member List Header</strong> template:</p>
+
+        <pre><code>&lt;!-- CSS — link to the Atlas core styles --&gt;
+&lt;link rel="stylesheet" href="https://cdn.yourdomain.com/atlas/dist/atlas.css"&gt;
+
+&lt;!-- HTML — your Atlas directory --&gt;
+&lt;div data-atlas&gt;
+    &lt;input data-search placeholder="Search members..."&gt;
+    &lt;div data-filters&gt;&lt;/div&gt;
+    &lt;div data-sort&gt;&lt;/div&gt;
+    &lt;div data-chips&gt;&lt;/div&gt;
+    &lt;div data-results&gt;&lt;/div&gt;
+    &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+    &lt;button data-layout="list"&gt;List&lt;/button&gt;
+
+    &lt;div data-directory&gt;
+        &lt;% MEMBERLIST_ROWS %&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- JavaScript — import and initialise Atlas --&gt;
+&lt;script type="module"&gt;
+    import Atlas from 'https://cdn.yourdomain.com/atlas/dist/atlas.js';
+    new Atlas();
+&lt;/script&gt;</code></pre>
+
+        <div class="note">
+            <strong>Note:</strong> Replace <code>cdn.yourdomain.com</code> with your actual CDN URL.
+            If you're using Cloudflare, this would be your Cloudflare Pages or R2 URL.
+        </div>
+
+        <hr>
+
+        <h2>Option B: Self-Host</h2>
+
+        <p>
+            If you prefer to host the files on your own server, upload the Atlas files
+            to your JCink forum's file manager and link to them locally.
+        </p>
+
+        <p>Add this to your <strong>Member List Header</strong> template:</p>
+
+        <pre><code>&lt;!-- CSS — link to the Atlas core styles --&gt;
+&lt;link rel="stylesheet" href="https://yourforum.jcink.net/uploads/atlas/atlas.css"&gt;
+
+&lt;!-- HTML — your Atlas directory --&gt;
+&lt;div data-atlas&gt;
+    &lt;input data-search placeholder="Search members..."&gt;
+    &lt;div data-filters&gt;&lt;/div&gt;
+    &lt;div data-sort&gt;&lt;/div&gt;
+    &lt;div data-chips&gt;&lt;/div&gt;
+    &lt;div data-results&gt;&lt;/div&gt;
+    &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+    &lt;button data-layout="list"&gt;List&lt;/button&gt;
+
+    &lt;div data-directory&gt;
+        &lt;% MEMBERLIST_ROWS %&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- JavaScript — import and initialise Atlas --&gt;
+&lt;script type="module"&gt;
+    import Atlas from 'https://yourforum.jcink.net/uploads/atlas/src/core/Atlas.js';
+    new Atlas();
+&lt;/script&gt;</code></pre>
+
+        <div class="tip">
+            <strong>Tip:</strong> The <code>&lt;% MEMBERLIST_ROWS %&gt;</code> tag is essential —
+            it tells JCink where to insert each member row. Don't remove it!
+        </div>
+
+        <hr>
+
+        <h2>Step 1: Edit Member List Templates</h2>
+
+        <p>
+            In your JCink ACP, navigate to: <strong>Manage Templates → Member List</strong>
+        </p>
+
+        <p>You'll need to edit two templates:</p>
+        <ul>
+            <li><strong>Member List Header</strong> — The top of the member list</li>
+            <li><strong>Member List Row</strong> — Each individual member row</li>
+        </ul>
+
+        <hr>
+
+        <h2>Step 2: Member List Header</h2>
+
+        <p>
+            Replace the contents of your <strong>Member List Header</strong> template with this code.
+            This sets up the Atlas container, controls, and directory wrapper.
+        </p>
+
+        <pre><code>&lt;!-- CSS — link to Atlas styles (adjust path as needed) --&gt;
+&lt;link rel="stylesheet" href="https://cdn.yourdomain.com/atlas/dist/atlas.css"&gt;
+
+&lt;div data-atlas&gt;
+
+    &lt;!-- Search --&gt;
+    &lt;input data-search placeholder="Search members..."&gt;
+
+    &lt;!-- Controls --&gt;
+    &lt;div data-filters&gt;&lt;/div&gt;
+    &lt;div data-sort&gt;&lt;/div&gt;
+    &lt;div data-chips&gt;&lt;/div&gt;
+    &lt;div data-results&gt;&lt;/div&gt;
+
+    &lt;!-- Layout buttons (optional — default is grid) --&gt;
+    &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+    &lt;button data-layout="list"&gt;List&lt;/button&gt;
+
+    &lt;!-- Member directory wrapper --&gt;
+    &lt;div data-directory&gt;
+
+        &lt;!-- This is where Member List Row will be inserted --&gt;
+        &lt;% MEMBERLIST_ROWS %&gt;
+
+    &lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;!-- JavaScript — import and initialise Atlas --&gt;
+&lt;script type="module"&gt;
+    import Atlas from 'https://cdn.yourdomain.com/atlas/dist/atlas.js';
+    new Atlas();
+&lt;/script&gt;</code></pre>
+
+        <hr>
+
+        <h2>Step 3: Member List Row</h2>
+
+        <p>
+            Replace the contents of your <strong>Member List Row</strong> template with this code.
+            This defines how each member card is displayed.
+        </p>
+
+        <pre><code>&lt;article data-member&gt;
+
+    &lt;!-- Name — Searchable &amp; Sortable --&gt;
+    &lt;div&gt;
+        &lt;strong&gt;Name:&lt;/strong&gt;
+        &lt;span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false"&gt;
+            &lt;!-- |name| --&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Face Claim — Searchable &amp; Sortable, NOT Filterable --&gt;
+    &lt;div&gt;
+        &lt;strong&gt;Face Claim:&lt;/strong&gt;
+        &lt;span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false"&gt;
+            &lt;!-- |field_#| --&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Species — Filterable &amp; Sortable --&gt;
+    &lt;div&gt;
+        &lt;strong&gt;Species:&lt;/strong&gt;
+        &lt;span data-field="species" data-sortable="true"&gt;
+            &lt;!-- |field_#| --&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Occupation — Searchable, Filterable &amp; Sortable --&gt;
+    &lt;div&gt;
+        &lt;strong&gt;Occupation:&lt;/strong&gt;
+        &lt;span data-field="occupation" data-searchable="true" data-sortable="true"&gt;
+            &lt;!-- |field_#| --&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Faction — Filterable &amp; Sortable --&gt;
+    &lt;div&gt;
+        &lt;strong&gt;Faction:&lt;/strong&gt;
+        &lt;span data-field="faction" data-sortable="true"&gt;
+            &lt;!-- |field_#| --&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Homeworld — Filterable &amp; Sortable --&gt;
+    &lt;div&gt;
+        &lt;strong&gt;Homeworld:&lt;/strong&gt;
+        &lt;span data-field="homeworld" data-sortable="true"&gt;
+            &lt;!-- |field_#| --&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Status — Filterable &amp; Sortable --&gt;
+    &lt;div&gt;
+        &lt;strong&gt;Status:&lt;/strong&gt;
+        &lt;span data-field="status" data-sortable="true"&gt;
+            &lt;!-- |field_#| --&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+
+&lt;/article&gt;</code></pre>
+
+        <hr>
+
+        <h2>Step 4: Map Your JCink Fields</h2>
+
+        <p>
+            Replace each <code>&lt;!-- |field_#| --&gt;</code> placeholder with your actual JCink
+            field variables. Here's how to find them:
+        </p>
+
+        <table>
+            <tr><th>Semantic Field</th><th>JCink Variable</th><th>Description</th></tr>
+            <tr><td><code>name</code></td><td><code>&lt;!-- |name| --&gt;</code></td><td>Member's display name (already available in JCink)</td></tr>
+            <tr><td><code>faceclaim</code></td><td><code>&lt;!-- |field_1| --&gt;</code></td><td>Face claim (actor name)</td></tr>
+            <tr><td><code>species</code></td><td><code>&lt;!-- |field_2| --&gt;</code></td><td>Species (e.g., Human, Togruta)</td></tr>
+            <tr><td><code>occupation</code></td><td><code>&lt;!-- |field_3| --&gt;</code></td><td>Occupation (e.g., Bounty Hunter, Jedi)</td></tr>
+            <tr><td><code>faction</code></td><td><code>&lt;!-- |field_4| --&gt;</code></td><td>Faction (e.g., Mandalorian, Rebellion)</td></tr>
+            <tr><td><code>homeworld</code></td><td><code>&lt;!-- |field_5| --&gt;</code></td><td>Homeworld (e.g., Aq Vetina, Shili)</td></tr>
+            <tr><td><code>status</code></td><td><code>&lt;!-- |field_6| --&gt;</code></td><td>Status (e.g., Active, Inactive, Unknown)</td></tr>
+        </table>
+
+        <p>
+            The field numbers (<code>field_1</code>, <code>field_2</code>, etc.) correspond to
+            the custom fields you've set up in your JCink ACP. You may need to check your
+            ACP to confirm which field number matches which semantic field.
+        </p>
+
+        <div class="tip">
+            <strong>Tip:</strong> You can use any semantic field names you like —
+            Atlas doesn't care what you call them. Just make sure the <code>data-field</code>
+            attribute matches what you use in your HTML.
+        </div>
+
+        <hr>
+
+        <h2>Troubleshooting</h2>
+
+        <h3>Members don't appear</h3>
+        <ul>
+            <li>Check that <code>&lt;% MEMBERLIST_ROWS %&gt;</code> is in your Member List Header</li>
+            <li>Check that the Member List Row template is correctly filled in</li>
+            <li>Check your browser console for errors</li>
+        </ul>
+
+        <h3>Filters don't appear</h3>
+        <ul>
+            <li>Ensure <code>&lt;div data-filters&gt;&lt;/div&gt;</code> is in your Member List Header</li>
+            <li>Check that at least one field has <code>data-filterable="true"</code> (or omitted, since true is default)</li>
+        </ul>
+
+        <h3>Search doesn't work</h3>
+        <ul>
+            <li>Ensure <code>&lt;input data-search&gt;</code> is in your Member List Header</li>
+            <li>Check that fields have <code>data-searchable="true"</code> (it's opt-in)</li>
+        </ul>
+
+        <h3>Sorting doesn't work</h3>
+        <ul>
+            <li>Ensure <code>&lt;div data-sort&gt;&lt;/div&gt;</code> is in your Member List Header</li>
+            <li>Check that fields have <code>data-sortable="true"</code> (it's opt-in)</li>
+            <li>Only fields present in ALL members will appear as sort options</li>
+        </ul>
+
+        <hr>
+
+        <h2>Next Steps</h2>
+
+        <ul>
+            <li>🎨 <a href="../css-customisation.html">CSS Customisation</a> — Style your directory</li>
+            <li>📐 <a href="../examples/layout-examples.html">Layout Examples</a> — See different layouts</li>
+            <li>📖 <a href="../html-api.html">HTML API Reference</a> — All available attributes</li>
+        </ul>
+
+    </main>
+
+</div>
+
+<script src="../assets/js/docs.js"></script>
+</body>
+</html>

@@ -47,7 +47,7 @@
 
         <p>Add the <code>data-atlas</code> attribute to your container, then add controls and members.</p>
 
-        <pre><code>&lt;div data-atlas&gt;
+                <pre><code>&lt;div data-atlas&gt;
     &lt;!-- Search --&gt;
     &lt;input data-search placeholder="Search members..."&gt;
 
@@ -64,15 +64,13 @@
     &lt;!-- Members --&gt;
     &lt;div data-directory&gt;
         &lt;article data-member&gt;
-            &lt;span data-field="name" data-searchable="true" data-sortable="true"&gt;
-                Katniss Everdeen
-            &lt;/span&gt;
-            &lt;span data-field="species" data-filterable="true"&gt;
-                Human
-            &lt;/span&gt;
-            &lt;span data-field="occupation" data-filterable="true"&gt;
-                Hunter
-            &lt;/span&gt;
+            &lt;div&gt;&lt;strong&gt;Name:&lt;/strong&gt; &lt;span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false"&gt;Din Djarin&lt;/span&gt;&lt;/div&gt;
+            &lt;div&gt;&lt;strong&gt;Faceclaim:&lt;/strong&gt; &lt;span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false"&gt;Pedro Pascal&lt;/span&gt;&lt;/div&gt;
+            &lt;div&gt;&lt;strong&gt;Species:&lt;/strong&gt; &lt;span data-field="species" data-sortable="true"&gt;Human&lt;/span&gt;&lt;/div&gt;
+            &lt;div&gt;&lt;strong&gt;Occupation:&lt;/strong&gt; &lt;span data-field="occupation" data-searchable="true" data-sortable="true"&gt;Bounty Hunter&lt;/span&gt;&lt;/div&gt;
+            &lt;div&gt;&lt;strong&gt;Faction:&lt;/strong&gt; &lt;span data-field="faction" data-sortable="true"&gt;Mandalorian&lt;/span&gt;&lt;/div&gt;
+            &lt;div&gt;&lt;strong&gt;Homeworld:&lt;/strong&gt; &lt;span data-field="homeworld" data-sortable="true"&gt;Aq Vetina&lt;/span&gt;&lt;/div&gt;
+            &lt;div&gt;&lt;strong&gt;Status:&lt;/strong&gt; &lt;span data-field="status" data-sortable="true"&gt;Active&lt;/span&gt;&lt;/div&gt;
         &lt;/article&gt;
         &lt;!-- Add more members --&gt;
     &lt;/div&gt;
@@ -102,6 +100,16 @@
     import Atlas from './dist/atlas.js';
     new Atlas();
 &lt;/script&gt;</code></pre>
+
+        <h2>JCink Users</h2>
+        <p>
+            If you're installing Atlas on a JCink forum, you'll need to place the HTML
+            across two templates: <strong>Member List Header</strong> and
+            <strong>Member List Row</strong>.
+        </p>
+        <p>
+            <a href="installation/jcink.html">→ View the JCink Installation Guide</a>
+        </p>
 
         <p>That's it! Atlas discovers everything automatically.</p>
 

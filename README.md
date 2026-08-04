@@ -43,11 +43,14 @@ Atlas transforms static HTML member lists into interactive, searchable directori
 
     <!-- Member directory -->
     <div data-directory>
-        <article data-member>
-            <span data-field="name">Katniss Everdeen</span>
-            <span data-field="species">Human</span>
-            <span data-field="occupation">Hunter</span>
-            <span data-field="district">12</span>
+            <article data-member>
+                <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Din Djarin</span></div>
+                <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Pedro Pascal</span></div>
+                <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Human</span></div>
+                <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Bounty Hunter</span></div>
+                <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Mandalorian</span></div>
+                <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Aq Vetina</span></div>
+                <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
         </article>
         <!-- More members... -->
     </div>
@@ -71,6 +74,17 @@ For custom styling, see the CSS Customisation section in docs/html-api.md.
 </script>
 
 That's it. Atlas discovers everything automatically.
+
+---
+
+## JCink Installation
+
+For JCink forums, Atlas is installed across two templates:
+
+- **Member List Header** — Contains the Atlas wrapper, controls, and directory
+- **Member List Row** — Contains each member card
+
+See the [JCink Installation Guide](docs/installation/jcink.html) for step-by-step instructions.
 
 ---
 
@@ -104,6 +118,20 @@ That's it. Atlas discovers everything automatically.
 | data-layout | Layout toggle button (grid or list) — optional |
 
 See docs/html-api.md for full documentation.
+
+---
+
+## Live Examples
+
+See Atlas in action with different layouts:
+
+- [Standard Layout](examples/standard.html)
+- [Sidebar Layout](examples/sidebar.html)
+- [Centered Minimal Layout](examples/centered.html)
+- [Two-Column Layout](examples/two-column.html)
+- [Slide-out Top Bar](examples/slideout.html)
+
+[View all layout examples](docs/examples/layout-examples.html)
 
 ---
 
