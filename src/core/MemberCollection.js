@@ -259,6 +259,8 @@ export default class MemberCollection {
     /**
      * Apply filters to the collection.
      *
+     * Optimised with Set lookups for O(1) value matching.
+     *
      * @param {Object} filters - { fieldName: [value1, value2], ... }
      * @returns {Member[]} Array of members that match all active filters
      */
@@ -273,19 +275,30 @@ export default class MemberCollection {
             return this.getAll();
         }
 
+        // ─── Build lookup Sets for each field ──────────
+        // This gives us O(1) lookups instead of Array.includes O(n)
+        const filterSets = {};
+        for (const fieldName of activeFields) {
+            filterSets[fieldName] = new Set(
+                filters[fieldName].map(v => v.toLowerCase())
+            );
+        }
+
+        // ─── Early exit: if any field has no values, return empty ──
+        for (const fieldName of activeFields) {
+            if (filterSets[fieldName].size === 0) {
+                return [];
+            }
+        }
+
         const results = [];
 
+        // ─── Iterate members once ──────────────────────
         for (const member of this.#members.values()) {
 
             let matches = true;
 
-            for (const [fieldName, values] of Object.entries(filters)) {
-
-                // If no values for this field, skip
-                if (!values || values.length === 0) {
-                    continue;
-                }
-
+            for (const fieldName of activeFields) {
                 const memberValue = member.get(fieldName);
 
                 // If member doesn't have this field, they don't match
@@ -294,17 +307,11 @@ export default class MemberCollection {
                     break;
                 }
 
-                // Check if member's value matches any of the selected values
-                const normalizedMemberValue = memberValue.toLowerCase();
-                const matchFound = values.some(value =>
-                    value.toLowerCase() === normalizedMemberValue
-                );
-
-                if (!matchFound) {
+                // O(1) Set lookup
+                if (!filterSets[fieldName].has(memberValue.toLowerCase())) {
                     matches = false;
                     break;
                 }
-
             }
 
             if (matches) {

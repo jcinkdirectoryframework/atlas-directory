@@ -10,6 +10,7 @@
  * - Store layout state
  * - Provide getters and setters
  * - Publish events when state changes
+ * - Cache filter results for performance
  *
  * Deliberately does NOT:
  * - Know about the DOM
@@ -28,6 +29,10 @@ export default class Store {
     };
 
     #events = null;
+
+    // ─── Filter Cache ──────────────────────────────────
+
+    #filterCache = new Map();
 
     /**
      * Create a Store.
@@ -99,6 +104,9 @@ export default class Store {
             isActive = false;
         }
 
+        // Clear filter cache when filters change
+        this.#filterCache.clear();
+
         // Publish event
         this.#publish('store:filtersChanged', {
             filters: this.filters,
@@ -143,6 +151,9 @@ export default class Store {
     clearFieldFilters(fieldName) {
         delete this.#state.filters[fieldName];
 
+        // Clear filter cache when filters change
+        this.#filterCache.clear();
+
         this.#publish('store:filtersChanged', {
             filters: this.filters,
             field: fieldName,
@@ -155,6 +166,9 @@ export default class Store {
      */
     clearAllFilters() {
         this.#state.filters = {};
+
+        // Clear filter cache when filters change
+        this.#filterCache.clear();
 
         this.#publish('store:filtersChanged', {
             filters: this.filters,
@@ -180,6 +194,9 @@ export default class Store {
             return; // No change
         }
         this.#state.search = trimmed;
+
+        // Clear filter cache when search changes (results will be different)
+        this.#filterCache.clear();
 
         this.#publish('store:searchChanged', {
             search: this.#state.search
@@ -215,6 +232,9 @@ export default class Store {
         }
 
         this.#state.sort = newSort;
+
+        // Clear filter cache when sort changes (results will be in different order)
+        this.#filterCache.clear();
 
         this.#publish('store:sortChanged', {
             sort: this.sort
@@ -254,6 +274,97 @@ export default class Store {
      */
     getState() {
         return { ...this.#state };
+    }
+
+    // ─── Filter Cache Methods ──────────────────────────
+
+    /**
+     * Generate a cache key from current filters.
+     * Used to detect if filters have changed.
+     */
+    #getFilterCacheKey() {
+        const filters = this.#state.filters;
+        // Sort fields for consistent keys
+        const sortedFields = Object.keys(filters).sort();
+        let key = '';
+        for (const field of sortedFields) {
+            const values = filters[field];
+            if (values && values.length > 0) {
+                key += field + ':' + [...values].sort().join(',') + '|';
+            }
+        }
+        return key || 'none';
+    }
+
+    /**
+     * Get cached filter results for a MemberCollection.
+     * Returns null if no cache hit.
+     */
+    getCachedFilterResults(memberCollection) {
+        const key = this.#getFilterCacheKey();
+
+        // If no filters are active, return null (don't cache "all members")
+        if (key === 'none') {
+            return null;
+        }
+
+        const cached = this.#filterCache.get(key);
+        if (cached) {
+            // Verify the cache is still valid (MemberCollection hasn't changed)
+            // We store a simple hash of the member count and first/last IDs
+            const members = memberCollection.getAll();
+            const memberIds = members.map(m => m.id).join(',');
+            if (cached.memberIds === memberIds) {
+                return cached.results;
+            }
+            // Invalid cache, clear it
+            this.#filterCache.delete(key);
+        }
+        return null;
+    }
+
+    /**
+     * Cache filter results for a MemberCollection.
+     */
+    setCachedFilterResults(memberCollection, results) {
+        const key = this.#getFilterCacheKey();
+
+        // Don't cache empty results
+        if (key === 'none' || results.length === 0) {
+            return;
+        }
+
+        const members = memberCollection.getAll();
+        const memberIds = members.map(m => m.id).join(',');
+
+        this.#filterCache.set(key, {
+            results: results,
+            memberIds: memberIds,
+            timestamp: Date.now()
+        });
+
+        // Limit cache size to prevent memory leaks (max 20 entries)
+        if (this.#filterCache.size > 20) {
+            // Remove oldest entry
+            let oldest = null;
+            let oldestTime = Infinity;
+            for (const [k, v] of this.#filterCache) {
+                if (v.timestamp < oldestTime) {
+                    oldestTime = v.timestamp;
+                    oldest = k;
+                }
+            }
+            if (oldest) {
+                this.#filterCache.delete(oldest);
+            }
+        }
+    }
+
+    /**
+     * Clear the filter cache.
+     */
+    clearFilterCache() {
+        this.#filterCache.clear();
     }
 
 }
