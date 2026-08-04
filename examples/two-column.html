@@ -329,23 +329,26 @@
             background: #fafafc;
         }
 
-        [data-field] {
+        [data-member] > div {
             display: block;
-            font-size: 0.85rem;
-            color: #b0b0c0;
-            font-weight: 300;
+            line-height: 1.5;
         }
 
-        [data-field="name"] {
+        [data-member] > div strong {
             font-weight: 500;
-            font-size: 1.05rem;
+            color: #8a8a9e;
+            margin-right: 0.25rem;
+            font-size: 0.85rem;
+        }
+
+        [data-member] > div span[data-field] {
+            font-weight: 300;
             color: #1a1a2e;
+            font-size: 0.85rem;
         }
 
         [data-field="faceclaim"] {
-            font-size: 0.85rem;
-            color: #b0b0c0;
-            font-weight: 300;
+            color: #b0b0c0 !important;
         }
 
         /* ─── Grid ────────────────────────────────────── */
@@ -380,7 +383,7 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 0.5rem 1.5rem;
+            gap: 0.25rem 1.5rem;
             padding: 0.6rem 0;
             border-bottom: 1px solid #f0f0f5;
         }
@@ -389,17 +392,12 @@
             border-bottom: none;
         }
 
-        [data-directory].atlas-layout-list [data-field] {
+        [data-directory].atlas-layout-list [data-member] > div {
             display: inline;
         }
 
-        [data-directory].atlas-layout-list [data-field="name"] {
-            min-width: 140px;
-            font-weight: 500;
-        }
-
-        [data-directory].atlas-layout-list [data-field="faceclaim"] {
-            min-width: 100px;
+        [data-directory].atlas-layout-list [data-member] > div strong {
+            margin-right: 0.2rem;
         }
 
         /* ─── Hidden ──────────────────────────────────── */
@@ -453,97 +451,97 @@
 
             <main class="right-col">
                 <div data-results></div>
-        <div data-directory>
+                <div data-directory>
 
-            <!-- ─── Din Djarin ──────────────────────────── -->
-            <article data-member>
-                <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Name: Din Djarin</span>
-                <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Faceclaim: Pedro Pascal</span>
-                <span data-field="species" data-sortable="true">Species: Human</span>
-                <span data-field="occupation" data-searchable="true" data-sortable="true">Occupation: Bounty Hunter</span>
-                <span data-field="faction" data-sortable="true">Faction: Mandalorian</span>
-                <span data-field="homeworld" data-sortable="true">Homeworld: Aq Vetina</span>
-                <span data-field="status" data-sortable="true">Status: Active</span>
-            </article>
+                    <!-- ─── Din Djarin ──────────────────────────── -->
+                    <article data-member>
+                        <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Din Djarin</span></div>
+                        <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Pedro Pascal</span></div>
+                        <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Human</span></div>
+                        <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Bounty Hunter</span></div>
+                        <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Mandalorian</span></div>
+                        <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Aq Vetina</span></div>
+                        <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
+                    </article>
 
-            <!-- ─── Grogu ────────────────────────────────── -->
-            <article data-member>
-                <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Name: Grogu</span>
-                <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Faceclaim: None</span>
-                <span data-field="species" data-sortable="true">Species: Unknown</span>
-                <span data-field="occupation" data-searchable="true" data-sortable="true">Occupation: Force User</span>
-                <span data-field="faction" data-sortable="true">Faction: Mandalorian</span>
-                <span data-field="homeworld" data-sortable="true">Homeworld: Unknown</span>
-                <span data-field="status" data-sortable="true">Status: Inactive</span>
-            </article>
+                    <!-- ─── Grogu ────────────────────────────────── -->
+                    <article data-member>
+                        <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Grogu</span></div>
+                        <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">None</span></div>
+                        <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Unknown</span></div>
+                        <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Force User</span></div>
+                        <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Mandalorian</span></div>
+                        <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Unknown</span></div>
+                        <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Inactive</span></div>
+                    </article>
 
-            <!-- ─── Cara Dune ───────────────────────────── -->
-            <article data-member>
-                <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Name: Cara Dune</span>
-                <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Faceclaim: Gina Carano</span>
-                <span data-field="species" data-sortable="true">Species: Human</span>
-                <span data-field="occupation" data-searchable="true" data-sortable="true">Occupation: Marshal</span>
-                <span data-field="faction" data-sortable="true">Faction: Rebellion</span>
-                <span data-field="homeworld" data-sortable="true">Homeworld: Alderaan</span>
-                <span data-field="status" data-sortable="true">Status: Unknown</span>
-            </article>
+                    <!-- ─── Cara Dune ───────────────────────────── -->
+                    <article data-member>
+                        <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Cara Dune</span></div>
+                        <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Gina Carano</span></div>
+                        <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Human</span></div>
+                        <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Marshal</span></div>
+                        <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Rebellion</span></div>
+                        <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Alderaan</span></div>
+                        <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Unknown</span></div>
+                    </article>
 
-            <!-- ─── Bo-Katan Kryze ──────────────────────── -->
-            <article data-member>
-                <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Name: Bo-Katan Kryze</span>
-                <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Faceclaim: Katee Sackhoff</span>
-                <span data-field="species" data-sortable="true">Species: Human</span>
-                <span data-field="occupation" data-searchable="true" data-sortable="true">Occupation: Leader</span>
-                <span data-field="faction" data-sortable="true">Faction: Mandalorian</span>
-                <span data-field="homeworld" data-sortable="true">Homeworld: Kalevala</span>
-                <span data-field="status" data-sortable="true">Status: Active</span>
-            </article>
+                    <!-- ─── Bo-Katan Kryze ──────────────────────── -->
+                    <article data-member>
+                        <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Bo-Katan Kryze</span></div>
+                        <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Katee Sackhoff</span></div>
+                        <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Human</span></div>
+                        <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Leader</span></div>
+                        <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Mandalorian</span></div>
+                        <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Kalevala</span></div>
+                        <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
+                    </article>
 
-            <!-- ─── Moff Gideon ──────────────────────────── -->
-            <article data-member>
-                <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Name: Moff Gideon</span>
-                <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Faceclaim: Giancarlo Esposito</span>
-                <span data-field="species" data-sortable="true">Species: Human</span>
-                <span data-field="occupation" data-searchable="true" data-sortable="true">Occupation: Imperial Officer</span>
-                <span data-field="faction" data-sortable="true">Faction: Empire</span>
-                <span data-field="homeworld" data-sortable="true">Homeworld: Unknown</span>
-                <span data-field="status" data-sortable="true">Status: Active</span>
-            </article>
+                    <!-- ─── Moff Gideon ──────────────────────────── -->
+                    <article data-member>
+                        <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Moff Gideon</span></div>
+                        <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Giancarlo Esposito</span></div>
+                        <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Human</span></div>
+                        <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Imperial Officer</span></div>
+                        <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Empire</span></div>
+                        <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Unknown</span></div>
+                        <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
+                    </article>
 
-            <!-- ─── Ahsoka Tano ──────────────────────────── -->
-            <article data-member>
-                <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Name: Ahsoka Tano</span>
-                <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Faceclaim: Rosario Dawson</span>
-                <span data-field="species" data-sortable="true">Species: Togruta</span>
-                <span data-field="occupation" data-searchable="true" data-sortable="true">Occupation: Jedi</span>
-                <span data-field="faction" data-sortable="true">Faction: Rebellion</span>
-                <span data-field="homeworld" data-sortable="true">Homeworld: Shili</span>
-                <span data-field="status" data-sortable="true">Status: Active</span>
-            </article>
+                    <!-- ─── Ahsoka Tano ──────────────────────────── -->
+                    <article data-member>
+                        <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Ahsoka Tano</span></div>
+                        <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Rosario Dawson</span></div>
+                        <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Togruta</span></div>
+                        <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Jedi</span></div>
+                        <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Rebellion</span></div>
+                        <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Shili</span></div>
+                        <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
+                    </article>
 
-            <!-- ─── Boba Fett ────────────────────────────── -->
-            <article data-member>
-                <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Name: Boba Fett</span>
-                <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Faceclaim: Temuera Morrison</span>
-                <span data-field="species" data-sortable="true">Species: Human</span>
-                <span data-field="occupation" data-searchable="true" data-sortable="true">Occupation: Bounty Hunter</span>
-                <span data-field="faction" data-sortable="true">Faction: Independent</span>
-                <span data-field="homeworld" data-sortable="true">Homeworld: Kamino</span>
-                <span data-field="status" data-sortable="true">Status: Active</span>
-            </article>
+                    <!-- ─── Boba Fett ────────────────────────────── -->
+                    <article data-member>
+                        <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Boba Fett</span></div>
+                        <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Temuera Morrison</span></div>
+                        <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Human</span></div>
+                        <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Bounty Hunter</span></div>
+                        <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Independent</span></div>
+                        <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Kamino</span></div>
+                        <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
+                    </article>
 
-            <!-- ─── Fennec Shand ─────────────────────────── -->
-            <article data-member>
-                <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Name: Fennec Shand</span>
-                <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Faceclaim: Ming-Na Wen</span>
-                <span data-field="species" data-sortable="true">Species: Human</span>
-                <span data-field="occupation" data-searchable="true" data-sortable="true">Occupation: Assassin</span>
-                <span data-field="faction" data-sortable="true">Faction: Independent</span>
-                <span data-field="homeworld" data-sortable="true">Homeworld: Unknown</span>
-                <span data-field="status" data-sortable="true">Status: Active</span>
-            </article>
+                    <!-- ─── Fennec Shand ─────────────────────────── -->
+                    <article data-member>
+                        <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Fennec Shand</span></div>
+                        <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Ming-Na Wen</span></div>
+                        <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Human</span></div>
+                        <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Assassin</span></div>
+                        <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Independent</span></div>
+                        <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Unknown</span></div>
+                        <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
+                    </article>
 
-        </div>
+                </div>
             </main>
 
         </div>
