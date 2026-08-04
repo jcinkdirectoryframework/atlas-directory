@@ -1,0 +1,261 @@
+/**
+ * Atlas — Core Styles
+ * Version 1.0.0
+ *
+ * Copyright (c) 2026 Maeve aka MaeveCodes
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * https://github.com/jcinkdirectoryframework/atlas-directory
+ *
+ * This is the minimal CSS required for Atlas to function.
+ * It provides:
+ * - Loading state (prevent flicker)
+ * - Visibility toggles
+ * - Layout container classes (grid/list)
+ * - Focus states (accessibility)
+ * - Reduced motion support (accessibility)
+ * - Generic mobile optimisations (touch targets, iOS zoom prevention)
+ *
+ * All visual styling (buttons, chips, filters, member cards, etc.)
+ * should be provided by the user.
+ *
+ * Layout-specific responsive behaviour (sidebars, slideouts, etc.)
+ * should be provided by the user in their own CSS.
+ */
+
+/* ─── Loading State ────────────────────────────────── */
+
+/* Hide directory while Atlas is loading */
+[data-atlas-loading] [data-directory] {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* Fade in when ready */
+[data-directory] {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+/* ─── Visibility ──────────────────────────────────── */
+
+/* Hidden members — supports both [hidden] and [data-hidden] */
+[data-member][hidden],
+[data-member][data-hidden] {
+    display: none !important;
+}
+
+/* ─── Layout Containers ───────────────────────────── */
+
+/* Grid layout (default) — generic responsive */
+[data-directory].atlas-layout-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+/* On smaller screens, use fewer columns — generic optimisation */
+@media (max-width: 640px) {
+    [data-directory].atlas-layout-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    [data-directory].atlas-layout-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+}
+
+/* List layout — always single column */
+[data-directory].atlas-layout-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* ─── Focus States (Accessibility) ────────────────── */
+
+/* Keyboard-only focus indicator */
+[data-atlas] button:focus-visible,
+[data-atlas] .atlas-chip:focus-visible,
+[data-atlas] [data-search]:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Focus ring for filter buttons */
+[data-filter-options] button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Focus ring for sort buttons */
+[data-sort] button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Focus ring for chips */
+.atlas-chip:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Focus ring for Clear All button */
+.atlas-clear-all:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ─── Reduced Motion (Accessibility) ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+
+    /* Disable all transitions */
+    [data-atlas] *,
+    [data-atlas] *::before,
+    [data-atlas] *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Loading state — instant fade */
+    [data-atlas-loading] [data-directory] {
+        opacity: 0;
+        transition: none;
+    }
+
+    [data-directory] {
+        opacity: 1;
+        transition: none;
+    }
+
+}
+
+/* ─── Generic Mobile Optimisations ────────────────── */
+
+/* Ensure all interactive elements have minimum tap target size */
+[data-atlas] button,
+[data-atlas] .atlas-chip,
+[data-atlas] [data-search] {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Filter buttons need smaller padding but maintain 36px height */
+[data-filter-options] button {
+    min-height: 36px;
+    padding: 0.3rem 0.8rem;
+}
+
+/* Sort buttons */
+[data-sort] button {
+    min-height: 36px;
+    padding: 0.3rem 0.9rem;
+}
+
+/* Layout buttons */
+[data-layout] {
+    min-height: 36px;
+    padding: 0.3rem 0.9rem;
+}
+
+/* Search input */
+[data-search] {
+    min-height: 44px;
+}
+
+/* ─── Generic Mobile Controls Stacking ────────────── */
+
+/* On small screens, filters stack vertically */
+@media (max-width: 640px) {
+    [data-filters] {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    [data-filter] {
+        width: 100%;
+    }
+
+    [data-filter-options] {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+
+    [data-filter-options] button {
+        min-height: 32px;
+        font-size: 0.8rem;
+        padding: 0.2rem 0.7rem;
+    }
+
+    /* Sort buttons on mobile */
+    [data-sort] {
+        gap: 0.3rem;
+        padding: 0.3rem 0;
+    }
+
+    [data-sort] button {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.7rem;
+        min-height: 32px;
+    }
+
+    /* Layout buttons on mobile */
+    [data-layout] {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.7rem;
+        min-height: 32px;
+    }
+
+    /* Chips on mobile */
+    [data-chips] {
+        gap: 0.3rem;
+        padding: 0.3rem 0;
+    }
+
+    .atlas-chip {
+        font-size: 0.8rem;
+        padding: 0.15rem 0.4rem 0.15rem 0.6rem;
+        min-height: 32px;
+        min-width: 32px;
+    }
+
+    .atlas-clear-all {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.6rem;
+        min-height: 32px;
+    }
+
+    /* Search input on mobile */
+    [data-search] {
+        font-size: 16px; /* Prevents iOS zoom on focus */
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+/* ─── Prevent iOS Zoom on Focus ────────────────────── */
+
+/* Inputs should be at least 16px font size to prevent iOS zoom */
+[data-search] {
+    font-size: 16px;
+}
+
+@media (max-width: 640px) {
+    [data-search] {
+        font-size: 16px;
+    }
+}
