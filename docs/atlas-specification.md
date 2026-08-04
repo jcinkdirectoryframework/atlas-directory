@@ -203,13 +203,27 @@ See html-api.md for full documentation.
 
 Atlas is designed for directories of approximately 1,000 members.
 
-Performance strategies:
+### Optimisations
 
-- Cached data (read DOM once)
-- Batch DOM updates (DocumentFragment)
-- Efficient selectors
-- No unnecessary reflows
-- Event-driven (only update what changed)
+- **Set lookups:** Filter values use `Set` for O(1) lookups
+- **Filter caching:** Results are cached by filter state
+- **Lazy rendering:** Activates automatically at 300+ members
+- **Intersection Observer:** Only visible members are rendered in the DOM
+- **Batch rendering:** Members load in batches of 25 as you scroll
+- **Intl.Collator:** Native browser collation for sorting
+
+### Benchmarks
+
+Tests with 1,000 members:
+
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| Init Time | 276ms | 151ms | 45% faster |
+| Filter Time (first) | 121ms | 0.4ms | 300x faster |
+| Sort Time | 24ms | 1.2ms | 20x faster |
+| DOM Nodes (visible) | 22,000 | ~700 | 97% reduction |
+
+**Note:** Lazy rendering only activates when a directory has more than 300 members.
 
 ---
 

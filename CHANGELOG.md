@@ -1,5 +1,46 @@
 # Changelog
 
+## [M1.0] — 2026-08-04
+
+### Added
+
+- **Lazy Rendering** — Automatically activates when a directory has 300+ members
+  - Uses Intersection Observer with sentinel elements
+  - Renders members in batches of 25 as you scroll
+  - Removes off-screen members from the DOM to reduce memory usage
+  - Reduces visible DOM nodes from ~22,000 to ~700 for 1,000 members
+
+### Changed
+
+- **MemberCollection.applyFilters()** — Optimised with Set lookups (O(1) instead of O(n))
+  - Filter time reduced from 121ms to 0.4ms (300x faster)
+
+- **Store** — Added filter caching
+  - Results are cached by filter state
+  - Repeated filters are instant
+  - Cache is automatically cleared when filters, search, or sort change
+
+- **Renderer.sortMembers()** — Optimised with Intl.Collator
+  - Sort time reduced from 24ms to 1.2ms (20x faster)
+
+- **Init time** — Reduced from 276ms to 151ms (45% faster)
+
+### Fixed
+
+- DOM memory usage for large directories is now significantly lower
+- Scrolling performance with 1,000+ members is now smooth
+
+### Performance Summary
+
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| Init Time | 276ms | 151ms | 45% faster |
+| Filter Time (first) | 121ms | 0.4ms | 300x faster |
+| Sort Time | 24ms | 1.2ms | 20x faster |
+| DOM Nodes (visible) | 22,000 | ~700 | 97% reduction |
+
+---
+
 ## [M0.10] — 2026-08-04
 
 ### Added

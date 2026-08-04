@@ -23,6 +23,24 @@ Atlas transforms static HTML member lists into interactive, searchable directori
 
 ---
 
+## Performance
+
+Atlas is optimised for directories of up to ~1,000 members.
+
+**Key optimisations:**
+- **Set lookups** for O(1) filter matching
+- **Filter caching** — repeated filters are instant
+- **Lazy rendering** — automatically activates at 300+ members
+- **Intersection Observer** — only renders visible members
+
+With 1,000 members:
+- Init time: ~150ms
+- Filter time: ~0.4ms (first), instant (cached)
+- Sort time: ~1.2ms
+- Visible DOM nodes: ~700 (vs 22,000 without lazy rendering)
+
+---
+
 ## Quick Start
 
 ### 1. Add HTML

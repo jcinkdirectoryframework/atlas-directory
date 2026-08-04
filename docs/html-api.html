@@ -154,6 +154,24 @@
             If you only want grid layout, simply don't include these buttons.
         </div>
 
+                <h2>Performance</h2>
+
+        <p>
+            Atlas automatically optimises performance for large directories.
+            No configuration is required — it just works.
+        </p>
+
+        <h3>Lazy Rendering</h3>
+        <p>
+            When a directory has more than 300 members, Atlas automatically switches to
+            lazy rendering. Only members visible in the viewport (plus a buffer) are
+            rendered in the DOM. As you scroll, new members are loaded in batches of 25.
+        </p>
+
+        <p>
+            This keeps the DOM small and responsive, even with 1,000+ members.
+        </p>
+
         <h2>Complete Example</h2>
 
         <pre><code>&lt;div data-atlas&gt;
