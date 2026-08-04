@@ -17,6 +17,25 @@
 
 <div data-atlas>
 
+    <!-- ─── Header with Documentation Link ────────────── -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0;">
+
+        <div>
+            <h1 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Atlas Demo</h1>
+            <p style="margin: 0; color: #64748b; font-size: 0.85rem;">A dependency-free, HTML-driven directory engine</p>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="docs/" style="display: inline-block; padding: 0.4rem 0.9rem; background: #2563eb; color: white; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s;">
+                📖 Docs
+            </a>
+            <a href="examples/standard.html" style="display: inline-block; padding: 0.4rem 0.9rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; color: #0f172a; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s;">
+                📐 Examples
+            </a>
+        </div>
+
+    </div>
+
     <input data-search placeholder="Search members...">
 
     <div>
@@ -41,39 +60,101 @@
     <!-- Result counter here -->
     <div data-results></div>
 
-<section data-directory>
+    <section data-directory>
 
         <article data-member>
-            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Alice</h3>
-            <p data-field="species" data-searchable="true">Elf</p>
-            <p data-field="occupation" data-sortable="true">Ranger</p>
+            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Din Djarin</h3>
+            <p data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Pedro Pascal</p>
+            <p data-field="species" data-sortable="true">Human</p>
+            <p data-field="occupation" data-searchable="true" data-sortable="true">Bounty Hunter</p>
+            <p data-field="faction" data-sortable="true">Mandalorian</p>
+            <p data-field="homeworld" data-sortable="true">Aq Vetina</p>
+            <p data-field="status" data-sortable="true">Active</p>
         </article>
 
         <article data-member>
-            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Bob</h3>
-            <p data-field="species" data-searchable="true">Dwarf</p>
-            <p data-field="occupation" data-sortable="true">Warrior</p>
+            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Grogu</h3>
+            <p data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">None</p>
+            <p data-field="species" data-sortable="true">Unknown</p>
+            <p data-field="occupation" data-searchable="true" data-sortable="true">Force User</p>
+            <p data-field="faction" data-sortable="true">Mandalorian</p>
+            <p data-field="homeworld" data-sortable="true">Unknown</p>
+            <p data-field="status" data-sortable="true">Inactive</p>
         </article>
 
         <article data-member>
-            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Charlie</h3>
-            <p data-field="species" data-searchable="true">Human</p>
-            <p data-field="occupation" data-sortable="true">Mage</p>
+            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Cara Dune</h3>
+            <p data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Gina Carano</p>
+            <p data-field="species" data-sortable="true">Human</p>
+            <p data-field="occupation" data-searchable="true" data-sortable="true">Marshal</p>
+            <p data-field="faction" data-sortable="true">Rebellion</p>
+            <p data-field="homeworld" data-sortable="true">Alderaan</p>
+            <p data-field="status" data-sortable="true">Unknown</p>
         </article>
 
         <article data-member>
-            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Diana</h3>
-            <p data-field="species" data-searchable="true">Elf</p>
-            <p data-field="occupation" data-sortable="true">Rogue</p>
+            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Bo-Katan Kryze</h3>
+            <p data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Katee Sackhoff</p>
+            <p data-field="species" data-sortable="true">Human</p>
+            <p data-field="occupation" data-searchable="true" data-sortable="true">Leader</p>
+            <p data-field="faction" data-sortable="true">Mandalorian</p>
+            <p data-field="homeworld" data-sortable="true">Kalevala</p>
+            <p data-field="status" data-sortable="true">Active</p>
         </article>
 
         <article data-member>
-            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Eve</h3>
-            <p data-field="species" data-searchable="true">Human</p>
-            <p data-field="occupation" data-sortable="true">Warrior</p>
+            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Moff Gideon</h3>
+            <p data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Giancarlo Esposito</p>
+            <p data-field="species" data-sortable="true">Human</p>
+            <p data-field="occupation" data-searchable="true" data-sortable="true">Imperial Officer</p>
+            <p data-field="faction" data-sortable="true">Empire</p>
+            <p data-field="homeworld" data-sortable="true">Unknown</p>
+            <p data-field="status" data-sortable="true">Active</p>
+        </article>
+
+        <article data-member>
+            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Ahsoka Tano</h3>
+            <p data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Rosario Dawson</p>
+            <p data-field="species" data-sortable="true">Togruta</p>
+            <p data-field="occupation" data-searchable="true" data-sortable="true">Jedi</p>
+            <p data-field="faction" data-sortable="true">Rebellion</p>
+            <p data-field="homeworld" data-sortable="true">Shili</p>
+            <p data-field="status" data-sortable="true">Active</p>
+        </article>
+
+        <article data-member>
+            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Boba Fett</h3>
+            <p data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Temuera Morrison</p>
+            <p data-field="species" data-sortable="true">Human</p>
+            <p data-field="occupation" data-searchable="true" data-sortable="true">Bounty Hunter</p>
+            <p data-field="faction" data-sortable="true">Independent</p>
+            <p data-field="homeworld" data-sortable="true">Kamino</p>
+            <p data-field="status" data-sortable="true">Active</p>
+        </article>
+
+        <article data-member>
+            <h3 data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Fennec Shand</h3>
+            <p data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Ming-Na Wen</p>
+            <p data-field="species" data-sortable="true">Human</p>
+            <p data-field="occupation" data-searchable="true" data-sortable="true">Assassin</p>
+            <p data-field="faction" data-sortable="true">Independent</p>
+            <p data-field="homeworld" data-sortable="true">Unknown</p>
+            <p data-field="status" data-sortable="true">Active</p>
         </article>
 
     </section>
+
+    <!-- ─── Footer ────────────────────────────────────── -->
+    <div style="margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.8rem; color: #94a3b8;">
+        <span>
+            <a href="https://github.com/jcinkdirectoryframework/atlas-directory" style="color: #2563eb; text-decoration: none;">GitHub</a>
+            &middot;
+            <a href="docs/" style="color: #2563eb; text-decoration: none;">Documentation</a>
+            &middot;
+            <a href="examples/standard.html" style="color: #2563eb; text-decoration: none;">Layout Examples</a>
+        </span>
+        <span>Atlas — Built with ❤️ for JCink communities</span>
+    </div>
 
 </div>
 
