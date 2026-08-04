@@ -24,6 +24,9 @@
         <a href="architecture.html">Architecture</a>
         <a href="css-customisation.html">CSS Customisation</a>
 
+        <span class="nav-label">Installation</span>
+        <a href="installation/jcink.html">JCink Setup</a>
+
         <span class="nav-label">Examples</span>
         <a href="examples/layout-examples.html">Layout Examples</a>
 
@@ -74,18 +77,6 @@
             <li><code>data-member</code> — Individual member card</li>
         </ul>
 
-        <h2>JCink Template Placement</h2>
-        <p>
-            On JCink forums, the controls and directory are split across two templates:
-        </p>
-        <ul>
-            <li><strong>Member List Header:</strong> Contains the <code>data-atlas</code> wrapper, controls, and <code>data-directory</code> tag</li>
-            <li><strong>Member List Row:</strong> Contains each <code>data-member</code> card</li>
-        </ul>
-        <p>
-            <a href="installation/jcink.html">→ View the JCink Installation Guide</a>
-        </p>
-
         <h2>Member Fields</h2>
 
         <pre><code>&lt;article data-member&gt;
@@ -111,10 +102,10 @@
 &lt;span data-field="species" data-filterable="false"&gt;Human&lt;/span&gt;
 
 &lt;!-- Opt in to search --&gt;
-&lt;span data-field="name" data-searchable="true"&gt;Katniss Everdeen&lt;/span&gt;
+&lt;span data-field="name" data-searchable="true"&gt;Din Djarin&lt;/span&gt;
 
 &lt;!-- Opt in to sorting --&gt;
-&lt;span data-field="name" data-sortable="true"&gt;Katniss Everdeen&lt;/span&gt;</code></pre>
+&lt;span data-field="name" data-sortable="true"&gt;Din Djarin&lt;/span&gt;</code></pre>
 
         <h2>Controls</h2>
 
@@ -154,7 +145,7 @@
             If you only want grid layout, simply don't include these buttons.
         </div>
 
-                <h2>Performance</h2>
+        <h2>Performance</h2>
 
         <p>
             Atlas automatically optimises performance for large directories.
@@ -170,6 +161,24 @@
 
         <p>
             This keeps the DOM small and responsive, even with 1,000+ members.
+        </p>
+
+        <h3>Filter Caching</h3>
+        <p>
+            Filter results are automatically cached. Applying the same filter multiple
+            times is instant — no recomputation needed.
+        </p>
+
+        <h2>JCink Template Placement</h2>
+        <p>
+            On JCink forums, the controls and directory are split across two templates:
+        </p>
+        <ul>
+            <li><strong>Member List Header:</strong> Contains the <code>data-atlas</code> wrapper, controls, and <code>data-directory</code> opening tag</li>
+            <li><strong>Member List Row:</strong> Contains each <code>data-member</code> card</li>
+        </ul>
+        <p>
+            <a href="installation/jcink.html">→ View the JCink Installation Guide</a>
         </p>
 
         <h2>Complete Example</h2>
@@ -188,14 +197,26 @@
 
     &lt;div data-directory&gt;
         &lt;article data-member&gt;
-            &lt;span data-field="name" data-searchable="true" data-sortable="true"&gt;
-                Katniss Everdeen
+            &lt;span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false"&gt;
+                Din Djarin
             &lt;/span&gt;
-            &lt;span data-field="species" data-filterable="true"&gt;
+            &lt;span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false"&gt;
+                Pedro Pascal
+            &lt;/span&gt;
+            &lt;span data-field="species" data-sortable="true"&gt;
                 Human
             &lt;/span&gt;
-            &lt;span data-field="occupation" data-filterable="true"&gt;
-                Hunter
+            &lt;span data-field="occupation" data-searchable="true" data-sortable="true"&gt;
+                Bounty Hunter
+            &lt;/span&gt;
+            &lt;span data-field="faction" data-sortable="true"&gt;
+                Mandalorian
+            &lt;/span&gt;
+            &lt;span data-field="homeworld" data-sortable="true"&gt;
+                Aq Vetina
+            &lt;/span&gt;
+            &lt;span data-field="status" data-sortable="true"&gt;
+                Active
             &lt;/span&gt;
         &lt;/article&gt;
     &lt;/div&gt;

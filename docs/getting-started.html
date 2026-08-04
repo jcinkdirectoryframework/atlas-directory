@@ -24,6 +24,9 @@
         <a href="architecture.html">Architecture</a>
         <a href="css-customisation.html">CSS Customisation</a>
 
+        <span class="nav-label">Installation</span>
+        <a href="installation/jcink.html">JCink Setup</a>
+
         <span class="nav-label">Examples</span>
         <a href="examples/layout-examples.html">Layout Examples</a>
 
@@ -47,7 +50,7 @@
 
         <p>Add the <code>data-atlas</code> attribute to your container, then add controls and members.</p>
 
-                <pre><code>&lt;div data-atlas&gt;
+        <pre><code>&lt;div data-atlas&gt;
     &lt;!-- Search --&gt;
     &lt;input data-search placeholder="Search members..."&gt;
 
@@ -101,6 +104,38 @@
     new Atlas();
 &lt;/script&gt;</code></pre>
 
+        <p>That's it! Atlas discovers everything automatically.</p>
+
+        <h2>Performance Tips</h2>
+
+        <ul>
+            <li><strong>Lazy rendering</strong> — Activates automatically when a directory has more than 300 members. Only visible members are rendered in the DOM.</li>
+            <li><strong>Filter caching</strong> — Filter results are cached. Applying the same filter twice is instant.</li>
+            <li><strong>Set lookups</strong> — Filter values use Set for O(1) lookups, making filtering fast even with 1,000+ members.</li>
+        </ul>
+
+        <div class="tip">
+            <strong>Performance Tip:</strong> Atlas automatically handles performance
+            for you. For directories with more than 300 members, lazy rendering
+            activates automatically. You don't need to configure anything.
+        </div>
+
+        <h2>Accessibility</h2>
+
+        <ul>
+            <li><strong>Keyboard navigation</strong> — All controls are accessible via keyboard (Tab, Enter, Space).</li>
+            <li><strong>Screen readers</strong> — ARIA labels and roles are built in.</li>
+            <li><strong>Reduced motion</strong> — Respects <code>prefers-reduced-motion</code> system setting.</li>
+        </ul>
+
+        <h2>Mobile Optimisation</h2>
+
+        <ul>
+            <li><strong>Touch targets</strong> — All interactive elements have a minimum tap target of 44px.</li>
+            <li><strong>Responsive grid</strong> — Grid columns adjust automatically on smaller screens.</li>
+            <li><strong>iOS zoom prevention</strong> — Search inputs use 16px font size to prevent iOS zoom.</li>
+        </ul>
+
         <h2>JCink Users</h2>
         <p>
             If you're installing Atlas on a JCink forum, you'll need to place the HTML
@@ -111,22 +146,14 @@
             <a href="installation/jcink.html">→ View the JCink Installation Guide</a>
         </p>
 
-        <p>That's it! Atlas discovers everything automatically.</p>
-
         <h2>What's Next?</h2>
 
         <ul>
-            <li>📖 <a href="html-api.html">HTML API Reference</a> — All available attributes</li>
-            <li>🎨 <a href="css-customisation.html">CSS Customisation</a> — Style your directory</li>
-            <li>🏗️ <a href="architecture.html">Architecture</a> — Understand how Atlas works</li>
-            <li>📐 <a href="examples/layout-examples.html">Layout Examples</a> — See different layouts</li>
+            <li><a href="html-api.html">HTML API Reference</a> — All available attributes</li>
+            <li><a href="css-customisation.html">CSS Customisation</a> — Style your directory</li>
+            <li><a href="architecture.html">Architecture</a> — Understand how Atlas works</li>
+            <li><a href="examples/layout-examples.html">Layout Examples</a> — See different layouts</li>
         </ul>
-
-        <div class="tip">
-            <strong>Performance Tip:</strong> Atlas automatically handles performance
-            for you. For directories with more than 300 members, lazy rendering
-            activates automatically. You don't need to configure anything.
-        </div>
 
     </main>
 

@@ -18,7 +18,7 @@ Atlas transforms static HTML member lists into interactive, searchable directori
 - **Result Counter** — "Showing X of Y members" updates in real-time.
 - **No Flicker** — Smooth loading with CSS transitions.
 - **Accessible** — Keyboard navigation, screen reader support, reduced-motion compatible.
-- **Responsive** — Works on all screen sizes.
+- **Mobile-Optimised** — Touch targets, responsive layouts, iOS zoom prevention.
 - **~1,000 Members** — Optimised for directories of up to one thousand members.
 
 ---
@@ -32,8 +32,9 @@ Atlas is optimised for directories of up to ~1,000 members.
 - **Filter caching** — repeated filters are instant
 - **Lazy rendering** — automatically activates at 300+ members
 - **Intersection Observer** — only renders visible members
+- **Intl.Collator** — faster locale-aware sorting
 
-With 1,000 members:
+**Benchmarks with 1,000 members:**
 - Init time: ~150ms
 - Filter time: ~0.4ms (first), instant (cached)
 - Sort time: ~1.2ms
@@ -61,14 +62,14 @@ With 1,000 members:
 
     <!-- Member directory -->
     <div data-directory>
-            <article data-member>
-                <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Din Djarin</span></div>
-                <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Pedro Pascal</span></div>
-                <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Human</span></div>
-                <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Bounty Hunter</span></div>
-                <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Mandalorian</span></div>
-                <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Aq Vetina</span></div>
-                <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
+        <article data-member>
+            <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Din Djarin</span></div>
+            <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Pedro Pascal</span></div>
+            <div><strong>Species:</strong> <span data-field="species" data-sortable="true">Human</span></div>
+            <div><strong>Occupation:</strong> <span data-field="occupation" data-searchable="true" data-sortable="true">Bounty Hunter</span></div>
+            <div><strong>Faction:</strong> <span data-field="faction" data-sortable="true">Mandalorian</span></div>
+            <div><strong>Homeworld:</strong> <span data-field="homeworld" data-sortable="true">Aq Vetina</span></div>
+            <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
         </article>
         <!-- More members... -->
     </div>
@@ -92,17 +93,6 @@ For custom styling, see the CSS Customisation section in docs/html-api.md.
 </script>
 
 That's it. Atlas discovers everything automatically.
-
----
-
-## JCink Installation
-
-For JCink forums, Atlas is installed across two templates:
-
-- **Member List Header** — Contains the Atlas wrapper, controls, and directory
-- **Member List Row** — Contains each member card
-
-See the [JCink Installation Guide](docs/installation/jcink.html) for step-by-step instructions.
 
 ---
 
@@ -139,6 +129,17 @@ See docs/html-api.md for full documentation.
 
 ---
 
+## JCink Installation
+
+For JCink forums, Atlas is installed across two templates:
+
+- **Member List Header** — Contains the Atlas wrapper, controls, and directory
+- **Member List Row** — Contains each member card
+
+See the [JCink Installation Guide](docs/installation/jcink.html) for step-by-step instructions.
+
+---
+
 ## Live Examples
 
 See Atlas in action with different layouts:
@@ -165,7 +166,7 @@ EVENTBUS (Central communication hub)
 ├── STORE (State management, publish events)
 ├── MEMBER COLLECTION (Data layer, queries)
     ↓
-RENDERER (DOM updates, batch rendering, loading state)
+RENDERER (DOM updates, batch rendering, loading state, lazy rendering)
     ↓
 MODULES (FilterGenerator, FilterChips, ResultCounter, SortGenerator, LayoutManager)
 
@@ -199,12 +200,13 @@ Atlas is currently in active development.
 - Layout switching (grid/list)
 - State persistence (layout)
 - Loading state (no flicker)
+- Performance optimisation (Set lookups, filter caching, lazy rendering)
+- Accessibility (ARIA, keyboard navigation, reduced motion)
+- Mobile optimisation (touch targets, responsive layouts)
 
 ### Next
-- Performance optimisation
-- Accessibility improvements
-- Mobile responsiveness
 - Documentation finalisation
+- Release preparation (npm, CDN)
 
 ---
 
@@ -217,6 +219,7 @@ Atlas targets modern browsers that support:
 - requestAnimationFrame
 - AbortController
 - localStorage
+- Intersection Observer (for lazy rendering)
 
 Supported browsers:
 - Chrome 80+

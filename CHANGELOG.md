@@ -1,5 +1,47 @@
 # Changelog
 
+## [M1.2] — 2026-08-04
+
+### Added
+
+- **Mobile Optimisation**
+  - Minimum tap targets (44px) for all interactive elements
+  - Responsive grid columns adjust on smaller screens
+  - iOS zoom prevention (search inputs use 16px font size)
+  - Filters stack vertically on small screens
+  - Chips wrap and are touch-friendly on mobile
+  - Search input full-width on mobile
+  - Prevent iOS zoom on focus
+
+### Changed
+
+- **atlas.css** — Added generic mobile optimisations (tap targets, responsive grid, filter stacking, iOS zoom prevention)
+- **examples.css** — Added layout-specific mobile optimisations (sidebar stacking, two-column stacking, slide-out stacking, centered adjustments)
+
+## [M1.1] — 2026-08-04
+
+### Added
+
+- **Accessibility**
+  - Keyboard navigation support (Tab, Enter, Space)
+  - ARIA attributes: `role`, `aria-label`, `aria-pressed`, `aria-live`, `aria-atomic`
+  - Focus states with `:focus-visible` (blue outline for keyboard users)
+  - Reduced motion support (`prefers-reduced-motion`)
+  - ARIA live regions for result counter
+  - ARIA list/listitem roles for directory and members
+  - ARIA toolbar roles for filter/sort/chip containers
+  - Descriptive ARIA labels on all interactive elements
+
+### Changed
+
+- **FilterGenerator** — ARIA attributes and keyboard support
+- **FilterChips** — ARIA attributes and keyboard support
+- **ResultCounter** — ARIA live region for announcements
+- **SortGenerator** — ARIA attributes and keyboard support
+- **Atlas** — ARIA label for search input
+- **Renderer** — ARIA list/listitem roles for directory and members
+- **atlas.css** — Focus states and reduced motion support
+
 ## [M1.0] — 2026-08-04
 
 ### Added
@@ -38,8 +80,6 @@
 | Filter Time (first) | 121ms | 0.4ms | 300x faster |
 | Sort Time | 24ms | 1.2ms | 20x faster |
 | DOM Nodes (visible) | 22,000 | ~700 | 97% reduction |
-
----
 
 ## [M0.10] — 2026-08-04
 
