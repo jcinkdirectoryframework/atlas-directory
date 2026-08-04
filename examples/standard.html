@@ -591,41 +591,43 @@
         </div>
     </div>
 
-    <script type="module">
-        function displayCode(htmlSelector, cssSelector) {
-            const htmlEl = document.querySelector(htmlSelector);
-            const cssEl = document.querySelector(cssSelector);
+<script type="module">
+    function displayCode(htmlSelector, cssSelector) {
+        const htmlEl = document.querySelector(htmlSelector);
+        const cssEl = document.querySelector(cssSelector);
 
-            if (htmlEl) {
-                const atlasContainer = document.querySelector('[data-atlas]');
-                if (atlasContainer) {
-                    const clone = atlasContainer.cloneNode(true);
-                    const codeSections = clone.querySelectorAll('.code-section');
-                    codeSections.forEach(el => el.remove());
-                    htmlEl.textContent = clone.outerHTML;
-                }
-            }
-
-            if (cssEl) {
-                const styles = [];
-                document.querySelectorAll('style').forEach(el => {
-                    styles.push(el.textContent);
-                });
-                cssEl.textContent = styles.join('\n\n');
+        if (htmlEl) {
+            const atlasContainer = document.querySelector('[data-atlas]');
+            if (atlasContainer) {
+                const clone = atlasContainer.cloneNode(true);
+                const codeSections = clone.querySelectorAll('.code-section');
+                codeSections.forEach(el => el.remove());
+                htmlEl.textContent = clone.outerHTML;
             }
         }
 
-        import('../../src/core/Atlas.js')
-            .then(module => {
-                const Atlas = module.default;
-                new Atlas({ debug: false });
-            })
-            .catch(err => {
-                console.error('Failed to load Atlas:', err);
+        if (cssEl) {
+            const styles = [];
+            document.querySelectorAll('style').forEach(el => {
+                styles.push(el.textContent);
             });
+            cssEl.textContent = styles.join('\n\n');
+        }
+    }
 
-        displayCode('#html-code', '#css-code');
-    </script>
+    // ─── Import Atlas from the correct path ──────────
+    // From examples/ go up one level to the repo root
+    import('../src/core/Atlas.js')
+        .then(module => {
+            const Atlas = module.default;
+            new Atlas({ debug: true });
+        })
+        .catch(err => {
+            console.error('Failed to load Atlas:', err);
+        });
+
+    displayCode('#html-code', '#css-code');
+</script>
 
 </body>
 </html>

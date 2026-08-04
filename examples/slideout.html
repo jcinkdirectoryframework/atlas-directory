@@ -694,59 +694,58 @@
         </div>
     </div>
 
-    <script type="module">
-        function displayCode(htmlSelector, cssSelector) {
-            const htmlEl = document.querySelector(htmlSelector);
-            const cssEl = document.querySelector(cssSelector);
+<script type="module">
+    function displayCode(htmlSelector, cssSelector) {
+        const htmlEl = document.querySelector(htmlSelector);
+        const cssEl = document.querySelector(cssSelector);
 
-            if (htmlEl) {
-                const atlasContainer = document.querySelector('[data-atlas]');
-                if (atlasContainer) {
-                    const clone = atlasContainer.cloneNode(true);
-                    const codeSections = clone.querySelectorAll('.code-section');
-                    codeSections.forEach(el => el.remove());
-                    htmlEl.textContent = clone.outerHTML;
-                }
-            }
-
-            if (cssEl) {
-                const styles = [];
-                document.querySelectorAll('style').forEach(el => {
-                    styles.push(el.textContent);
-                });
-                cssEl.textContent = styles.join('\n\n');
+        if (htmlEl) {
+            const atlasContainer = document.querySelector('[data-atlas]');
+            if (atlasContainer) {
+                const clone = atlasContainer.cloneNode(true);
+                const codeSections = clone.querySelectorAll('.code-section');
+                codeSections.forEach(el => el.remove());
+                htmlEl.textContent = clone.outerHTML;
             }
         }
 
-        // ─── Slide-out Toggle ──────────────────────────
-
-        const toggle = document.getElementById('topbarToggle');
-        const content = document.getElementById('topbarContent');
-        const arrow = document.getElementById('arrowIcon');
-
-        if (toggle && content) {
-            toggle.addEventListener('click', () => {
-                const isOpen = content.classList.toggle('open');
-                toggle.setAttribute('aria-expanded', isOpen);
-                if (arrow) {
-                    arrow.classList.toggle('open', isOpen);
-                }
+        if (cssEl) {
+            const styles = [];
+            document.querySelectorAll('style').forEach(el => {
+                styles.push(el.textContent);
             });
+            cssEl.textContent = styles.join('\n\n');
         }
+    }
 
-        // ─── Initialise Atlas ──────────────────────────
+    // ─── Slide-out Toggle ──────────────────────────────
 
-        import('../../src/core/Atlas.js')
-            .then(module => {
-                const Atlas = module.default;
-                new Atlas({ debug: false });
-            })
-            .catch(err => {
-                console.error('Failed to load Atlas:', err);
-            });
+    const toggle = document.getElementById('topbarToggle');
+    const content = document.getElementById('topbarContent');
+    const arrow = document.getElementById('arrowIcon');
 
-        displayCode('#html-code', '#css-code');
-    </script>
+    if (toggle && content) {
+        toggle.addEventListener('click', () => {
+            const isOpen = content.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', isOpen);
+            if (arrow) {
+                arrow.classList.toggle('open', isOpen);
+            }
+        });
+    }
+
+    // ─── Import Atlas from the correct path ──────────
+    import('../src/core/Atlas.js')
+        .then(module => {
+            const Atlas = module.default;
+            new Atlas({ debug: true });
+        })
+        .catch(err => {
+            console.error('Failed to load Atlas:', err);
+        });
+
+    displayCode('#html-code', '#css-code');
+</script>
 
 </body>
 </html>
