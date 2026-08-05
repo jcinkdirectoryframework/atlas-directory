@@ -145,6 +145,167 @@
             If you only want grid layout, simply don't include these buttons.
         </div>
 
+        <h2>Understanding data-field and Controls</h2>
+
+        <p>
+            This is the most important concept to understand when using Atlas:
+            <strong>the <code>data-</code> attributes tell Atlas where to find data and controls,
+            but they don't control how anything looks.</strong>
+        </p>
+
+        <div class="tip">
+            <strong>Design Freedom:</strong> You can style your member cards and controls however you want.
+            Use any HTML structure, classes, or inline styles. The only requirement is that
+            the <code>data-</code> attributes are on the correct elements.
+        </div>
+
+        <h3>data-field — The Value Must Be Contained</h3>
+
+        <p>
+            <code>data-field</code> must be placed on the element that <strong>contains the actual value</strong>.
+            Labels, wrappers, and other display elements should <strong>not</strong> have <code>data-field</code>.
+        </p>
+
+        <h4>✅ Correct: data-field on the value element</h4>
+
+        <pre><code>&lt;div&gt;
+    &lt;strong&gt;Species:&lt;/strong&gt;
+    &lt;span data-field="species" data-sortable="true"&gt;Human&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+
+        <p>
+            <strong>Why this works:</strong> Atlas reads the value "Human" from the <code>span</code>.
+            The label "Species:" is ignored — it's just for display.
+        </p>
+
+        <h4>❌ Incorrect: data-field on a wrapper element</h4>
+
+        <pre><code>&lt;div data-field="species" data-sortable="true"&gt;
+    &lt;strong&gt;Species:&lt;/strong&gt;
+    &lt;span&gt;Human&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+
+        <div class="warning">
+            <strong>Warning:</strong> This will <strong>not</strong> work. Atlas will read the entire
+            <code>div</code> as the value, including the "Species:" label. Filters will show
+            "Species: Human" instead of just "Human".
+        </div>
+
+        <h3>Controls — Labels Go Outside Containers</h3>
+
+        <p>
+            <code>data-sort</code>, <code>data-filters</code>, and <code>data-chips</code> are
+            <strong>containers that Atlas fills with generated content</strong>.
+            Any content inside them will be <strong>overwritten</strong>.
+        </p>
+
+        <h4>✅ Correct: Labels outside the container</h4>
+
+        <pre><code>&lt;div&gt;
+    &lt;strong&gt;Sort by:&lt;/strong&gt;
+    &lt;div data-sort&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div&gt;
+    &lt;strong&gt;Filter by:&lt;/strong&gt;
+    &lt;div data-filters&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div&gt;
+    &lt;strong&gt;Active filters:&lt;/strong&gt;
+    &lt;div data-chips&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+        <h4>❌ Incorrect: Labels inside the container</h4>
+
+        <pre><code>&lt;!-- This will NOT work — Atlas will overwrite the label --&gt;
+&lt;div data-sort&gt;
+    &lt;strong&gt;Sort by:&lt;/strong&gt;
+&lt;/div&gt;</code></pre>
+
+        <div class="warning">
+            <strong>Warning:</strong> Content inside <code>data-sort</code>, <code>data-filters</code>,
+            and <code>data-chips</code> will be <strong>removed</strong> when Atlas generates the controls.
+            Always place labels <strong>outside</strong> these containers.
+        </div>
+
+        <h3>What About the Search Input?</h3>
+
+        <p>
+            <code>data-search</code> is different — it's a <strong>single element</strong>,
+            not a container that Atlas fills. You can style it and wrap it with labels freely:
+        </p>
+
+        <pre><code>&lt;!-- This works — it's a single element --&gt;
+&lt;div&gt;
+    &lt;strong&gt;Search:&lt;/strong&gt;
+    &lt;input data-search placeholder="Search members..."&gt;
+&lt;/div&gt;</code></pre>
+
+        <h3>Quick Reference: Containers vs Single Elements</h3>
+
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Type</th>
+                <th>What Happens</th>
+                <th>Can You Put Content Inside?</th>
+            </tr>
+            <tr>
+                <td><code>data-search</code></td>
+                <td>Single Element</td>
+                <td>Atlas binds to it — doesn't replace content</td>
+                <td>✅ Yes (it's an input, it has no children)</td>
+            </tr>
+            <tr>
+                <td><code>data-layout</code></td>
+                <td>Single Element</td>
+                <td>Atlas binds to it — doesn't replace content</td>
+                <td>✅ Yes (it's a button, it has no children)</td>
+            </tr>
+            <tr>
+                <td><code>data-sort</code></td>
+                <td>Container</td>
+                <td>Atlas <strong>replaces all content</strong> with buttons</td>
+                <td>❌ No — content will be removed</td>
+            </tr>
+            <tr>
+                <td><code>data-filters</code></td>
+                <td>Container</td>
+                <td>Atlas <strong>replaces all content</strong> with filters</td>
+                <td>❌ No — content will be removed</td>
+            </tr>
+            <tr>
+                <td><code>data-chips</code></td>
+                <td>Container</td>
+                <td>Atlas <strong>replaces all content</strong> with chips</td>
+                <td>❌ No — content will be removed</td>
+            </tr>
+            <tr>
+                <td><code>data-results</code></td>
+                <td>Container</td>
+                <td>Atlas <strong>replaces all content</strong> with the counter</td>
+                <td>❌ No — content will be removed</td>
+            </tr>
+            <tr>
+                <td><code>data-directory</code></td>
+                <td>Container</td>
+                <td>Atlas discovers members inside it</td>
+                <td>✅ Yes — this is where your members go</td>
+            </tr>
+            <tr>
+                <td><code>data-member</code></td>
+                <td>Element</td>
+                <td>Atlas discovers <code>data-field</code> inside it</td>
+                <td>✅ Yes — this is your member card</td>
+            </tr>
+        </table>
+
+        <div class="tip">
+            <strong>Key takeaway:</strong> The <code>data-</code> attributes tell Atlas where to find
+            data and controls. Everything else — layout, colours, spacing, fonts, labels — is yours to design.
+        </div>
+
         <h2>Performance</h2>
 
         <p>
