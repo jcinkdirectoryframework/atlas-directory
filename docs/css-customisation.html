@@ -351,6 +351,109 @@
     display: inline;
 }</code></pre>
 
+        <h2>Customising Filter Order</h2>
+
+        <p>
+            By default, Atlas displays filters in the order they are discovered in your member data.
+            You can reorder them or move a specific filter to a different location using CSS or a simple script.
+        </p>
+
+        <div class="tip">
+            <strong>Tip:</strong> These techniques work with any filter — just replace <code>faceclaim</code> with your field name.
+        </div>
+
+        <h3>Option 1: Reorder Filters with CSS (Simple)</h3>
+
+        <p>
+            Use CSS <code>order</code> to visually reorder filters without changing your member data.
+        </p>
+
+        <pre><code>/* Move a filter to the top */
+[data-filter][data-field="faceclaim"] {
+    order: -1;
+}
+
+/* Move a filter to the bottom */
+[data-filter][data-field="status"] {
+    order: 999;
+}</code></pre>
+
+        <p>
+            <strong>How it works:</strong> The <code>data-filter</code> container has a <code>data-field</code>
+            attribute matching your field name. CSS <code>order</code> repositions it within the flex container.
+        </p>
+
+        <div class="tip">
+            <strong>Note:</strong> This only works if <code>[data-filters]</code> uses <code>display: flex</code>.
+            If you've changed it to <code>grid</code>, you may need to use <code>grid-row</code> or <code>grid-column</code> instead.
+        </div>
+
+        <h3>Option 2: Move a Filter to a Different Location</h3>
+
+        <p>
+            If you want a specific filter to appear in a different part of your page (like a sidebar or above the search bar),
+            you can move it using a small script.
+        </p>
+
+        <p><strong>Step 1: Add a target container where you want the filter to appear.</strong></p>
+
+        <pre><code>&lt;div id="faceclaim-filter-container"&gt;&lt;/div&gt;</code></pre>
+
+        <p><strong>Step 2: Add this script after initialising Atlas.</strong></p>
+
+        <pre><code>&lt;script type="module"&gt;
+    import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
+
+    new Atlas();
+
+    // Wait for Atlas to generate the filters
+    requestAnimationFrame(() =&gt; {
+        const faceclaimFilter = document.querySelector('[data-filter][data-field="faceclaim"]');
+        const targetContainer = document.getElementById('faceclaim-filter-container');
+        if (faceclaimFilter &amp;&amp; targetContainer) {
+            // Move it to the new location
+            targetContainer.appendChild(faceclaimFilter);
+        }
+    });
+&lt;/script&gt;</code></pre>
+
+        <p>
+            <strong>How it works:</strong> Atlas generates the filters, then the script finds the faceclaim filter
+            and moves it to your designated container.
+        </p>
+
+        <div class="tip">
+            <strong>Tip:</strong> Replace <code>faceclaim</code> with your own field name, and
+            <code>faceclaim-filter-container</code> with the ID of your target container.
+        </div>
+
+        <h3>Quick Reference</h3>
+
+        <table>
+            <tr>
+                <th>Goal</th>
+                <th>Method</th>
+                <th>Code</th>
+            </tr>
+            <tr>
+                <td>Move filter to the top of the list</td>
+                <td>CSS</td>
+                <td><code>[data-filter][data-field="FIELDNAME"] { order: -1; }</code></td>
+            </tr>
+            <tr>
+                <td>Move filter to the bottom of the list</td>
+                <td>CSS</td>
+                <td><code>[data-filter][data-field="FIELDNAME"] { order: 999; }</code></td>
+            </tr>
+            <tr>
+                <td>Move filter to a different location on the page</td>
+                <td>JavaScript</td>
+                <td>See Option 2 above</td>
+            </tr>
+        </table>
+
+        <hr>
+
         <h2>Tips</h2>
 
         <ul>
