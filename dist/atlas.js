@@ -1246,8 +1246,35 @@ class FilterGenerator {
     }
 
     #createFilterForField(fieldName) {
-        const uniqueValues = this.#memberCollection.getUniqueValues(fieldName);
-        if (uniqueValues.length === 0) return;
+        // Get unique raw values (preserving original casing)
+        const rawValues = this.#memberCollection.getUniqueValues(fieldName);
+
+        // Skip fields with no values
+        if (rawValues.length === 0) {
+            return;
+        }
+
+        // Build a map of normalized → raw (using the first occurrence)
+        const displayMap = new Map();
+        const allMembers = this.#memberCollection.getAll();
+
+        for (const member of allMembers) {
+            const raw = member.get(fieldName);
+            if (raw && raw.trim()) {
+                const normalized = raw.toLowerCase().trim();
+                if (!displayMap.has(normalized)) {
+                    displayMap.set(normalized, raw);
+                }
+            }
+        }
+
+        // Get sorted list of normalized keys
+        const sortedKeys = Array.from(displayMap.keys()).sort((a, b) => a.localeCompare(b));
+
+        // If no values after normalisation, skip
+        if (sortedKeys.length === 0) {
+            return;
+        }
 
         const group = document.createElement('div');
         group.dataset.filter = '';
@@ -1275,14 +1302,18 @@ class FilterGenerator {
         optionsContainer.appendChild(allButton);
 
         const valueButtons = [];
-        for (const value of uniqueValues) {
+
+        for (const normalizedKey of sortedKeys) {
+            const displayValue = displayMap.get(normalizedKey);
             const button = document.createElement('button');
-            button.dataset.value = value;
-            button.textContent = value;
+            // Store the normalized value for filtering (case-insensitive)
+            button.dataset.value = normalizedKey;
+            // Display the raw value (preserving original casing)
+            button.textContent = displayValue;
             button.type = 'button';
             button.setAttribute('role', 'button');
             button.setAttribute('aria-pressed', 'false');
-            button.setAttribute('aria-label', `Filter by ${fieldName}: ${value}`);
+            button.setAttribute('aria-label', `Filter by ${fieldName}: ${displayValue}`);
             valueButtons.push(button);
             optionsContainer.appendChild(button);
         }
@@ -1293,7 +1324,8 @@ class FilterGenerator {
         this.#fieldFilterMap.set(fieldName, {
             container: group,
             allButton: allButton,
-            valueButtons: valueButtons
+            valueButtons: valueButtons,
+            displayMap: displayMap
         });
 
         this.#attachEvents(fieldName, allButton, valueButtons);
@@ -1454,26 +1486,32 @@ class FilterChips {
             const fieldInfo = this.#fieldFilterMap.get(fieldName);
             if (!fieldInfo) continue;
 
+            // Get the display map to show the raw value
+            const displayMap = fieldInfo.displayMap || new Map();
+
             for (const value of values) {
+                // Get the display value from the map, or use the normalized value if not found
+                const displayValue = displayMap.get(value) || value;
+
                 const chip = document.createElement('span');
                 chip.className = 'atlas-chip';
                 chip.dataset.field = fieldName;
                 chip.dataset.value = value;
                 chip.setAttribute('role', 'button');
                 chip.setAttribute('tabindex', '0');
-                chip.setAttribute('aria-label', `Remove ${fieldName} filter: ${value}`);
+                chip.setAttribute('aria-label', `Remove ${fieldName} filter: ${displayValue}`);
 
                 const text = document.createElement('span');
                 text.className = 'atlas-chip-text';
                 const displayLabel = this.#getFieldLabel(fieldName);
-                text.textContent = `${displayLabel}: ${value}`;
+                text.textContent = `${displayLabel}: ${displayValue}`;
                 chip.appendChild(text);
 
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'atlas-chip-remove';
                 removeBtn.textContent = '×';
                 removeBtn.type = 'button';
-                removeBtn.setAttribute('aria-label', `Remove ${value} filter`);
+                removeBtn.setAttribute('aria-label', `Remove ${displayValue} filter`);
                 removeBtn.setAttribute('tabindex', '-1');
 
                 removeBtn.addEventListener('click', (e) => {

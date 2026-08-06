@@ -10,6 +10,7 @@
  * - Handle filter selection events
  * - Update Store when filters change
  * - Accessibility: ARIA attributes, keyboard navigation
+ * - Case-insensitive: Groups values by normalized (lowercase) form
  *
  * Deliberately does NOT:
  * - Manage application state (delegates to Store)
@@ -24,7 +25,7 @@ export default class FilterGenerator {
     #memberCollection;
     #store;
     #events;
-    #fieldFilterMap = new Map(); // fieldName → { container, allButton, valueButtons }
+    #fieldFilterMap = new Map(); // fieldName → { container, allButton, valueButtons, displayMap }
 
     /**
      * Create a FilterGenerator.
@@ -102,13 +103,39 @@ export default class FilterGenerator {
 
     /**
      * Create a filter interface for a specific field.
+     *
+     * Uses normalized (lowercase) values for grouping, but displays
+     * the raw value (preserving original capitalisation) for the button text.
      */
     #createFilterForField(fieldName) {
 
-        const uniqueValues = this.#memberCollection.getUniqueValues(fieldName);
+        // Get unique raw values (preserving original casing)
+        const rawValues = this.#memberCollection.getUniqueValues(fieldName);
 
         // Skip fields with no values
-        if (uniqueValues.length === 0) {
+        if (rawValues.length === 0) {
+            return;
+        }
+
+        // Build a map of normalized → raw (using the first occurrence)
+        const displayMap = new Map();
+        const allMembers = this.#memberCollection.getAll();
+
+        for (const member of allMembers) {
+            const raw = member.get(fieldName);
+            if (raw && raw.trim()) {
+                const normalized = raw.toLowerCase().trim();
+                if (!displayMap.has(normalized)) {
+                    displayMap.set(normalized, raw);
+                }
+            }
+        }
+
+        // Get sorted list of normalized keys
+        const sortedKeys = Array.from(displayMap.keys()).sort((a, b) => a.localeCompare(b));
+
+        // If no values after normalisation, skip
+        if (sortedKeys.length === 0) {
             return;
         }
 
@@ -144,14 +171,17 @@ export default class FilterGenerator {
         // Create buttons for each unique value
         const valueButtons = [];
 
-        for (const value of uniqueValues) {
+        for (const normalizedKey of sortedKeys) {
+            const displayValue = displayMap.get(normalizedKey);
             const button = document.createElement('button');
-            button.dataset.value = value;
-            button.textContent = value;
+            // Store the normalized value for filtering (case-insensitive)
+            button.dataset.value = normalizedKey;
+            // Display the raw value (preserving original casing)
+            button.textContent = displayValue;
             button.type = 'button';
             button.setAttribute('role', 'button');
             button.setAttribute('aria-pressed', 'false');
-            button.setAttribute('aria-label', `Filter by ${fieldName}: ${value}`);
+            button.setAttribute('aria-label', `Filter by ${fieldName}: ${displayValue}`);
             valueButtons.push(button);
             optionsContainer.appendChild(button);
         }
@@ -159,11 +189,12 @@ export default class FilterGenerator {
         group.appendChild(optionsContainer);
         this.#container.appendChild(group);
 
-        // Store references (including the "All" button)
+        // Store references
         this.#fieldFilterMap.set(fieldName, {
             container: group,
             allButton: allButton,
-            valueButtons: valueButtons
+            valueButtons: valueButtons,
+            displayMap: displayMap // Store for potential future use
         });
 
         // Add event listeners
@@ -189,10 +220,10 @@ export default class FilterGenerator {
             }
         });
 
-        // Value buttons select a value (no toggle)
+        // Value buttons select a value
         for (const button of valueButtons) {
             button.addEventListener('click', () => {
-                const value = button.dataset.value;
+                const value = button.dataset.value; // This is the normalized value
                 this.#handleValueSelect(fieldName, value);
             });
 
@@ -245,13 +276,13 @@ export default class FilterGenerator {
      */
     #handleValueSelect(fieldName, value) {
 
-        // Check if the value is already active
+        // Check if the value is already active (values are stored normalized)
         if (this.#store.isFilterActive(fieldName, value)) {
             // Do nothing — value is already selected
             return;
         }
 
-        // Add the value to the Store (Store publishes the event)
+        // Add the normalized value to the Store (Store publishes the event)
         this.#store.toggleFilter(fieldName, value);
 
         // Update the "All" button state for this field
@@ -319,7 +350,6 @@ export default class FilterGenerator {
     syncWithStore() {
 
         console.debug('FilterGenerator: Syncing with Store...');
-        console.debug('FilterGenerator: fieldFilterMap size =', this.#fieldFilterMap.size);
 
         const filters = this.#store.filters;
 
@@ -328,17 +358,16 @@ export default class FilterGenerator {
         // Update all fields
         for (const [fieldName, fieldData] of this.#fieldFilterMap) {
 
-            console.debug(`FilterGenerator: Updating field "${fieldName}"`);
-
             // Reset all value buttons
             for (const button of fieldData.valueButtons) {
                 button.classList.remove('active');
                 button.setAttribute('aria-pressed', 'false');
             }
 
-            // Apply active states from the Store
+            // Apply active states from the Store (values are normalized)
             const activeValues = filters[fieldName] || [];
             for (const button of fieldData.valueButtons) {
+                // button.dataset.value is already normalized
                 if (activeValues.includes(button.dataset.value)) {
                     button.classList.add('active');
                     button.setAttribute('aria-pressed', 'true');
