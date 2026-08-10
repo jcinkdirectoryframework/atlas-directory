@@ -1,14 +1,20 @@
 /**
  * Atlas — Core Styles
+ * Version 1.0.0
+ *
+ * Copyright (c) 2026 Maeve
+ * License: MIT
+ * https://github.com/jcinkdirectoryframework/atlas-directory
  *
  * This is the minimal CSS required for Atlas to function.
- * It provides only:
+ * It provides:
  * - Loading state (prevent flicker)
  * - Visibility toggles
  * - Layout container classes (grid/list)
  * - Focus states (accessibility)
  * - Reduced motion support (accessibility)
  * - Generic mobile optimisations (touch targets, iOS zoom prevention)
+ * - Filter display options (dropdowns, checkboxes, radio buttons)
  *
  * All visual styling (buttons, chips, filters, member cards, etc.)
  * should be provided by the user.
@@ -75,7 +81,10 @@
 /* Keyboard-only focus indicator */
 [data-atlas] button:focus-visible,
 [data-atlas] .atlas-chip:focus-visible,
-[data-atlas] [data-search]:focus-visible {
+[data-atlas] [data-search]:focus-visible,
+[data-atlas] select:focus-visible,
+[data-atlas] input[type="checkbox"]:focus-visible,
+[data-atlas] input[type="radio"]:focus-visible {
     outline: 2px solid #2563eb;
     outline-offset: 2px;
 }
@@ -140,7 +149,8 @@
 /* Ensure all interactive elements have minimum tap target size */
 [data-atlas] button,
 [data-atlas] .atlas-chip,
-[data-atlas] [data-search] {
+[data-atlas] [data-search],
+[data-atlas] select {
     min-height: 44px;
     min-width: 44px;
 }
@@ -166,6 +176,60 @@
 /* Search input */
 [data-search] {
     min-height: 44px;
+}
+
+/* ─── Filter Display Options ────────────────────────── */
+
+/* Dropdown filters */
+[data-filter-select] {
+    padding: 0.3rem 0.8rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+    font-family: inherit;
+    min-width: 140px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+[data-filter-select]:hover {
+    border-color: #9ca3af;
+}
+
+[data-filter-select]:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Checkbox and Radio filter options */
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.2rem 0;
+    padding: 0.15rem 0;
+}
+
+.filter-option input[type="checkbox"],
+.filter-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #2563eb;
+    flex-shrink: 0;
+}
+
+.filter-option label {
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #1e293b;
+    font-weight: 400;
+}
+
+.filter-option label:hover {
+    color: #0f172a;
 }
 
 /* ─── Generic Mobile Controls Stacking ────────────── */
@@ -236,6 +300,24 @@
     [data-search] {
         font-size: 16px; /* Prevents iOS zoom on focus */
         padding: 0.4rem 0.8rem;
+    }
+
+    /* Dropdown on mobile */
+    [data-filter-select] {
+        font-size: 0.85rem;
+        min-width: auto;
+        width: 100%;
+    }
+
+    /* Checkbox/Radio options on mobile */
+    .filter-option {
+        padding: 0.1rem 0;
+    }
+
+    .filter-option input[type="checkbox"],
+    .filter-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
     }
 }
 
