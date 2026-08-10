@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sidebar Layout — Atlas Example</title>
+    <title>Sidebar Layout - Atlas Example</title>
     <style>
-        /* ─── Sidebar Layout: Dark & Dramatic ────────── */
+        /*
+        Theme: Dark & Dramatic (Gold)
+        */
 
         * {
             box-sizing: border-box;
@@ -55,7 +57,9 @@
             text-decoration: underline;
         }
 
-        /* ─── Atlas Container ─────────────────────────── */
+        /*
+        Atlas Container
+        */
 
         [data-atlas] {
             max-width: 1200px;
@@ -68,17 +72,64 @@
             padding: 1.5rem;
         }
 
-        .sidebar {
+        .atlas-sidebar {
             width: 260px;
             flex-shrink: 0;
         }
 
-        .main-area {
+        .atlas-main {
             flex: 1;
             min-width: 0;
         }
 
-        /* ─── Search ──────────────────────────────────── */
+        /*
+        Occupation Filter (moved above search)
+        */
+
+        #occupation-filter-container {
+            margin-bottom: 0.75rem;
+        }
+
+        #occupation-filter-container [data-filter] {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        #occupation-filter-container [data-filter] label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        #occupation-filter-container [data-filter-select] {
+            padding: 0.4rem 1rem;
+            border: 1px solid #2a2a35;
+            border-radius: 6px;
+            background: #1a1a24;
+            color: #e8e0d0;
+            font-size: 0.9rem;
+            font-family: inherit;
+            min-width: 150px;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #occupation-filter-container [data-filter-select]:hover {
+            border-color: #d4af37;
+        }
+
+        #occupation-filter-container [data-filter-select]:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+        /*
+        Search
+        */
 
         [data-search] {
             padding: 0.6rem 1rem;
@@ -103,12 +154,14 @@
             box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
         }
 
-        /* ─── Filters ─────────────────────────────────── */
+        /*
+        Filters
+        */
 
         [data-filters] {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem;
             padding: 1rem 1.25rem;
             background: #0a0a0f;
             border: 1px solid #2a2a35;
@@ -129,6 +182,10 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
         }
+
+        /*
+        Filter Buttons
+        */
 
         [data-filter-options] {
             display: flex;
@@ -166,7 +223,47 @@
             border-color: #c4a027;
         }
 
-        /* ─── Sort ────────────────────────────────────── */
+        /*
+        Filter Checkboxes
+        */
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.15rem 0;
+            padding: 0.1rem 0.2rem;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+
+        .filter-option:hover {
+            background: #1a1a24;
+        }
+
+        .filter-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #d4af37;
+            flex-shrink: 0;
+        }
+
+        .filter-option label {
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #8a8a7a;
+            font-weight: 400;
+            user-select: none;
+        }
+
+        .filter-option label:hover {
+            color: #e8e0d0;
+        }
+
+        /*
+        Sort
+        */
 
         [data-sort] {
             display: flex;
@@ -213,7 +310,9 @@
             border-color: #7a2a2a;
         }
 
-        /* ─── Chips ───────────────────────────────────── */
+        /*
+        Chips
+        */
 
         [data-chips] {
             display: flex;
@@ -279,7 +378,9 @@
             color: #e8e0d0;
         }
 
-        /* ─── Result Counter ──────────────────────────── */
+        /*
+        Result Counter
+        */
 
         .atlas-result-counter {
             display: block;
@@ -288,7 +389,9 @@
             color: #8a8a7a;
         }
 
-        /* ─── Layout Controls ─────────────────────────── */
+        /*
+        Layout Controls
+        */
 
         [data-layout] {
             padding: 0.3rem 0.9rem;
@@ -316,7 +419,9 @@
             font-weight: 700;
         }
 
-        /* ─── Members ────────────────────────────────── */
+        /*
+        Members
+        */
 
         [data-member] {
             padding: 1rem 1.25rem;
@@ -348,10 +453,12 @@
         }
 
         [data-field="faceclaim"] {
-            color: #6a6a7a !important;
+            color: #6a6a7a;
         }
 
-        /* ─── Grid ────────────────────────────────────── */
+        /*
+        Grid
+        */
 
         [data-directory].atlas-layout-grid {
             display: grid;
@@ -360,7 +467,9 @@
             padding: 0.5rem 0;
         }
 
-        /* ─── List ────────────────────────────────────── */
+        /*
+        List
+        */
 
         [data-directory].atlas-layout-list {
             display: flex;
@@ -385,18 +494,24 @@
             margin-right: 0.2rem;
         }
 
-        /* ─── Hidden ──────────────────────────────────── */
+        /*
+        Hidden
+        */
 
         [data-member][hidden],
         [data-member][data-hidden] {
             display: none !important;
         }
 
+        /*
+        Responsive
+        */
+
         @media (max-width: 820px) {
             [data-atlas] {
                 flex-direction: column;
             }
-            .sidebar {
+            .atlas-sidebar {
                 width: 100%;
             }
         }
@@ -406,33 +521,60 @@
 
     <div class="example-header">
         <h1>Sidebar Layout</h1>
-        <p>Controls in a left sidebar, directory on the right. Great for wide screens.</p>
+        <p>Mixed filter displays: Radio (Status), Checkboxes (Species + Faction), Dropdown (Occupation - moved above search).</p>
         <div class="nav-links">
-            <a href="../docs/examples/layout-examples.html">← All Examples</a>
+            <a href="../docs/examples/layout-examples.html">All Examples</a>
             <a href="../index.html">Main Demo</a>
         </div>
     </div>
 
-    <!-- ─── Atlas ────────────────────────────────────── -->
+    <!--
+    Atlas
+    -->
 
     <div data-atlas>
 
-        <aside class="sidebar">
-            <div data-filters></div>
-            <div data-sort></div>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <!--
+        Sidebar
+        -->
+
+        <aside class="atlas-sidebar">
+
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
                 <button data-layout="grid">Grid</button>
                 <button data-layout="list">List</button>
             </div>
+
+            <!-- Main Filters -->
+            <div data-filters
+                 data-filter-radio="status"
+                 data-filter-checkboxes="species,faction">
+            </div>
+
+            <!-- Sort -->
+            <div data-sort></div>
+
         </aside>
 
-        <main class="main-area">
+        <!--
+        Main Area
+        -->
+
+        <main class="atlas-main">
+
+            <!-- Occupation Filter (moved above search) -->
+            <div id="occupation-filter-container">
+                <!-- Atlas will move the occupation filter here -->
+            </div>
+
             <input data-search placeholder="Search members...">
+
             <div data-chips></div>
             <div data-results></div>
+
             <div data-directory>
 
-                <!-- ─── Din Djarin ──────────────────────────── -->
+                <!-- Din Djarin -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Din Djarin</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Pedro Pascal</span></div>
@@ -443,7 +585,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Grogu ────────────────────────────────── -->
+                <!-- Grogu -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Grogu</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">None</span></div>
@@ -454,7 +596,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Inactive</span></div>
                 </article>
 
-                <!-- ─── Cara Dune ───────────────────────────── -->
+                <!-- Cara Dune -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Cara Dune</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Gina Carano</span></div>
@@ -465,7 +607,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Unknown</span></div>
                 </article>
 
-                <!-- ─── Bo-Katan Kryze ──────────────────────── -->
+                <!-- Bo-Katan Kryze -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Bo-Katan Kryze</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Katee Sackhoff</span></div>
@@ -476,7 +618,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Moff Gideon ──────────────────────────── -->
+                <!-- Moff Gideon -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Moff Gideon</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Giancarlo Esposito</span></div>
@@ -487,7 +629,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Ahsoka Tano ──────────────────────────── -->
+                <!-- Ahsoka Tano -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Ahsoka Tano</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Rosario Dawson</span></div>
@@ -498,7 +640,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Boba Fett ────────────────────────────── -->
+                <!-- Boba Fett -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Boba Fett</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Temuera Morrison</span></div>
@@ -509,7 +651,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Fennec Shand ─────────────────────────── -->
+                <!-- Fennec Shand -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Fennec Shand</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Ming-Na Wen</span></div>
@@ -521,19 +663,24 @@
                 </article>
 
             </div>
+
         </main>
 
     </div>
 
     <script type="module">
-        import('../src/core/Atlas.js')
-            .then(module => {
-                const Atlas = module.default;
-                new Atlas({ debug: false });
-            })
-            .catch(err => {
-                console.error('Failed to load Atlas:', err);
-            });
+        import Atlas from '../src/core/Atlas.js';
+
+        const atlas = new Atlas({ debug: false });
+
+        // Move Occupation Filter
+        requestAnimationFrame(() => {
+            const occupationFilter = document.querySelector('[data-filter][data-field="occupation"]');
+            const targetContainer = document.getElementById('occupation-filter-container');
+            if (occupationFilter && targetContainer) {
+                targetContainer.appendChild(occupationFilter);
+            }
+        });
     </script>
 
 </body>

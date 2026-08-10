@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centered Minimal — Atlas Example</title>
+    <title>Centered Minimal - Atlas Example</title>
     <style>
-        /* ─── Centered Layout: Warm & Friendly ──────── */
+        /*
+        Theme: Warm & Friendly (Orange/Cream)
+        */
 
         * {
             box-sizing: border-box;
@@ -54,7 +56,9 @@
             text-decoration: underline;
         }
 
-        /* ─── Atlas Container ─────────────────────────── */
+        /*
+        Atlas Container
+        */
 
         [data-atlas] {
             max-width: 800px;
@@ -74,20 +78,112 @@
             margin: 0 0 0.5rem 0;
         }
 
-        .controls-row {
+        /*
+        Occupation Filter (moved above search)
+        */
+
+        #occupation-filter-container {
+            margin-bottom: 0.75rem;
+            text-align: left;
+        }
+
+        #occupation-filter-container [data-filter] {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        #occupation-filter-container [data-filter] label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #7a5a44;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        #occupation-filter-container [data-filter-select] {
+            padding: 0.4rem 1rem;
+            border: 2px solid #e8d5c4;
+            border-radius: 30px;
+            background: #fdf6ed;
+            color: #2d1b0e;
+            font-size: 0.9rem;
+            font-family: inherit;
+            min-width: 150px;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #occupation-filter-container [data-filter-select]:hover {
+            border-color: #c76b2e;
+        }
+
+        #occupation-filter-container [data-filter-select]:focus {
+            outline: none;
+            border-color: #c76b2e;
+            box-shadow: 0 0 0 3px rgba(199, 107, 46, 0.12);
+        }
+
+        /*
+        Faction Filter (moved below results)
+        */
+
+        #faction-filter-container {
+            margin-top: 1rem;
+            text-align: left;
+        }
+
+        #faction-filter-container [data-filter] {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        #faction-filter-container [data-filter] label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #7a5a44;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        #faction-filter-container [data-filter-options] {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.5rem;
-            margin: 1rem 0;
+            gap: 0.3rem;
         }
 
-        .controls-row > * {
-            flex: 1;
-            min-width: 200px;
+        #faction-filter-container [data-filter-options] button {
+            padding: 0.25rem 0.9rem;
+            border: 2px solid #e8d5c4;
+            border-radius: 30px;
+            background: #fdf6ed;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: inherit;
+            color: #5a3f2e;
+            transition: all 0.2s;
         }
 
-        /* ─── Search ──────────────────────────────────── */
+        #faction-filter-container [data-filter-options] button:hover {
+            background: #f5e8dc;
+            border-color: #c76b2e;
+        }
+
+        #faction-filter-container [data-filter-options] button.active {
+            background: #c76b2e;
+            color: #fdf6ed;
+            border-color: #c76b2e;
+        }
+
+        #faction-filter-container [data-filter-options] button.active:hover {
+            background: #a85d2b;
+            border-color: #a85d2b;
+        }
+
+        /*
+        Search
+        */
 
         [data-search] {
             padding: 0.7rem 1.2rem;
@@ -113,7 +209,26 @@
             background: white;
         }
 
-        /* ─── Filters ─────────────────────────────────── */
+        /*
+        Controls Row
+        */
+
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .controls-row > * {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /*
+        Filters
+        */
 
         [data-filters] {
             display: flex;
@@ -141,6 +256,10 @@
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
+
+        /*
+        Filter Buttons (for species)
+        */
 
         [data-filter-options] {
             display: flex;
@@ -177,7 +296,67 @@
             border-color: #a85d2b;
         }
 
-        /* ─── Sort ────────────────────────────────────── */
+        /*
+        Filter Checkboxes
+        */
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.2rem 0;
+            padding: 0.15rem 0.3rem;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+
+        .filter-option:hover {
+            background: #f5e8dc;
+        }
+
+        .filter-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #c76b2e;
+            flex-shrink: 0;
+        }
+
+        .filter-option label {
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #5a3f2e;
+            font-weight: 400;
+            user-select: none;
+        }
+
+        .filter-option label:hover {
+            color: #2d1b0e;
+        }
+
+        /*
+        Filter Radio
+        */
+
+        [data-filter] input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #c76b2e;
+            flex-shrink: 0;
+        }
+
+        [data-filter] .filter-option label {
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #5a3f2e;
+            font-weight: 400;
+            user-select: none;
+        }
+
+        /*
+        Sort
+        */
 
         [data-sort] {
             display: flex;
@@ -223,7 +402,9 @@
             border-color: #b55a4a;
         }
 
-        /* ─── Chips ───────────────────────────────────── */
+        /*
+        Chips
+        */
 
         [data-chips] {
             display: flex;
@@ -290,7 +471,9 @@
             color: #fdf6ed;
         }
 
-        /* ─── Result Counter ──────────────────────────── */
+        /*
+        Result Counter
+        */
 
         .atlas-result-counter {
             display: block;
@@ -300,7 +483,9 @@
             font-style: italic;
         }
 
-        /* ─── Layout Controls ─────────────────────────── */
+        /*
+        Layout Controls
+        */
 
         [data-layout] {
             padding: 0.35rem 1.1rem;
@@ -332,7 +517,9 @@
             padding: 0.5rem 0;
         }
 
-        /* ─── Members ────────────────────────────────── */
+        /*
+        Members
+        */
 
         [data-directory] {
             text-align: left;
@@ -368,10 +555,12 @@
         }
 
         [data-field="faceclaim"] {
-            color: #b8957a !important;
+            color: #b8957a;
         }
 
-        /* ─── Grid ────────────────────────────────────── */
+        /*
+        Grid
+        */
 
         [data-directory].atlas-layout-grid {
             display: grid;
@@ -380,7 +569,9 @@
             padding: 0.5rem 0;
         }
 
-        /* ─── List ────────────────────────────────────── */
+        /*
+        List
+        */
 
         [data-directory].atlas-layout-list {
             display: flex;
@@ -405,12 +596,18 @@
             margin-right: 0.2rem;
         }
 
-        /* ─── Hidden ──────────────────────────────────── */
+        /*
+        Hidden
+        */
 
         [data-member][hidden],
         [data-member][data-hidden] {
             display: none !important;
         }
+
+        /*
+        Responsive
+        */
 
         @media (max-width: 640px) {
             [data-atlas] {
@@ -421,6 +618,7 @@
             }
             .controls-row > * {
                 min-width: auto;
+                width: 100%;
             }
         }
     </style>
@@ -429,28 +627,48 @@
 
     <div class="example-header">
         <h1>Centered Minimal Layout</h1>
-        <p>Clean, centered design with minimal controls. Focus on the content.</p>
+        <p>Mixed filter displays: Checkboxes (Species), Radio (Status), Dropdown (Occupation - moved above search), Buttons (Faction - moved below results).</p>
         <div class="nav-links">
-            <a href="../docs/examples/layout-examples.html">← All Examples</a>
+            <a href="../docs/examples/layout-examples.html">All Examples</a>
             <a href="../index.html">Main Demo</a>
         </div>
     </div>
 
-    <!-- ─── Atlas ────────────────────────────────────── -->
+    <!--
+    Atlas
+    -->
 
     <div data-atlas>
 
         <h2>Our Members</h2>
 
+        <!-- Occupation Filter (moved above search) -->
+        <div id="occupation-filter-container">
+            <!-- Atlas will move the occupation filter here -->
+        </div>
+
         <input data-search placeholder="Search members...">
 
         <div class="controls-row">
-            <div data-filters></div>
+
+            <!-- Main Filters (Species as Checkboxes, Status as Radio) -->
+            <div data-filters
+                 data-filter-checkboxes="species"
+                 data-filter-radio="status">
+            </div>
+
+            <!-- Sort -->
             <div data-sort></div>
+
         </div>
 
         <div data-chips></div>
         <div data-results></div>
+
+        <!-- Faction Filter (moved below results) -->
+        <div id="faction-filter-container">
+            <!-- Atlas will move the faction filter here -->
+        </div>
 
         <div class="layout-buttons">
             <button data-layout="grid">Grid</button>
@@ -459,7 +677,7 @@
 
         <div data-directory>
 
-            <!-- ─── Din Djarin ──────────────────────────── -->
+            <!-- Din Djarin -->
             <article data-member>
                 <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Din Djarin</span></div>
                 <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Pedro Pascal</span></div>
@@ -470,7 +688,7 @@
                 <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
             </article>
 
-            <!-- ─── Grogu ────────────────────────────────── -->
+            <!-- Grogu -->
             <article data-member>
                 <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Grogu</span></div>
                 <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">None</span></div>
@@ -481,7 +699,7 @@
                 <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Inactive</span></div>
             </article>
 
-            <!-- ─── Cara Dune ───────────────────────────── -->
+            <!-- Cara Dune -->
             <article data-member>
                 <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Cara Dune</span></div>
                 <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Gina Carano</span></div>
@@ -492,7 +710,7 @@
                 <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Unknown</span></div>
             </article>
 
-            <!-- ─── Bo-Katan Kryze ──────────────────────── -->
+            <!-- Bo-Katan Kryze -->
             <article data-member>
                 <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Bo-Katan Kryze</span></div>
                 <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Katee Sackhoff</span></div>
@@ -503,7 +721,7 @@
                 <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
             </article>
 
-            <!-- ─── Moff Gideon ──────────────────────────── -->
+            <!-- Moff Gideon -->
             <article data-member>
                 <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Moff Gideon</span></div>
                 <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Giancarlo Esposito</span></div>
@@ -514,7 +732,7 @@
                 <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
             </article>
 
-            <!-- ─── Ahsoka Tano ──────────────────────────── -->
+            <!-- Ahsoka Tano -->
             <article data-member>
                 <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Ahsoka Tano</span></div>
                 <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Rosario Dawson</span></div>
@@ -525,7 +743,7 @@
                 <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
             </article>
 
-            <!-- ─── Boba Fett ────────────────────────────── -->
+            <!-- Boba Fett -->
             <article data-member>
                 <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Boba Fett</span></div>
                 <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Temuera Morrison</span></div>
@@ -536,7 +754,7 @@
                 <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
             </article>
 
-            <!-- ─── Fennec Shand ─────────────────────────── -->
+            <!-- Fennec Shand -->
             <article data-member>
                 <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Fennec Shand</span></div>
                 <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Ming-Na Wen</span></div>
@@ -552,14 +770,27 @@
     </div>
 
     <script type="module">
-        import('../src/core/Atlas.js')
-            .then(module => {
-                const Atlas = module.default;
-                new Atlas({ debug: false });
-            })
-            .catch(err => {
-                console.error('Failed to load Atlas:', err);
-            });
+        import Atlas from '../src/core/Atlas.js';
+
+        const atlas = new Atlas({ debug: false });
+
+        // Move Occupation Filter
+        requestAnimationFrame(() => {
+            const occupationFilter = document.querySelector('[data-filter][data-field="occupation"]');
+            const targetContainer = document.getElementById('occupation-filter-container');
+            if (occupationFilter && targetContainer) {
+                targetContainer.appendChild(occupationFilter);
+            }
+        });
+
+        // Move Faction Filter
+        requestAnimationFrame(() => {
+            const factionFilter = document.querySelector('[data-filter][data-field="faction"]');
+            const targetContainer = document.getElementById('faction-filter-container');
+            if (factionFilter && targetContainer) {
+                targetContainer.appendChild(factionFilter);
+            }
+        });
     </script>
 
 </body>

@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slide-out — Atlas Example</title>
+    <title>Slide-out Layout - Atlas Example</title>
     <style>
-        /* ─── Slide-out Layout: Fixed Top Bar ────────── */
+        /*
+        Theme: Fixed Top Bar (Navy/White)
+        */
 
         * {
             box-sizing: border-box;
@@ -22,17 +24,13 @@
             padding-top: 70px;
         }
 
-        /* ─── [data-atlas] as wrapper ────────────────── */
-
-        [data-atlas] {
-            /* No layout styles — let the page control itself */
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        /* ─── Page Header ────────────────────────────── */
+        /*
+        Page Header (below top bar)
+        */
 
         .page-header {
+            max-width: 1100px;
+            margin: 0 auto 2rem auto;
             padding: 1rem 1.5rem 1rem 1.5rem;
             border-bottom: 2px solid #e2e8f0;
         }
@@ -62,7 +60,9 @@
             text-decoration: underline;
         }
 
-        /* ─── Fixed Top Bar ───────────────────────────── */
+        /*
+        Fixed Top Bar
+        */
 
         .topbar-wrapper {
             position: fixed;
@@ -144,7 +144,9 @@
             align-items: start;
         }
 
-        /* ─── Controls in Top Bar ────────────────────── */
+        /*
+        Controls in Top Bar
+        */
 
         .topbar-grid [data-filters] {
             display: flex;
@@ -169,6 +171,10 @@
             text-transform: uppercase;
             letter-spacing: 0.06em;
         }
+
+        /*
+        Filter Buttons
+        */
 
         .topbar-grid [data-filter-options] {
             display: flex;
@@ -198,6 +204,72 @@
             color: white;
             border-color: #3182ce;
         }
+
+        /*
+        Filter Checkboxes
+        */
+
+        .topbar-grid .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin: 0.1rem 0;
+            padding: 0.1rem 0.2rem;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+
+        .topbar-grid .filter-option:hover {
+            background: #2d3748;
+        }
+
+        .topbar-grid .filter-option input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: #3182ce;
+            flex-shrink: 0;
+        }
+
+        .topbar-grid .filter-option label {
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #a0aec0;
+            font-weight: 300;
+            user-select: none;
+        }
+
+        .topbar-grid .filter-option label:hover {
+            color: #e2e8f0;
+        }
+
+        /*
+        Filter Radio
+        */
+
+        .topbar-grid [data-filter] input[type="radio"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: #3182ce;
+            flex-shrink: 0;
+        }
+
+        .topbar-grid [data-filter] .filter-option label {
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #a0aec0;
+            font-weight: 300;
+            user-select: none;
+        }
+
+        .topbar-grid [data-filter] .filter-option label:hover {
+            color: #e2e8f0;
+        }
+
+        /*
+        Sort
+        */
 
         .topbar-grid [data-sort] {
             display: flex;
@@ -242,6 +314,10 @@
             border-color: #e53e3e;
         }
 
+        /*
+        Search
+        */
+
         .topbar-grid [data-search] {
             padding: 0.4rem 0.7rem;
             font-size: 0.85rem;
@@ -262,6 +338,10 @@
             outline: none;
             border-color: #3182ce;
         }
+
+        /*
+        Chips
+        */
 
         .topbar-grid [data-chips] {
             display: flex;
@@ -327,6 +407,10 @@
             color: white;
         }
 
+        /*
+        Layout Controls
+        */
+
         .topbar-grid [data-layout] {
             padding: 0.2rem 0.6rem;
             border: 1px solid #2d3748;
@@ -370,13 +454,59 @@
             padding: 0;
         }
 
-        /* ─── Directory Area ──────────────────────────── */
+        /*
+        Occupation Filter (moved to its own row)
+        */
+
+        #occupation-filter-container {
+            margin-bottom: 0.5rem;
+        }
+
+        #occupation-filter-container [data-filter] {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        #occupation-filter-container [data-filter] label {
+            font-weight: 600;
+            font-size: 0.65rem;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        #occupation-filter-container [data-filter-select] {
+            padding: 0.3rem 0.7rem;
+            border: 1px solid #2d3748;
+            border-radius: 6px;
+            background: #2d3748;
+            color: #e2e8f0;
+            font-size: 0.85rem;
+            font-family: inherit;
+            width: 100%;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        #occupation-filter-container [data-filter-select]:focus {
+            outline: none;
+            border-color: #3182ce;
+        }
+
+        /*
+        Directory Area
+        */
 
         .directory-area {
+            max-width: 1100px;
+            margin: 0 auto;
             padding: 0 1.5rem 2rem 1.5rem;
         }
 
-        /* ─── Members ────────────────────────────────── */
+        /*
+        Members
+        */
 
         [data-member] {
             padding: 0.75rem 1rem;
@@ -407,7 +537,7 @@
         }
 
         [data-field="faceclaim"] {
-            color: #718096 !important;
+            color: #718096;
         }
 
         [data-directory].atlas-layout-grid {
@@ -440,10 +570,18 @@
             margin-right: 0.2rem;
         }
 
+        /*
+        Hidden
+        */
+
         [data-member][hidden],
         [data-member][data-hidden] {
             display: none !important;
         }
+
+        /*
+        Responsive
+        */
 
         @media (max-width: 820px) {
             .topbar-grid {
@@ -472,70 +610,98 @@
 </head>
 <body>
 
-    <!-- ─── Atlas Wraps Everything ──────────────────── -->
+    <!--
+    Fixed Top Bar
+    -->
+
+    <div class="topbar-wrapper" id="topbarWrapper">
+        <div class="topbar-inner-wrapper">
+
+            <button class="topbar-toggle" id="topbarToggle" aria-expanded="false">
+                <span>Atlas Controls</span>
+                <span class="badge">Click to expand</span>
+                <span class="arrow" id="arrowIcon">▼</span>
+            </button>
+
+            <div class="topbar-content" id="topbarContent">
+                <!-- Controls are inside data-atlas below -->
+            </div>
+
+        </div>
+    </div>
+
+    <!--
+    Page Header
+    -->
+
+    <div class="page-header">
+        <h1>Slide-out Top Bar</h1>
+        <p>Mixed filter displays: Radio (Status), Checkboxes (Species + Faction), Dropdown (Occupation - moved to its own row).</p>
+        <div class="nav-links">
+            <a href="../docs/examples/layout-examples.html">All Examples</a>
+            <a href="../index.html">Main Demo</a>
+        </div>
+    </div>
+
+    <!--
+    Atlas
+    -->
 
     <div data-atlas>
+        <div class="directory-area">
 
-        <!-- ─── Fixed Top Bar ─────────────────────────────── -->
-        <div class="topbar-wrapper" id="topbarWrapper">
-            <div class="topbar-inner-wrapper">
+            <!--
+            Slide-out Controls
+            -->
 
-                <button class="topbar-toggle" id="topbarToggle" aria-expanded="false">
-                    <span>☰ Atlas Controls</span>
-                    <span class="badge">Click to expand</span>
-                    <span class="arrow" id="arrowIcon">▼</span>
-                </button>
+            <div class="topbar-grid" id="slideoutControls" style="display: none;">
 
-                <div class="topbar-content" id="topbarContent">
+                <!-- Column 1: Filters -->
+                <div>
+                    <div data-filters
+                         data-filter-radio="status"
+                         data-filter-checkboxes="species,faction">
+                    </div>
+                </div>
 
-                    <!-- ─── Slide-out Controls ───────────────────── -->
-                    <div class="topbar-grid" id="slideoutControls" style="display: none;">
+                <!-- Column 2: Sort + Search + Layout -->
+                <div>
 
-                        <div>
-                            <div data-filters></div>
-                        </div>
+                    <!-- Occupation Filter (moved to its own row) -->
+                    <div id="occupation-filter-container">
+                        <!-- Atlas will move the occupation filter here -->
+                    </div>
 
-                        <div>
-                            <div data-sort></div>
-                            <div style="margin-top: 0.5rem;">
-                                <input data-search placeholder="Search members...">
-                            </div>
-                            <div style="margin-top: 0.5rem;" class="layout-row">
-                                <button data-layout="grid">Grid</button>
-                                <button data-layout="list">List</button>
-                            </div>
-                        </div>
+                    <div data-sort></div>
 
-                        <div>
-                            <div data-chips></div>
-                            <div class="results-row">
-                                <div data-results></div>
-                            </div>
-                        </div>
+                    <div style="margin-top: 0.5rem;">
+                        <input data-search placeholder="Search members...">
+                    </div>
 
+                    <div style="margin-top: 0.5rem;" class="layout-row">
+                        <button data-layout="grid">Grid</button>
+                        <button data-layout="list">List</button>
                     </div>
 
                 </div>
 
-            </div>
-        </div>
+                <!-- Column 3: Chips + Results -->
+                <div>
+                    <div data-chips></div>
+                    <div class="results-row">
+                        <div data-results></div>
+                    </div>
+                </div>
 
-        <!-- ─── Page Header ───────────────────────────────── -->
-        <div class="page-header">
-            <h1>Slide-out Top Bar</h1>
-            <p>Controls are fixed to the top of the page and follow as you scroll.</p>
-            <div class="nav-links">
-                <a href="../docs/examples/layout-examples.html">← All Examples</a>
-                <a href="../index.html">Main Demo</a>
             </div>
-        </div>
 
-        <!-- ─── Directory Area ─────────────────────────────── -->
-        <div class="directory-area">
+            <!--
+            Directory
+            -->
 
             <div data-directory>
 
-                <!-- ─── Din Djarin ──────────────────────────── -->
+                <!-- Din Djarin -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Din Djarin</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Pedro Pascal</span></div>
@@ -546,7 +712,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Grogu ────────────────────────────────── -->
+                <!-- Grogu -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Grogu</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">None</span></div>
@@ -557,7 +723,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Inactive</span></div>
                 </article>
 
-                <!-- ─── Cara Dune ───────────────────────────── -->
+                <!-- Cara Dune -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Cara Dune</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Gina Carano</span></div>
@@ -568,7 +734,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Unknown</span></div>
                 </article>
 
-                <!-- ─── Bo-Katan Kryze ──────────────────────── -->
+                <!-- Bo-Katan Kryze -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Bo-Katan Kryze</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Katee Sackhoff</span></div>
@@ -579,7 +745,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Moff Gideon ──────────────────────────── -->
+                <!-- Moff Gideon -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Moff Gideon</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Giancarlo Esposito</span></div>
@@ -590,7 +756,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Ahsoka Tano ──────────────────────────── -->
+                <!-- Ahsoka Tano -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Ahsoka Tano</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Rosario Dawson</span></div>
@@ -601,7 +767,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Boba Fett ────────────────────────────── -->
+                <!-- Boba Fett -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Boba Fett</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Temuera Morrison</span></div>
@@ -612,7 +778,7 @@
                     <div><strong>Status:</strong> <span data-field="status" data-sortable="true">Active</span></div>
                 </article>
 
-                <!-- ─── Fennec Shand ─────────────────────────── -->
+                <!-- Fennec Shand -->
                 <article data-member>
                     <div><strong>Name:</strong> <span data-field="name" data-searchable="true" data-sortable="true" data-filterable="false">Fennec Shand</span></div>
                     <div><strong>Faceclaim:</strong> <span data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false">Ming-Na Wen</span></div>
@@ -626,13 +792,23 @@
             </div>
 
         </div>
-
     </div>
-    <!-- ─── End Atlas ────────────────────────────────── -->
 
     <script type="module">
-        // ─── Slide-out Toggle ──────────────────────────────
+        import Atlas from '../src/core/Atlas.js';
 
+        const atlas = new Atlas({ debug: false });
+
+        // Move Occupation Filter
+        requestAnimationFrame(() => {
+            const occupationFilter = document.querySelector('[data-filter][data-field="occupation"]');
+            const targetContainer = document.getElementById('occupation-filter-container');
+            if (occupationFilter && targetContainer) {
+                targetContainer.appendChild(occupationFilter);
+            }
+        });
+
+        // Slide-out Toggle
         const toggle = document.getElementById('topbarToggle');
         const content = document.getElementById('topbarContent');
         const arrow = document.getElementById('arrowIcon');
@@ -648,17 +824,6 @@
                 controls.style.display = isOpen ? 'grid' : 'none';
             });
         }
-
-        // ─── Import Atlas ──────────────────────────────────
-
-        import('../src/core/Atlas.js')
-            .then(module => {
-                const Atlas = module.default;
-                new Atlas({ debug: false });
-            })
-            .catch(err => {
-                console.error('Failed to load Atlas:', err);
-            });
     </script>
 
 </body>
