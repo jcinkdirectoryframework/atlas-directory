@@ -125,6 +125,21 @@
             <tr><td><code>[data-hidden]</code></td><td>Individual <code>[data-member]</code></td><td>Alternate attribute for hidden members</td></tr>
         </table>
 
+        <h3>Filter Display Classes</h3>
+
+        <p>
+            These classes are used for the new filter display options — dropdowns, checkboxes, and radio buttons.
+        </p>
+
+        <table>
+            <tr><th>Selector</th><th>Applied To</th><th>Description</th></tr>
+            <tr><td><code>[data-filter-select]</code></td><td><code>select</code> element in dropdown filter</td><td>The dropdown select element</td></tr>
+            <tr><td><code>.filter-option</code></td><td><code>div</code> wrapper</td><td>Wrapper for each checkbox/radio option</td></tr>
+            <tr><td><code>.filter-option input[type="checkbox"]</code></td><td><code>input</code> element</td><td>Checkbox input in filter</td></tr>
+            <tr><td><code>.filter-option input[type="radio"]</code></td><td><code>input</code> element</td><td>Radio input in filter</td></tr>
+            <tr><td><code>.filter-option label</code></td><td><code>label</code> element</td><td>Label for checkbox/radio filter options</td></tr>
+        </table>
+
         <div class="tip">
             <strong>Tip:</strong> You can override any of these classes in your own CSS.
             Atlas uses minimal specificity, so your styles will take precedence.
@@ -138,6 +153,9 @@
             <tr><td><code>[data-filters]</code></td><td>Container layout, spacing</td></tr>
             <tr><td><code>[data-filter]</code></td><td>Filter group layout</td></tr>
             <tr><td><code>[data-filter-options] button</code></td><td>Filter buttons (active/inactive states)</td></tr>
+            <tr><td><code>[data-filter-select]</code></td><td>Dropdown select styling</td></tr>
+            <tr><td><code>.filter-option</code></td><td>Checkbox/radio option wrapper</td></tr>
+            <tr><td><code>.filter-option label</code></td><td>Checkbox/radio label styling</td></tr>
             <tr><td><code>[data-sort] button</code></td><td>Sort buttons (active/asc/desc states)</td></tr>
             <tr><td><code>[data-chips]</code></td><td>Chip container</td></tr>
             <tr><td><code>.atlas-chip</code></td><td>Individual chip</td></tr>
@@ -197,6 +215,68 @@
     background: #2563eb;
     color: white;
     border-color: #2563eb;
+}
+
+/* ─── Filter Dropdowns ────────────────────────────── */
+
+[data-filter-select] {
+    padding: 0.4rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.9rem;
+    font-family: inherit;
+    min-width: 150px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    color: #1e293b;
+}
+
+[data-filter-select]:hover {
+    border-color: #94a3b8;
+}
+
+[data-filter-select]:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ─── Filter Checkboxes & Radio ────────────────────── */
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.25rem 0;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.filter-option:hover {
+    background: #f8fafc;
+}
+
+.filter-option input[type="checkbox"],
+.filter-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #2563eb;
+    flex-shrink: 0;
+}
+
+.filter-option label {
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #1e293b;
+    font-weight: 400;
+    user-select: none;
+}
+
+.filter-option label:hover {
+    color: #0f172a;
 }
 
 /* ─── Sort Buttons ─────────────────────────────────── */
@@ -465,6 +545,7 @@
             <li><strong>For mobile</strong>, ensure your tap targets are at least 44px</li>
             <li><strong>Adding CSS to JCink:</strong> Add custom styles to your forum's global CSS, or add a <code>&lt;style&gt;</code> block in your
             Member List Header.</li>
+            <li><strong>Styling filter display options:</strong> Use <code>[data-filter-select]</code> for dropdowns and <code>.filter-option</code> for checkboxes/radio buttons.</li>
         </ul>
 
     </main>

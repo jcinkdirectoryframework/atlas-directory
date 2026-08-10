@@ -7,7 +7,7 @@
  * - Discover filterable fields from MemberCollection
  * - Generate filter UI for each field
  * - Support display options: buttons (default), dropdowns, checkboxes, radio
- * - Display order is controlled by attribute order and field listing order
+ * - Display order is controlled by the order of attributes on the element
  * - Insert generated UI into the [data-filters] container
  * - Handle filter selection events
  * - Update Store when filters change
@@ -86,11 +86,10 @@ export default class FilterGenerator {
     /**
      * Read display options from the container attributes.
      *
-     * The order of attributes determines display order:
-     * - data-filter-radio (first in order)
-     * - data-filter-checkboxes (second in order)
-     * - data-filter-buttons (third in order)
-     * - data-filter-dropdown (fourth in order)
+     * The order of attributes on the element controls the display order:
+     * - The first attribute encountered sets the first display type
+     * - The second attribute encountered sets the second display type
+     * - etc.
      *
      * Within each attribute, the order of fields determines their order.
      */
@@ -112,20 +111,39 @@ export default class FilterGenerator {
         // Store display options
         this.#displayOptions = { radio, checkboxes, buttons, dropdown };
 
-        // Build display type order based on which attributes are present
+        // ─── Build display type order based on attribute order ───
+
         this.#displayTypeOrder = [];
 
-        if (radio.length > 0) {
-            this.#displayTypeOrder.push('radio');
+        // Get the dataset keys in the order they appear on the element
+        const datasetKeys = Object.keys(this.#container.dataset);
+
+        // Map dataset keys to display types
+        const attributeMap = {
+            filterRadio: 'radio',
+            filterCheckboxes: 'checkboxes',
+            filterButtons: 'buttons',
+            filterDropdown: 'dropdown'
+        };
+
+        // Process attributes in the order they appear on the element
+        for (const key of datasetKeys) {
+            if (attributeMap[key]) {
+                const type = attributeMap[key];
+                const fields = this.#displayOptions[type] || [];
+                if (fields.length > 0 && !this.#displayTypeOrder.includes(type)) {
+                    this.#displayTypeOrder.push(type);
+                }
+            }
         }
-        if (checkboxes.length > 0) {
-            this.#displayTypeOrder.push('checkboxes');
-        }
-        if (buttons.length > 0) {
-            this.#displayTypeOrder.push('buttons');
-        }
-        if (dropdown.length > 0) {
-            this.#displayTypeOrder.push('dropdown');
+
+        // If any type is missing from the order, add it at the end in default order
+        const defaultOrder = ['radio', 'checkboxes', 'buttons', 'dropdown'];
+        for (const type of defaultOrder) {
+            const fields = this.#displayOptions[type] || [];
+            if (fields.length > 0 && !this.#displayTypeOrder.includes(type)) {
+                this.#displayTypeOrder.push(type);
+            }
         }
 
     }

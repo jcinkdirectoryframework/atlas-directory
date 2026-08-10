@@ -262,7 +262,7 @@
             This sets up the Atlas container, controls, and directory wrapper.
         </p>
 
-        <pre><code>&lt;!-- CSS — link to Atlas styles (use your own link if you are self-hosting) --&gt;
+        <pre><code>&lt;!-- CSS — link to Atlas styles (adjust if self-hosting) --&gt;
 &lt;link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css"&gt;
 
 &lt;div data-atlas&gt;
@@ -290,7 +290,7 @@
 
 &lt;/div&gt;
 
-&lt;!-- JavaScript — import and initialise Atlas (use your own link if you are self-hosting) --&gt;
+&lt;!-- JavaScript — import and initialise Atlas (adjust if self-hosting) --&gt;
 &lt;script type="module"&gt;
     import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
     new Atlas();
@@ -436,7 +436,44 @@
 
         <hr>
 
-        <h2>Step 5: Add Custom CSS (Optional)</h2>
+        <h2>Step 5: Customise Filter Display (Optional)</h2>
+
+        <p>
+            By default, filters appear as buttons. You can change how each filter displays
+            using attributes on the <code>data-filters</code> container.
+        </p>
+
+        <p>
+            <strong>Available display types:</strong>
+        </p>
+
+        <ul>
+            <li><strong>Buttons</strong> (default) — Visual, clickable buttons</li>
+            <li><strong>Dropdown</strong> — Single-select dropdown menu</li>
+            <li><strong>Checkboxes</strong> — Multi-select checkboxes</li>
+            <li><strong>Radio Buttons</strong> — Single-select radio buttons</li>
+        </ul>
+
+        <p>
+            The <strong>order of attributes</strong> controls the display order. For example:
+        </p>
+
+        <pre><code>&lt;!-- Radio buttons first, then Dropdown, then Checkboxes --&gt;
+&lt;div data-filters 
+     data-filter-radio="status" 
+     data-filter-dropdown="author" 
+     data-filter-checkboxes="species"&gt;
+&lt;/div&gt;</code></pre>
+
+        <p>
+            For a complete reference, see the
+            <a href="/atlas-directory/docs/html-api.html#filter-display-options">Filter Display Options</a>
+            section in the HTML API.
+        </p>
+
+        <hr>
+
+        <h2>Step 6: Add Custom CSS</h2>
 
         <p>
             Atlas provides minimal core CSS. To make your directory look polished, you'll want to add custom styles.
@@ -474,7 +511,7 @@
 
         <hr>
 
-        <h2>Step 6: Test Your Installation</h2>
+        <h2>Step 7: Test Your Installation</h2>
 
         <p>
             After saving your templates, it's time to verify that Atlas is working correctly.

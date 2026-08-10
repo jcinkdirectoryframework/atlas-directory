@@ -147,6 +147,93 @@
             If you only want grid layout, simply don't include these buttons.
         </div>
 
+        <h2>Filter Display Options</h2>
+
+        <p>
+            By default, filters appear as buttons. You can change how each filter displays
+            using these attributes on the <code>data-filters</code> container.
+        </p>
+
+        <h3>Available Display Types</h3>
+
+        <table>
+            <tr><th>Display Type</th><th>Attribute</th><th>Description</th></tr>
+            <tr><td>Buttons (default)</td><td><em>No attribute needed</em></td><td>Visual, clickable buttons for each filter value</td></tr>
+            <tr><td>Dropdown</td><td><code>data-filter-dropdown</code></td><td>Single-select dropdown menu — saves space</td></tr>
+            <tr><td>Checkboxes</td><td><code>data-filter-checkboxes</code></td><td>Multi-select checkboxes — select multiple values</td></tr>
+            <tr><td>Radio Buttons</td><td><code>data-filter-radio</code></td><td>Single-select radio buttons — compact list</td></tr>
+        </table>
+
+        <h3>How Display Order Works</h3>
+
+        <p>
+            The <strong>order of attributes</strong> on the <code>data-filters</code> container controls
+            the display order of the filter types.
+        </p>
+
+        <p>
+            The first attribute listed in the HTML will appear first, followed by the second, and so on.
+            This gives you full control over how your filters are arranged.
+        </p>
+
+        <h4>Example 1: Radio first, then Dropdown, then Checkboxes</h4>
+
+        <pre><code>&lt;div data-filters 
+     data-filter-radio="status" 
+     data-filter-dropdown="occupation" 
+     data-filter-checkboxes="species"&gt;
+&lt;/div&gt;</code></pre>
+
+        <p>Display order:</p>
+        <ol>
+            <li><code>status</code> — Radio (first attribute)</li>
+            <li><code>occupation</code> — Dropdown (second attribute)</li>
+            <li><code>species</code> — Checkboxes (third attribute)</li>
+            <li>Any other filterable fields — Buttons (at the end)</li>
+        </ol>
+
+        <h4>Example 2: Dropdown first, then Radio, then Buttons</h4>
+
+        <pre><code>&lt;div data-filters 
+     data-filter-dropdown="author" 
+     data-filter-radio="status" 
+     data-filter-buttons="species"&gt;
+&lt;/div&gt;</code></pre>
+
+        <p>Display order:</p>
+        <ol>
+            <li><code>author</code> — Dropdown (first attribute)</li>
+            <li><code>status</code> — Radio (second attribute)</li>
+            <li><code>species</code> — Buttons (third attribute)</li>
+            <li>Any other filterable fields — Buttons (at the end)</li>
+        </ol>
+
+        <div class="tip">
+            <strong>Tip:</strong> The order you list fields within each attribute controls their order
+            within that type. The order of the attributes themselves controls the order of the types.
+        </div>
+
+        <h3>Mixed Example</h3>
+
+        <pre><code>&lt;div data-filters 
+     data-filter-radio="status" 
+     data-filter-checkboxes="species,faction" 
+     data-filter-dropdown="author"&gt;
+&lt;/div&gt;</code></pre>
+
+        <p>Display order:</p>
+        <ol>
+            <li><code>status</code> — Radio (first attribute)</li>
+            <li><code>species</code> — Checkboxes (second attribute)</li>
+            <li><code>faction</code> — Checkboxes (second attribute, second field)</li>
+            <li><code>author</code> — Dropdown (third attribute)</li>
+            <li>Any other filterable fields — Buttons (at the end)</li>
+        </ol>
+
+        <div class="tip">
+            <strong>Tip:</strong> If a field is omitted from all attributes, it still appears as a filter with the default button display at the end.
+        </div>
+
         <h2>Understanding data-field and Controls</h2>
 
         <p>
@@ -349,7 +436,7 @@
         <pre><code>&lt;div data-atlas&gt;
     &lt;input data-search placeholder="Search members..."&gt;
 
-    &lt;div data-filters&gt;&lt;/div&gt;
+    &lt;div data-filters data-filter-radio="status" data-filter-checkboxes="species" data-filter-dropdown="author"&gt;&lt;/div&gt;
     &lt;div data-sort&gt;&lt;/div&gt;
 
     &lt;div data-chips&gt;&lt;/div&gt;
@@ -398,6 +485,10 @@
             <tr><td><code>data-sortable</code></td><td>Any</td><td>Opt-in to sorting (default: false)</td></tr>
             <tr><td><code>data-search</code></td><td>input</td><td>Search input field</td></tr>
             <tr><td><code>data-filters</code></td><td>div</td><td>Filter container</td></tr>
+            <tr><td><code>data-filter-radio</code></td><td>div</td><td>Fields to show as radio buttons, in order</td></tr>
+            <tr><td><code>data-filter-checkboxes</code></td><td>div</td><td>Fields to show as checkboxes, in order</td></tr>
+            <tr><td><code>data-filter-buttons</code></td><td>div</td><td>Fields to show as buttons, in order</td></tr>
+            <tr><td><code>data-filter-dropdown</code></td><td>div</td><td>Fields to show as dropdowns, in order</td></tr>
             <tr><td><code>data-sort</code></td><td>div</td><td>Sort container</td></tr>
             <tr><td><code>data-chips</code></td><td>div</td><td>Filter chips container</td></tr>
             <tr><td><code>data-results</code></td><td>div</td><td>Result counter container</td></tr>

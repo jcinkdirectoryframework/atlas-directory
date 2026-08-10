@@ -120,10 +120,16 @@ EVENTBUS (Central communication hub)
         <h3>Renderer</h3>
         <p>Updates the DOM. Listens to Store events, batch updates using DocumentFragment, manages loading state, and handles lazy rendering for large directories. Contains no business logic.</p>
 
+        <h3>URLManager</h3>
+        <p>Manages URL persistence. Reads filter/sort state from URL, writes state to URL using <code>history.pushState()</code>, and restores state on page load.</p>
+
+        <h3>JCinkAdapter</h3>
+        <p>Platform-specific adapter for JCink. Ensures <code>&max_results=1000</code> is always present on the member list page.</p>
+
         <h2>Modules</h2>
 
         <ul>
-            <li><strong>FilterGenerator</strong> — Generates filter UI from member data. ARIA-enabled, keyboard accessible.</li>
+            <li><strong>FilterGenerator</strong> — Generates filter UI from member data. Supports buttons (default), dropdowns, checkboxes, and radio buttons. ARIA-enabled, keyboard accessible.</li>
             <li><strong>FilterChips</strong> — Displays active filters as removable chips. ARIA-enabled, keyboard accessible.</li>
             <li><strong>ResultCounter</strong> — Shows "Showing X of Y members" with ARIA live region.</li>
             <li><strong>SortGenerator</strong> — Generates sort controls (three-state toggle). ARIA-enabled, keyboard accessible.</li>
@@ -174,6 +180,41 @@ EVENTBUS (Central communication hub)
             Small directories render everything instantly with no overhead.
         </div>
 
+        <h2>Filter Display Options</h2>
+
+        <p>
+            Atlas supports four filter display types: buttons (default), dropdowns, checkboxes, and radio buttons.
+            The order of attributes on the <code>data-filters</code> container controls the display order.
+        </p>
+
+        <pre><code>&lt;!-- Radio buttons first, then Dropdown, then Checkboxes --&gt;
+&lt;div data-filters 
+     data-filter-radio="status" 
+     data-filter-dropdown="author" 
+     data-filter-checkboxes="species"&gt;
+&lt;/div&gt;</code></pre>
+
+        <p>
+            For a complete reference, see the
+            <a href="/atlas-directory/docs/html-api.html#filter-display-options">Filter Display Options</a>
+            section in the HTML API.
+        </p>
+
+        <h2>URL Persistence</h2>
+
+        <p>
+            Atlas automatically saves filter, search, and sort state to the URL.
+            This means users can bookmark or share filtered views.
+        </p>
+
+        <pre><code>// Example URL with filters applied
+https://yourforum.jcink.net/index.php?act=Members&species=Human&faction=Rebellion&sort_key=name&sort_order=asc</code></pre>
+
+        <p>
+            When the page loads, Atlas reads the URL parameters and restores the filter state automatically.
+            This is handled by the <code>URLManager</code> class.
+        </p>
+
         <h2>Accessibility</h2>
 
         <p>Atlas is built with accessibility as a core principle:</p>
@@ -208,6 +249,7 @@ EVENTBUS (Central communication hub)
             <li>Renderer listens → re-renders members</li>
             <li>ResultCounter listens → updates count</li>
             <li>FilterChips listens → updates chips</li>
+            <li>URLManager listens → updates URL</li>
         </ol>
 
         <h3>User types a search query:</h3>
@@ -217,6 +259,7 @@ EVENTBUS (Central communication hub)
             <li>Store publishes 'store:searchChanged'</li>
             <li>Renderer listens → re-renders members</li>
             <li>ResultCounter listens → updates count</li>
+            <li>URLManager listens → updates URL</li>
         </ol>
 
         <h2>Rendering Philosophy</h2>
@@ -266,15 +309,16 @@ EVENTBUS (Central communication hub)
 │   ├── Store.js
 │   ├── Member.js
 │   ├── MemberCollection.js
-│   └── Renderer.js
+│   ├── Renderer.js
+│   └── URLManager.js        # URL persistence
 ├── modules/                 # Feature modules
 │   ├── FilterGenerator.js
 │   ├── FilterChips.js
 │   ├── ResultCounter.js
 │   ├── SortGenerator.js
 │   └── LayoutManager.js
-├── adapters/                # Platform adapters (currently empty)
-│   └── JCinkAdapter.js      # (currently empty/unused)
+├── adapters/                # Platform adapters
+│   └── JCinkAdapter.js      # JCink-specific behaviours
 ├── models/                  # Data models (currently empty)
 ├── utils/                   # Utility functions
 │   └── memberGenerator.js  # Performance testing
