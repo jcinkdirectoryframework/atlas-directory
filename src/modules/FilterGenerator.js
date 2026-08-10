@@ -6,6 +6,8 @@
  * Responsibilities:
  * - Discover filterable fields from MemberCollection
  * - Generate filter UI for each field
+ * - Support display options: buttons (default), dropdowns, checkboxes, radio
+ * - Display order is controlled by attribute order and field listing order
  * - Insert generated UI into the [data-filters] container
  * - Handle filter selection events
  * - Update Store when filters change
@@ -25,7 +27,14 @@ export default class FilterGenerator {
     #memberCollection;
     #store;
     #events;
-    #fieldFilterMap = new Map(); // fieldName → { container, allButton, valueButtons, displayMap }
+    #fieldFilterMap = new Map();
+    #displayOptions = {
+        radio: [],
+        checkboxes: [],
+        buttons: [],
+        dropdown: []
+    };
+    #displayTypeOrder = [];
 
     /**
      * Create a FilterGenerator.
@@ -58,12 +67,123 @@ export default class FilterGenerator {
         this.#store = store;
         this.#events = events;
 
+        // ─── Read display options from container ──────
+
+        this.#readDisplayOptions();
+
+        // ─── Generate filters ──────────────────────────
+
         this.#generate();
 
-        // Listen for external filter changes (e.g., from chips)
+        // ─── Subscribe to events ────────────────────────
+
         this.#events.subscribe('store:filtersChanged', () => {
             this.syncWithStore();
         });
+
+    }
+
+    /**
+     * Read display options from the container attributes.
+     *
+     * The order of attributes determines display order:
+     * - data-filter-radio (first in order)
+     * - data-filter-checkboxes (second in order)
+     * - data-filter-buttons (third in order)
+     * - data-filter-dropdown (fourth in order)
+     *
+     * Within each attribute, the order of fields determines their order.
+     */
+    #readDisplayOptions() {
+
+        const parseList = (attr) => {
+            if (attr && attr.trim()) {
+                return attr.split(',').map(s => s.trim()).filter(s => s);
+            }
+            return [];
+        };
+
+        // Parse each attribute
+        const radio = parseList(this.#container.dataset.filterRadio);
+        const checkboxes = parseList(this.#container.dataset.filterCheckboxes);
+        const buttons = parseList(this.#container.dataset.filterButtons);
+        const dropdown = parseList(this.#container.dataset.filterDropdown);
+
+        // Store display options
+        this.#displayOptions = { radio, checkboxes, buttons, dropdown };
+
+        // Build display type order based on which attributes are present
+        this.#displayTypeOrder = [];
+
+        if (radio.length > 0) {
+            this.#displayTypeOrder.push('radio');
+        }
+        if (checkboxes.length > 0) {
+            this.#displayTypeOrder.push('checkboxes');
+        }
+        if (buttons.length > 0) {
+            this.#displayTypeOrder.push('buttons');
+        }
+        if (dropdown.length > 0) {
+            this.#displayTypeOrder.push('dropdown');
+        }
+
+    }
+
+    /**
+     * Determine the display type for a field.
+     */
+    #getDisplayType(fieldName) {
+
+        if (this.#displayOptions.radio.includes(fieldName)) {
+            return 'radio';
+        }
+
+        if (this.#displayOptions.checkboxes.includes(fieldName)) {
+            return 'checkboxes';
+        }
+
+        if (this.#displayOptions.buttons.includes(fieldName)) {
+            return 'buttons';
+        }
+
+        if (this.#displayOptions.dropdown.includes(fieldName)) {
+            return 'dropdown';
+        }
+
+        return 'buttons'; // default
+
+    }
+
+    /**
+     * Get the display order for all filterable fields.
+     * Returns an array of { fieldName, displayType } in display order.
+     */
+    #getDisplayOrder(filterableFields) {
+
+        const orderedFields = [];
+        const processedFields = new Set();
+
+        // 1. Process each display type in attribute order
+        for (const type of this.#displayTypeOrder) {
+            const fields = this.#displayOptions[type] || [];
+            for (const field of fields) {
+                if (filterableFields.includes(field) && !processedFields.has(field)) {
+                    orderedFields.push({ field, type });
+                    processedFields.add(field);
+                }
+            }
+        }
+
+        // 2. Add remaining fields (not specified) as buttons in DOM order
+        for (const field of filterableFields) {
+            if (!processedFields.has(field)) {
+                orderedFields.push({ field, type: 'buttons' });
+                processedFields.add(field);
+            }
+        }
+
+        return orderedFields;
 
     }
 
@@ -79,35 +199,28 @@ export default class FilterGenerator {
 
         const filterableFields = this.#memberCollection.getFilterableFields();
 
-        console.debug('FilterGenerator: filterableFields =', filterableFields);
-
         if (filterableFields.length === 0) {
-            console.debug('FilterGenerator: No filterable fields found');
             this.#container.innerHTML = '<p>No filterable fields found.</p>';
             return;
         }
 
-        for (const fieldName of filterableFields) {
-            console.debug(`FilterGenerator: Creating filter for "${fieldName}"`);
-            this.#createFilterForField(fieldName);
-        }
+        // Get the display order
+        const displayOrder = this.#getDisplayOrder(filterableFields);
 
-        console.debug('FilterGenerator: fieldFilterMap size =', this.#fieldFilterMap.size);
+        // Generate filters in the correct order
+        for (const { field, type } of displayOrder) {
+            this.#createFilterForField(field, type);
+        }
 
         // Apply existing filter state to the UI
         this.syncWithStore();
 
-        console.debug('FilterGenerator: Generation complete');
-
     }
 
     /**
-     * Create a filter interface for a specific field.
-     *
-     * Uses normalized (lowercase) values for grouping, but displays
-     * the raw value (preserving original capitalisation) for the button text.
+     * Create a filter interface for a specific field with a specific display type.
      */
-    #createFilterForField(fieldName) {
+    #createFilterForField(fieldName, displayType) {
 
         // Get unique raw values (preserving original casing)
         const rawValues = this.#memberCollection.getUniqueValues(fieldName);
@@ -151,7 +264,31 @@ export default class FilterGenerator {
         label.textContent = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
         group.appendChild(label);
 
-        // Create options container
+        // Create appropriate UI based on display type
+        switch (displayType) {
+            case 'dropdown':
+                this.#createDropdownFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+            case 'checkboxes':
+                this.#createCheckboxFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+            case 'radio':
+                this.#createRadioFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+            default:
+                this.#createButtonFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+        }
+
+        this.#container.appendChild(group);
+
+    }
+
+    /**
+     * Create a button-based filter (default).
+     */
+    #createButtonFilter(fieldName, group, displayMap, sortedKeys) {
+
         const optionsContainer = document.createElement('div');
         optionsContainer.dataset.filterOptions = '';
         optionsContainer.setAttribute('role', 'toolbar');
@@ -162,7 +299,7 @@ export default class FilterGenerator {
         allButton.dataset.value = 'all';
         allButton.textContent = 'All';
         allButton.type = 'button';
-        allButton.classList.add('active'); // Active by default
+        allButton.classList.add('active');
         allButton.setAttribute('role', 'button');
         allButton.setAttribute('aria-pressed', 'true');
         allButton.setAttribute('aria-label', `Show all ${fieldName} values`);
@@ -174,9 +311,7 @@ export default class FilterGenerator {
         for (const normalizedKey of sortedKeys) {
             const displayValue = displayMap.get(normalizedKey);
             const button = document.createElement('button');
-            // Store the normalized value for filtering (case-insensitive)
             button.dataset.value = normalizedKey;
-            // Display the raw value (preserving original casing)
             button.textContent = displayValue;
             button.type = 'button';
             button.setAttribute('role', 'button');
@@ -187,25 +322,230 @@ export default class FilterGenerator {
         }
 
         group.appendChild(optionsContainer);
-        this.#container.appendChild(group);
 
         // Store references
         this.#fieldFilterMap.set(fieldName, {
             container: group,
             allButton: allButton,
             valueButtons: valueButtons,
-            displayMap: displayMap // Store for potential future use
+            type: 'buttons',
+            displayMap: displayMap
         });
 
-        // Add event listeners
-        this.#attachEvents(fieldName, allButton, valueButtons);
+        // Attach events
+        this.#attachButtonEvents(fieldName, allButton, valueButtons);
 
     }
 
     /**
-     * Attach click events to filter buttons.
+     * Create a dropdown filter.
      */
-    #attachEvents(fieldName, allButton, valueButtons) {
+    #createDropdownFilter(fieldName, group, displayMap, sortedKeys) {
+
+        const select = document.createElement('select');
+        select.dataset.filterSelect = '';
+        select.setAttribute('aria-label', `Filter by ${fieldName}`);
+
+        // All option
+        const allOption = document.createElement('option');
+        allOption.value = 'all';
+        allOption.textContent = 'Show All';
+        select.appendChild(allOption);
+
+        // Value options
+        for (const normalizedKey of sortedKeys) {
+            const displayValue = displayMap.get(normalizedKey);
+            const option = document.createElement('option');
+            option.value = normalizedKey;
+            option.textContent = displayValue;
+            select.appendChild(option);
+        }
+
+        group.appendChild(select);
+
+        // Event listener
+        select.addEventListener('change', () => {
+            const value = select.value;
+            if (value === 'all') {
+                this.#store.clearFieldFilters(fieldName);
+            } else {
+                this.#store.clearFieldFilters(fieldName);
+                this.#store.toggleFilter(fieldName, value);
+            }
+        });
+
+        // Store reference
+        this.#fieldFilterMap.set(fieldName, {
+            container: group,
+            element: select,
+            type: 'dropdown',
+            displayMap: displayMap
+        });
+
+    }
+
+    /**
+     * Create a checkbox filter (multi-select).
+     */
+    #createCheckboxFilter(fieldName, group, displayMap, sortedKeys) {
+
+        const optionsContainer = document.createElement('div');
+        optionsContainer.dataset.filterOptions = '';
+        optionsContainer.setAttribute('role', 'group');
+        optionsContainer.setAttribute('aria-label', `${fieldName} filter options`);
+
+        // All checkbox
+        const allWrapper = document.createElement('div');
+        allWrapper.className = 'filter-option';
+        const allCheckbox = document.createElement('input');
+        allCheckbox.type = 'checkbox';
+        allCheckbox.id = `${fieldName}-filter-all`;
+        allCheckbox.checked = true;
+        allCheckbox.value = 'all';
+        allCheckbox.setAttribute('aria-label', `Show all ${fieldName} values`);
+        const allLabel = document.createElement('label');
+        allLabel.htmlFor = `${fieldName}-filter-all`;
+        allLabel.textContent = 'Show All';
+        allWrapper.appendChild(allCheckbox);
+        allWrapper.appendChild(allLabel);
+        optionsContainer.appendChild(allWrapper);
+
+        // Value checkboxes
+        const valueCheckboxes = [];
+
+        for (const normalizedKey of sortedKeys) {
+            const displayValue = displayMap.get(normalizedKey);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'filter-option';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `${fieldName}-filter-${normalizedKey.replace(/[^a-z0-9]/g, '')}`;
+            checkbox.value = normalizedKey;
+            checkbox.setAttribute('aria-label', `Filter by ${fieldName}: ${displayValue}`);
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = displayValue;
+            wrapper.appendChild(checkbox);
+            wrapper.appendChild(label);
+            optionsContainer.appendChild(wrapper);
+            valueCheckboxes.push(checkbox);
+
+            // Event listener for individual checkboxes
+            checkbox.addEventListener('change', () => {
+                // Uncheck "All" if any value is checked/unchecked
+                allCheckbox.checked = false;
+
+                // Check if any values are selected
+                const checkedBoxes = optionsContainer.querySelectorAll('input[type="checkbox"]:checked:not([value="all"])');
+                if (checkedBoxes.length === 0) {
+                    // If nothing is checked, check "All"
+                    allCheckbox.checked = true;
+                    this.#store.clearFieldFilters(fieldName);
+                } else {
+                    // Apply selected filters
+                    this.#store.clearFieldFilters(fieldName);
+                    for (const cb of checkedBoxes) {
+                        this.#store.toggleFilter(fieldName, cb.value);
+                    }
+                }
+            });
+        }
+
+        // "All" checkbox event
+        allCheckbox.addEventListener('change', () => {
+            if (allCheckbox.checked) {
+                // Uncheck all value checkboxes
+                for (const cb of valueCheckboxes) {
+                    cb.checked = false;
+                }
+                this.#store.clearFieldFilters(fieldName);
+            }
+        });
+
+        group.appendChild(optionsContainer);
+
+        // Store reference
+        this.#fieldFilterMap.set(fieldName, {
+            container: group,
+            element: optionsContainer,
+            type: 'checkboxes',
+            displayMap: displayMap,
+            allCheckbox: allCheckbox,
+            valueCheckboxes: valueCheckboxes
+        });
+
+    }
+
+    /**
+     * Create a radio button filter (single-select).
+     */
+    #createRadioFilter(fieldName, group, displayMap, sortedKeys) {
+
+        const optionsContainer = document.createElement('div');
+        optionsContainer.dataset.filterOptions = '';
+        optionsContainer.setAttribute('role', 'radiogroup');
+        optionsContainer.setAttribute('aria-label', `${fieldName} filter options`);
+
+        // All radio
+        const allWrapper = document.createElement('div');
+        allWrapper.className = 'filter-option';
+        const allRadio = document.createElement('input');
+        allRadio.type = 'radio';
+        allRadio.name = `${fieldName}-filter`;
+        allRadio.id = `${fieldName}-filter-all`;
+        allRadio.checked = true;
+        allRadio.value = 'all';
+        allRadio.setAttribute('aria-label', `Show all ${fieldName} values`);
+        const allLabel = document.createElement('label');
+        allLabel.htmlFor = `${fieldName}-filter-all`;
+        allLabel.textContent = 'Show All';
+        allWrapper.appendChild(allRadio);
+        allWrapper.appendChild(allLabel);
+        optionsContainer.appendChild(allWrapper);
+
+        // Value radios
+        for (const normalizedKey of sortedKeys) {
+            const displayValue = displayMap.get(normalizedKey);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'filter-option';
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = `${fieldName}-filter`;
+            radio.id = `${fieldName}-filter-${normalizedKey.replace(/[^a-z0-9]/g, '')}`;
+            radio.value = normalizedKey;
+            radio.setAttribute('aria-label', `Filter by ${fieldName}: ${displayValue}`);
+            const label = document.createElement('label');
+            label.htmlFor = radio.id;
+            label.textContent = displayValue;
+            wrapper.appendChild(radio);
+            wrapper.appendChild(label);
+            optionsContainer.appendChild(wrapper);
+
+            // Event listener
+            radio.addEventListener('change', () => {
+                if (radio.checked) {
+                    this.#store.clearFieldFilters(fieldName);
+                    this.#store.toggleFilter(fieldName, radio.value);
+                }
+            });
+        }
+
+        group.appendChild(optionsContainer);
+
+        // Store reference
+        this.#fieldFilterMap.set(fieldName, {
+            container: group,
+            element: optionsContainer,
+            type: 'radio',
+            displayMap: displayMap
+        });
+
+    }
+
+    /**
+     * Attach events to button-based filters.
+     */
+    #attachButtonEvents(fieldName, allButton, valueButtons) {
 
         // "All" button clears all filters for this field
         allButton.addEventListener('click', () => {
@@ -220,14 +560,13 @@ export default class FilterGenerator {
             }
         });
 
-        // Value buttons select a value
+        // Value buttons
         for (const button of valueButtons) {
             button.addEventListener('click', () => {
-                const value = button.dataset.value; // This is the normalized value
+                const value = button.dataset.value;
                 this.#handleValueSelect(fieldName, value);
             });
 
-            // Keyboard support for Enter/Space
             button.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -241,48 +580,33 @@ export default class FilterGenerator {
 
     /**
      * Handle "All" button click.
-     *
-     * Clears all filters for the field and updates the UI.
      */
     #handleAllClick(fieldName) {
 
-        // Clear all filters for this field in the Store
         this.#store.clearFieldFilters(fieldName);
 
-        // Update "All" button state
-        this.#updateAllButtonState(fieldName);
-
-        // Reset all value buttons (remove active)
         const fieldData = this.#fieldFilterMap.get(fieldName);
-        if (fieldData) {
+        if (fieldData && fieldData.type === 'buttons' && fieldData.valueButtons) {
             for (const button of fieldData.valueButtons) {
                 button.classList.remove('active');
                 button.setAttribute('aria-pressed', 'false');
             }
+            fieldData.allButton.classList.add('active');
+            fieldData.allButton.setAttribute('aria-pressed', 'true');
+            fieldData.allButton.focus();
         }
-
-        // Store publishes the event automatically via clearFieldFilters
-
-        // Move focus back to the "All" button
-        fieldData.allButton.focus();
 
     }
 
     /**
      * Handle a value button click.
-     *
-     * Selects the value (adds to filters) without toggling.
-     * Does nothing if the value is already active.
      */
     #handleValueSelect(fieldName, value) {
 
-        // Check if the value is already active (values are stored normalized)
         if (this.#store.isFilterActive(fieldName, value)) {
-            // Do nothing — value is already selected
             return;
         }
 
-        // Add the normalized value to the Store (Store publishes the event)
         this.#store.toggleFilter(fieldName, value);
 
         // Update the "All" button state for this field
@@ -291,42 +615,13 @@ export default class FilterGenerator {
     }
 
     /**
-     * Update the visual state of a filter button.
-     */
-    #updateButtonState(fieldName, value, isActive) {
-
-        const fieldData = this.#fieldFilterMap.get(fieldName);
-
-        if (!fieldData) {
-            return;
-        }
-
-        for (const button of fieldData.valueButtons) {
-            if (button.dataset.value === value) {
-                if (isActive) {
-                    button.classList.add('active');
-                    button.setAttribute('aria-pressed', 'true');
-                } else {
-                    button.classList.remove('active');
-                    button.setAttribute('aria-pressed', 'false');
-                }
-                break;
-            }
-        }
-
-    }
-
-    /**
      * Update the "All" button state for a field.
-     *
-     * If any value filters are active, "All" is inactive.
-     * If no value filters are active, "All" is active.
      */
     #updateAllButtonState(fieldName) {
 
         const fieldData = this.#fieldFilterMap.get(fieldName);
 
-        if (!fieldData) {
+        if (!fieldData || fieldData.type !== 'buttons') {
             return;
         }
 
@@ -344,38 +639,58 @@ export default class FilterGenerator {
 
     /**
      * Synchronize the UI with the current Store state.
-     *
-     * Called after generation and after external state changes.
      */
     syncWithStore() {
 
-        console.debug('FilterGenerator: Syncing with Store...');
-
         const filters = this.#store.filters;
 
-        console.debug('FilterGenerator: Current filters =', filters);
-
-        // Update all fields
         for (const [fieldName, fieldData] of this.#fieldFilterMap) {
 
-            // Reset all value buttons
-            for (const button of fieldData.valueButtons) {
-                button.classList.remove('active');
-                button.setAttribute('aria-pressed', 'false');
-            }
-
-            // Apply active states from the Store (values are normalized)
             const activeValues = filters[fieldName] || [];
-            for (const button of fieldData.valueButtons) {
-                // button.dataset.value is already normalized
-                if (activeValues.includes(button.dataset.value)) {
-                    button.classList.add('active');
-                    button.setAttribute('aria-pressed', 'true');
-                }
-            }
 
-            // Update the "All" button state
-            this.#updateAllButtonState(fieldName);
+            switch (fieldData.type) {
+
+                case 'buttons':
+                    for (const button of fieldData.valueButtons) {
+                        button.classList.remove('active');
+                        button.setAttribute('aria-pressed', 'false');
+                    }
+                    for (const button of fieldData.valueButtons) {
+                        if (activeValues.includes(button.dataset.value)) {
+                            button.classList.add('active');
+                            button.setAttribute('aria-pressed', 'true');
+                        }
+                    }
+                    this.#updateAllButtonState(fieldName);
+                    break;
+
+                case 'dropdown':
+                    if (activeValues.length > 0) {
+                        fieldData.element.value = activeValues[0];
+                    } else {
+                        fieldData.element.value = 'all';
+                    }
+                    break;
+
+                case 'checkboxes':
+                    for (const cb of fieldData.valueCheckboxes) {
+                        cb.checked = activeValues.includes(cb.value);
+                    }
+                    fieldData.allCheckbox.checked = activeValues.length === 0;
+                    break;
+
+                case 'radio':
+                    const radios = fieldData.element.querySelectorAll('input[type="radio"]');
+                    for (const radio of radios) {
+                        if (radio.value === 'all') {
+                            radio.checked = activeValues.length === 0;
+                        } else {
+                            radio.checked = activeValues.includes(radio.value);
+                        }
+                    }
+                    break;
+
+            }
 
         }
 
@@ -390,8 +705,6 @@ export default class FilterGenerator {
 
     /**
      * Get the field filter map.
-     *
-     * Used by FilterChips to access filter DOM elements.
      */
     get fieldFilterMap() {
         return this.#fieldFilterMap;
@@ -399,8 +712,6 @@ export default class FilterGenerator {
 
     /**
      * Refresh the filter UI.
-     *
-     * Useful after member data changes.
      */
     refresh() {
         this.#generate();

@@ -8,6 +8,7 @@
  * - Initialise Atlas
  * - Coordinate core services
  * - Expose the public API
+ * - Add credit line (optional)
  *
  * Deliberately does NOT:
  * - Search
@@ -24,6 +25,8 @@ import MemberCollection from "./MemberCollection.js";
 import Store from "./Store.js";
 import EventBus from "./EventBus.js";
 import Renderer from "./Renderer.js";
+import URLManager from "./URLManager.js";
+import JCinkAdapter from "../adapters/JCinkAdapter.js";
 import FilterGenerator from "../modules/FilterGenerator.js";
 import FilterChips from "../modules/FilterChips.js";
 import ResultCounter from "../modules/ResultCounter.js";
@@ -37,6 +40,7 @@ export default class Atlas {
     #store = null;
     #events = null;
     #renderer = null;
+    #urlManager = null;
     #modules = {};
 
     /**
@@ -45,16 +49,25 @@ export default class Atlas {
      * @param {Object} options - Configuration options
      * @param {string} options.root - CSS selector for the Atlas root (default: '[data-atlas]')
      * @param {boolean} options.debug - Enable debug logging (default: false)
+     * @param {boolean} options.showCredit - Show credit line in footer (default: true)
      */
     constructor(options = {}) {
 
         this.options = {
             root: '[data-atlas]',
             debug: false,
+            showCredit: true,
             ...options
         };
 
         this.root = this.#findRoot();
+
+        // ─── Apply JCink adapter ──────────────────────────
+
+        JCinkAdapter.apply();
+
+        // ─── Initialise Atlas ─────────────────────────────
+
         this.#initialise();
 
     }
@@ -108,11 +121,25 @@ export default class Atlas {
             events: this.#events
         });
 
-        // 6. Create all modules
+        // 6. Create the URLManager (handles URL persistence)
+        this.#urlManager = new URLManager({
+            store: this.#store,
+            events: this.#events
+        });
+
+        // 7. Create all modules
         this.#createModules();
 
-        // 7. Debug output (if enabled)
+        // 8. Add credit line (if enabled)
+        if (this.options.showCredit) {
+            this.#addCreditLine();
+        }
+
+        // 9. Debug output (if enabled)
         this.#debug();
+
+        // 10. Console credit (always shown, subtle)
+        this.#consoleCredit();
 
     }
 
@@ -154,7 +181,7 @@ export default class Atlas {
      */
     #createModules() {
 
-        // Filter Generator
+        // Filter Generator (with display options support)
         const filtersContainer = this.#registry.filtersContainer;
         if (filtersContainer) {
             this.#modules.filterGenerator = new FilterGenerator(
@@ -263,6 +290,103 @@ export default class Atlas {
     }
 
     /**
+     * Add the credit line to the page (theme-aware).
+     */
+    #addCreditLine() {
+
+        // Check if credit already exists (avoid duplicates)
+        if (document.querySelector('.atlas-credit')) {
+            return;
+        }
+
+        // ─── Inject styles ─────────────────────────────────
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .atlas-credit {
+                text-align: center;
+                font-size: 0.8rem;
+                color: currentColor;
+                opacity: 0.7;
+                padding: 1rem 0;
+                margin-top: 2rem;
+                border-top: 1px solid currentColor;
+                border-top-color: rgba(128, 128, 128, 0.2);
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                transition: border-top-color 0.2s;
+            }
+            .atlas-credit a {
+                color: currentColor;
+                text-decoration: underline;
+                text-underline-offset: 2px;
+                text-decoration-thickness: 1px;
+                text-decoration-color: rgba(128, 128, 128, 0.3);
+                transition: opacity 0.2s;
+            }
+            .atlas-credit a:hover {
+                opacity: 0.7;
+                text-decoration-color: currentColor;
+            }
+            .atlas-credit strong {
+                color: currentColor;
+                font-weight: 700;
+            }
+            .atlas-credit .divider {
+                margin: 0 0.5rem;
+                opacity: 0.3;
+            }
+            @media (prefers-color-scheme: dark) {
+                .atlas-credit {
+                    border-top-color: rgba(255, 255, 255, 0.12);
+                }
+                .atlas-credit a {
+                    text-decoration-color: rgba(255, 255, 255, 0.2);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ─── Create credit element ─────────────────────────
+
+        requestAnimationFrame(() => {
+
+            const credit = document.createElement('div');
+            credit.className = 'atlas-credit';
+            credit.innerHTML = `
+                <span>⚡ Powered by <a href="https://jcinkdirectoryframework.github.io/atlas-directory/" target="_blank">Atlas</a></span>
+                <span class="divider">·</span>
+                <span>Built by <strong>Maeve</strong> ❤️ for the JCink community</span>
+            `;
+
+            const atlasRoot = document.querySelector('[data-atlas]');
+            if (atlasRoot) {
+                atlasRoot.appendChild(credit);
+            } else {
+                document.body.appendChild(credit);
+            }
+
+        });
+
+    }
+
+    /**
+     * Console credit (theme-aware, subtle).
+     */
+    #consoleCredit() {
+
+        const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        console.log(
+            '%c⚡ Atlas %c A dependency-free, HTML-driven directory engine',
+            'background:#dc2626; color:white; padding:4px 8px; border-radius:4px 0 0 4px; font-weight:bold;',
+            isDark ? 'background:#2d3748; color:#e2e8f0; padding:4px 8px; border-radius:0 4px 4px 0;' : 'background:#1a1a2e; color:#e2e8f0; padding:4px 8px; border-radius:0 4px 4px 0;'
+        );
+        console.log('  🔗 https://jcinkdirectoryframework.github.io/atlas-directory/');
+        console.log('  ❤️ Built by Maeve for the JCink community');
+
+    }
+
+    /**
      * Debug output.
      */
     #debug() {
@@ -325,6 +449,11 @@ export default class Atlas {
     /** The Renderer instance. */
     get renderer() {
         return this.#renderer;
+    }
+
+    /** The URLManager instance. */
+    get urlManager() {
+        return this.#urlManager;
     }
 
     /** All modules. */
