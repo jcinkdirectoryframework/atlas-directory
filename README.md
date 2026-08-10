@@ -12,14 +12,17 @@ Atlas transforms static HTML member lists into interactive, searchable directori
 - **HTML-First** — Configure everything through HTML attributes. No JavaScript required for basic use.
 - **Instant Search** — Type to filter members in real-time.
 - **Faceted Filtering** — Multi-select filters for any field.
+- **Filter Display Options** — Choose between buttons, dropdowns, checkboxes, or radio buttons for each filter.
+- **URL Persistence** — Share or bookmark filtered views with URL parameters.
 - **Smart Sorting** — Three-state toggle (asc → desc → off).
-- **Layout Switching** — Grid and list views with persistent user preference.
+- **Layout Switching** — Grid and list views with persistent preference.
 - **Filter Chips** — Active filters displayed as removable chips with "Clear All".
 - **Result Counter** — "Showing X of Y members" updates in real-time.
 - **No Flicker** — Smooth loading with CSS transitions.
 - **Accessible** — Keyboard navigation, screen reader support, reduced-motion compatible.
 - **Mobile-Optimised** — Touch targets, responsive layouts, iOS zoom prevention.
 - **~1,000 Members** — Optimised for directories of up to one thousand members.
+- **Theme-Aware** — Adapts to your site's colour scheme automatically.
 
 ---
 
@@ -99,6 +102,29 @@ That's it. Atlas discovers everything automatically.
 
 ---
 
+## Filter Display Options
+
+Atlas now supports four filter display types, configurable via HTML attributes:
+
+| Display Type | Attribute | Description |
+|--------------|-----------|-------------|
+| Buttons (default) | (no attribute) | Visual, clickable buttons for each filter value |
+| Dropdown | `data-filter-dropdown` | Single-select dropdown menu — saves space |
+| Checkboxes | `data-filter-checkboxes` | Multi-select checkboxes — select multiple values |
+| Radio Buttons | `data-filter-radio` | Single-select radio buttons — compact list |
+
+### Example
+
+<div data-filters 
+     data-filter-radio="status" 
+     data-filter-checkboxes="species,faction" 
+     data-filter-dropdown="occupation">
+</div>
+
+For more details, see the HTML API documentation.
+
+---
+
 ## Performance
 
 Atlas is optimised for directories of up to ~1,000 members.
@@ -142,6 +168,10 @@ Benchmarks with 1,000 members:
 |-----------|-------------|
 | data-search | Search input field |
 | data-filters | Container where Atlas generates filters |
+| data-filter-radio | Fields to show as radio buttons, in order |
+| data-filter-checkboxes | Fields to show as checkboxes, in order |
+| data-filter-buttons | Fields to show as buttons, in order |
+| data-filter-dropdown | Fields to show as dropdowns, in order |
 | data-sort | Container where Atlas generates sort buttons |
 | data-chips | Container where Atlas displays filter chips |
 | data-results | Container where Atlas displays result counter |
@@ -215,6 +245,8 @@ Atlas is currently in active development.
 - EventBus for communication
 - Renderer with batch DOM updates
 - Filter generation (multi-select)
+- Filter display options (buttons, dropdowns, checkboxes, radio)
+- URL persistence
 - Filter chips with removal
 - Result counter
 - Search (starts-with matching)
@@ -225,10 +257,11 @@ Atlas is currently in active development.
 - Performance optimisation (Set lookups, filter caching, lazy rendering)
 - Accessibility (ARIA, keyboard navigation, reduced motion)
 - Mobile optimisation (touch targets, responsive layouts)
+- Theme-aware CSS
 
 ### Next
 - Documentation finalisation
-- Release preparation (npm, CDN)
+- Release preparation
 
 ---
 
@@ -266,3 +299,5 @@ MIT
 ## Acknowledgments
 
 Atlas was originally conceived for JCink roleplay forums but is designed to be platform-agnostic.
+
+Built with ❤️ by Maeve for the JCink community.

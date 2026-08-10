@@ -1,87 +1,53 @@
 # Changelog
 
-## [M1.2] — 2026-08-04
+## [M1.0.0] — 2026-08-11
 
 ### Added
 
-- **Mobile Optimisation**
-  - Minimum tap targets (44px) for all interactive elements
-  - Responsive grid columns adjust on smaller screens
-  - iOS zoom prevention (search inputs use 16px font size)
-  - Filters stack vertically on small screens
-  - Chips wrap and are touch-friendly on mobile
-  - Search input full-width on mobile
-  - Prevent iOS zoom on focus
+- **Filter Display Options**
+  - Support for radio buttons (`data-filter-radio`)
+  - Support for checkboxes (`data-filter-checkboxes`)
+  - Support for dropdown menus (`data-filter-dropdown`)
+  - Support for buttons (`data-filter-buttons`)
+  - Attribute order controls display order
+  - Fields can be moved to different locations on the page
+
+- **URL Persistence**
+  - Filter state saved to URL parameters
+  - Search state saved to URL parameters
+  - Sort state saved to URL parameters
+  - State restored on page load
+  - `history.pushState()` for seamless URL updates
+
+- **JCink Adapter**
+  - Always Show Max — automatically adds `&max_results=1000` to member list URLs
+  - Platform-specific behaviours isolated in adapter
+
+- **Credit Line**
+  - Theme-aware footer credit: "Built by Maeve ❤️ for the JCink community"
+  - Console credit on initialisation
+  - Configurable via `showCredit: false` option
+
+- **Theme-Aware CSS**
+  - All core styles use `currentColor` instead of hardcoded colours
+  - Focus rings adapt to site's colour scheme
+  - Checkbox/radio accents adapt to site's colour scheme
+  - Dropdown borders adapt to site's colour scheme
 
 ### Changed
 
-- **atlas.css** — Added generic mobile optimisations (tap targets, responsive grid, filter stacking, iOS zoom prevention)
-- **examples.css** — Added layout-specific mobile optimisations (sidebar stacking, two-column stacking, slide-out stacking, centered adjustments)
-
-## [M1.1] — 2026-08-04
-
-### Added
-
-- **Accessibility**
-  - Keyboard navigation support (Tab, Enter, Space)
-  - ARIA attributes: `role`, `aria-label`, `aria-pressed`, `aria-live`, `aria-atomic`
-  - Focus states with `:focus-visible` (blue outline for keyboard users)
-  - Reduced motion support (`prefers-reduced-motion`)
-  - ARIA live regions for result counter
-  - ARIA list/listitem roles for directory and members
-  - ARIA toolbar roles for filter/sort/chip containers
-  - Descriptive ARIA labels on all interactive elements
-
-### Changed
-
-- **FilterGenerator** — ARIA attributes and keyboard support
-- **FilterChips** — ARIA attributes and keyboard support
-- **ResultCounter** — ARIA live region for announcements
-- **SortGenerator** — ARIA attributes and keyboard support
-- **Atlas** — ARIA label for search input
-- **Renderer** — ARIA list/listitem roles for directory and members
-- **atlas.css** — Focus states and reduced motion support
-
-## [M1.0] — 2026-08-04
-
-### Added
-
-- **Lazy Rendering** — Automatically activates when a directory has 300+ members
-  - Uses Intersection Observer with sentinel elements
-  - Renders members in batches of 25 as you scroll
-  - Removes off-screen members from the DOM to reduce memory usage
-  - Reduces visible DOM nodes from ~22,000 to ~700 for 1,000 members
-
-### Changed
-
-- **MemberCollection.applyFilters()** — Optimised with Set lookups (O(1) instead of O(n))
-  - Filter time reduced from 121ms to 0.4ms (300x faster)
-
-- **Store** — Added filter caching
-  - Results are cached by filter state
-  - Repeated filters are instant
-  - Cache is automatically cleared when filters, search, or sort change
-
-- **Renderer.sortMembers()** — Optimised with Intl.Collator
-  - Sort time reduced from 24ms to 1.2ms (20x faster)
-
-- **Init time** — Reduced from 276ms to 151ms (45% faster)
+- **FilterGenerator** — Complete rewrite to support multiple display types and attribute-order control
+- **Atlas** — Added URLManager and JCinkAdapter integration
+- **Renderer** — Improved lazy rendering performance
+- **Core CSS** — Now fully theme-aware with no hardcoded colours
 
 ### Fixed
 
-- DOM memory usage for large directories is now significantly lower
-- Scrolling performance with 1,000+ members is now smooth
+- Case-insensitive filter grouping (e.g., "Maeve" and "maeve" now group together)
+- Filter display order now controlled by HTML attribute order
+- Non-ASCII characters removed from all examples for JCink compatibility
 
-### Performance Summary
-
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Init Time | 276ms | 151ms | 45% faster |
-| Filter Time (first) | 121ms | 0.4ms | 300x faster |
-| Sort Time | 24ms | 1.2ms | 20x faster |
-| DOM Nodes (visible) | 22,000 | ~700 | 97% reduction |
-
-## [M0.10] — 2026-08-04
+## [M0.10]
 
 ### Added
 
@@ -115,7 +81,7 @@
 - All features combine correctly (filters + search + sort + layout)
 - Examples now work with live member data
 
-## [M0.9] — 2026-08-03
+## [M0.9]
 
 ### Added
 
@@ -145,7 +111,7 @@
 
 - Layout persists across page refreshes via localStorage
 
-## [M0.8] — 2026-08-03
+## [M0.8]
 
 ### Added
 
@@ -185,7 +151,7 @@
 - Sort UI now updates correctly when filters change
 - Sort buttons show correct state after filter changes
 
-## [M0.7] — 2026-08-02
+## [M0.7]
 
 ### Added
 
@@ -222,7 +188,7 @@
 - "Clear All" button now correctly disappears when all filters are removed
 - Counter updates correctly on both filter and search changes
 
-## [M0.6] — 2026-08-02
+## [M0.6]
 
 ### Added
 
@@ -281,7 +247,7 @@
 - Proper synchronization between filters, chips, and counter
 - All filters are cleared when "Clear All" is clicked
 
-## [M0.5] — 2026-08-02
+## [M0.5]
 
 ### Added
 
@@ -313,6 +279,8 @@
 
 - Manual filter containers (`[data-filter]`) from demo HTML
   - Filter generation will be implemented automatically in a future milestone
+
+---
 
 ## Unreleased
 
