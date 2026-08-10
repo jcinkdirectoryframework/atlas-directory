@@ -8,7 +8,7 @@
     <style>
         .example-links {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 1rem;
             margin: 1.5rem 0;
         }
@@ -68,6 +68,50 @@
             color: white;
         }
 
+        .example-link-card .filter-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin: 0.4rem 0 0.6rem 0;
+        }
+
+        .example-link-card .filter-types span {
+            font-size: 0.6rem;
+            font-weight: 500;
+            padding: 0.05rem 0.5rem;
+            border-radius: 10px;
+            background: #e2e8f0;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .example-link-card .filter-types span.radio {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .example-link-card .filter-types span.checkboxes {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .example-link-card .filter-types span.dropdown {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .example-link-card .filter-types span.buttons {
+            background: #fce4ec;
+            color: #e11d48;
+        }
+
+        .example-link-card .filter-types span.moved {
+            background: #f3e8ff;
+            color: #7c3aed;
+            border: 1px dashed #7c3aed;
+        }
+
         .example-link-card h3 {
             margin: 0 0 0.2rem 0;
             font-size: 1rem;
@@ -86,7 +130,7 @@
             display: inline-block;
         }
 
-        /* ─── Layout Diagram ──────────────────────────── */
+        /* Layout Diagram */
 
         .preview {
             width: 100%;
@@ -176,7 +220,7 @@
             border: 1px dashed #cbd5e1;
         }
 
-        /* ─── Diagram Layouts ─────────────────────────── */
+        /* Diagram Layouts */
 
         .diagram-standard {
             flex-direction: column;
@@ -266,7 +310,7 @@
 
 <div class="docs-wrapper">
 
-    <!-- ─── Sidebar ─────────────────────────────────── -->
+    <!-- Sidebar -->
     <aside class="docs-sidebar">
         <a href="/atlas-directory/docs/index.html" class="logo">Atlas</a>
         <span class="subtitle">HTML-driven directory engine</span>
@@ -293,7 +337,7 @@
         <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
     </aside>
 
-    <!-- ─── Main Content ────────────────────────────── -->
+    <!-- Main Content -->
     <main class="docs-content">
 
         <h1>Layout Examples</h1>
@@ -302,11 +346,12 @@
         <p>
             Atlas controls can be placed anywhere within <code>data-atlas</code>.
             Click any example below to see it in action with live member data.
+            Each example demonstrates a different mix of filter display types to show the flexibility of the system.
         </p>
 
         <div class="example-links">
 
-            <!-- ─── Standard ─────────────────────────────── -->
+            <!-- Standard -->
             <a href="../../examples/standard.html" class="example-link-card">
                 <span class="badge most-common">Most Common</span>
 
@@ -319,10 +364,17 @@
 
                 <h3>Standard Layout</h3>
                 <p>Controls at the top, directory below. Simple and familiar.</p>
+
+                <div class="filter-types">
+                    <span class="radio">Radio: Status</span>
+                    <span class="checkboxes">Checkboxes: Species, Faction</span>
+                    <span class="dropdown moved">Dropdown: Occupation (moved)</span>
+                </div>
+
                 <span class="arrow">View Example →</span>
             </a>
 
-            <!-- ─── Sidebar ──────────────────────────────── -->
+            <!-- Sidebar -->
             <a href="../../examples/sidebar.html" class="example-link-card">
                 <span class="badge advanced">Advanced</span>
 
@@ -335,10 +387,17 @@
 
                 <h3>Sidebar Layout</h3>
                 <p>Controls in a left sidebar, directory on the right. Great for wide screens.</p>
+
+                <div class="filter-types">
+                    <span class="radio">Radio: Status</span>
+                    <span class="checkboxes">Checkboxes: Species, Faction</span>
+                    <span class="dropdown moved">Dropdown: Occupation (moved)</span>
+                </div>
+
                 <span class="arrow">View Example →</span>
             </a>
 
-            <!-- ─── Centered ──────────────────────────────── -->
+            <!-- Centered -->
             <a href="../../examples/centered.html" class="example-link-card">
                 <span class="badge simple">Simple</span>
 
@@ -351,10 +410,18 @@
 
                 <h3>Centered Minimal</h3>
                 <p>Clean, centered design with minimal controls. Focus on the content.</p>
+
+                <div class="filter-types">
+                    <span class="checkboxes">Checkboxes: Species</span>
+                    <span class="radio">Radio: Status</span>
+                    <span class="dropdown moved">Dropdown: Occupation (moved)</span>
+                    <span class="buttons moved">Buttons: Faction (moved)</span>
+                </div>
+
                 <span class="arrow">View Example →</span>
             </a>
 
-            <!-- ─── Two-Column ────────────────────────────── -->
+            <!-- Two-Column -->
             <a href="../../examples/two-column.html" class="example-link-card">
                 <span class="badge power-user">Power User</span>
 
@@ -370,10 +437,17 @@
 
                 <h3>Two-Column</h3>
                 <p>Search bar spans full width, filters and directory side by side.</p>
+
+                <div class="filter-types">
+                    <span class="radio">Radio: Status</span>
+                    <span class="checkboxes">Checkboxes: Species, Faction</span>
+                    <span class="dropdown moved">Dropdown: Occupation (moved)</span>
+                </div>
+
                 <span class="arrow">View Example →</span>
             </a>
 
-            <!-- ─── Slide-out ──────────────────────────────── -->
+            <!-- Slide-out -->
             <a href="../../examples/slideout.html" class="example-link-card">
                 <span class="badge mobile-friendly">Mobile-Friendly</span>
 
@@ -386,6 +460,13 @@
 
                 <h3>Slide-out Top Bar</h3>
                 <p>Controls in a collapsible top bar. Clean and mobile-friendly.</p>
+
+                <div class="filter-types">
+                    <span class="radio">Radio: Status</span>
+                    <span class="checkboxes">Checkboxes: Species, Faction</span>
+                    <span class="dropdown moved">Dropdown: Occupation (moved)</span>
+                </div>
+
                 <span class="arrow">View Example →</span>
             </a>
 
@@ -393,23 +474,32 @@
 
         <div class="tip">
             <strong>Tip:</strong> Each example uses the same member data but shows a different
-            layout and visual theme. This demonstrates how flexible Atlas can be.
+            layout and visual theme. The filter display types also vary, demonstrating the flexibility
+            of <a href="/atlas-directory/docs/html-api.html#filter-display-options">Filter Display Options</a>.
         </div>
 
-        <!-- ─── Code Snippets ────────────────────────────── -->
+        <!-- Code Snippets -->
         <div class="code-snippets">
 
             <h2>Code Snippets</h2>
-            <p>Here are the HTML structures for each layout pattern:</p>
+            <p>Here are the HTML structures for each layout pattern, including filter display attributes:</p>
 
             <h3>Standard Layout</h3>
-            <p>Controls at the top, directory below.</p>
+            <p>Controls at the top, directory below. Radio + Checkboxes + Dropdown (moved).</p>
             <pre><code>&lt;div data-atlas&gt;
+    &lt;div id="occupation-filter-container"&gt;&lt;/div&gt;
+
     &lt;input data-search placeholder="Search..."&gt;
-    &lt;div data-filters&gt;&lt;/div&gt;
+
+    &lt;div data-filters
+         data-filter-radio="status"
+         data-filter-checkboxes="species,faction"&gt;
+    &lt;/div&gt;
+
     &lt;div data-sort&gt;&lt;/div&gt;
     &lt;div data-chips&gt;&lt;/div&gt;
     &lt;div data-results&gt;&lt;/div&gt;
+
     &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
     &lt;button data-layout="list"&gt;List&lt;/button&gt;
 
@@ -422,13 +512,17 @@
             <p>Filters and controls in a sidebar, directory in the main area.</p>
             <pre><code>&lt;div data-atlas style="display: flex; gap: 2rem;"&gt;
     &lt;aside style="width: 250px;"&gt;
-        &lt;div data-filters&gt;&lt;/div&gt;
+        &lt;div data-filters
+             data-filter-radio="status"
+             data-filter-checkboxes="species,faction"&gt;
+        &lt;/div&gt;
         &lt;div data-sort&gt;&lt;/div&gt;
         &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
         &lt;button data-layout="list"&gt;List&lt;/button&gt;
     &lt;/aside&gt;
 
     &lt;main style="flex: 1;"&gt;
+        &lt;div id="occupation-filter-container"&gt;&lt;/div&gt;
         &lt;input data-search placeholder="Search..."&gt;
         &lt;div data-chips&gt;&lt;/div&gt;
         &lt;div data-results&gt;&lt;/div&gt;
@@ -440,21 +534,28 @@
 &lt;/div&gt;</code></pre>
 
             <h3>Centered Minimal Layout</h3>
-            <p>Clean, centered design with minimal controls.</p>
+            <p>Clean, centered design with minimal controls. Checkboxes + Radio + moved filters.</p>
             <pre><code>&lt;div data-atlas style="max-width: 800px; margin: 0 auto; text-align: center;"&gt;
     &lt;h2&gt;Our Members&lt;/h2&gt;
+
+    &lt;div id="occupation-filter-container"&gt;&lt;/div&gt;
 
     &lt;input data-search placeholder="Search..." style="width: 100%;"&gt;
 
     &lt;div style="display: flex; justify-content: center; gap: 1rem;"&gt;
-        &lt;div data-filters&gt;&lt;/div&gt;
+        &lt;div data-filters
+             data-filter-checkboxes="species"
+             data-filter-radio="status"&gt;
+        &lt;/div&gt;
         &lt;div data-sort&gt;&lt;/div&gt;
     &lt;/div&gt;
 
     &lt;div data-chips&gt;&lt;/div&gt;
     &lt;div data-results&gt;&lt;/div&gt;
 
-    &lt;div data-directory style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; text-align: left;"&gt;
+    &lt;div id="faction-filter-container"&gt;&lt;/div&gt;
+
+    &lt;div data-directory&gt;
         &lt;article data-member&gt;...&lt;/article&gt;
     &lt;/div&gt;
 &lt;/div&gt;</code></pre>
@@ -462,20 +563,25 @@
             <h3>Two-Column Layout</h3>
             <p>Search bar spanning full width, filters and directory side by side.</p>
             <pre><code>&lt;div data-atlas&gt;
-    &lt;input data-search placeholder="Search..." style="width: 100%;"&gt;
+    &lt;div class="search-row"&gt;
+        &lt;div id="occupation-filter-container"&gt;&lt;/div&gt;
+        &lt;input data-search placeholder="Search..." style="width: 100%;"&gt;
+    &lt;/div&gt;
 
     &lt;div style="display: flex; gap: 2rem;"&gt;
-        &lt;div style="width: 300px;"&gt;
-            &lt;div data-filters&gt;&lt;/div&gt;
+        &lt;div style="width: 280px;"&gt;
+            &lt;div data-filters
+                 data-filter-radio="status"
+                 data-filter-checkboxes="species,faction"&gt;
+            &lt;/div&gt;
             &lt;div data-sort&gt;&lt;/div&gt;
             &lt;div data-chips&gt;&lt;/div&gt;
+            &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
+            &lt;button data-layout="list"&gt;List&lt;/button&gt;
         &lt;/div&gt;
 
         &lt;div style="flex: 1;"&gt;
             &lt;div data-results&gt;&lt;/div&gt;
-            &lt;button data-layout="grid"&gt;Grid&lt;/button&gt;
-            &lt;button data-layout="list"&gt;List&lt;/button&gt;
-
             &lt;div data-directory&gt;
                 &lt;article data-member&gt;...&lt;/article&gt;
             &lt;/div&gt;
@@ -486,8 +592,7 @@
             <h3>Slide-out Top Bar</h3>
             <p>
                 Controls hidden in a collapsible top bar. Clean and mobile-friendly.
-                <strong>Important:</strong> The entire page is wrapped in <code>data-atlas</code>
-                so Atlas can discover the controls inside the top bar.
+                <strong>Important:</strong> The entire page is wrapped in <code>data-atlas</code>.
             </p>
 
             <div class="key-concept">
@@ -496,16 +601,18 @@
                 wherever they are placed on the page.
             </div>
 
-            <pre><code>&lt;!-- data-atlas wraps the entire page --&gt;
-&lt;div data-atlas&gt;
+            <pre><code>&lt;div data-atlas&gt;
 
     &lt;!-- Fixed Top Bar (contains controls) --&gt;
     &lt;div class="topbar"&gt;
         &lt;button class="topbar-toggle"&gt;☰ Controls&lt;/button&gt;
         &lt;div class="topbar-content"&gt;
-            &lt;!-- Controls are inside data-atlas — Atlas can find them --&gt;
-            &lt;div data-filters&gt;&lt;/div&gt;
+            &lt;div data-filters
+                 data-filter-radio="status"
+                 data-filter-checkboxes="species,faction"&gt;
+            &lt;/div&gt;
             &lt;div data-sort&gt;&lt;/div&gt;
+            &lt;div id="occupation-filter-container"&gt;&lt;/div&gt;
             &lt;input data-search placeholder="Search..."&gt;
             &lt;div data-chips&gt;&lt;/div&gt;
             &lt;div data-results&gt;&lt;/div&gt;
@@ -524,14 +631,22 @@
         &lt;article data-member&gt;...&lt;/article&gt;
     &lt;/div&gt;
 
-&lt;/div&gt;
-&lt;!-- end data-atlas --&gt;</code></pre>
+&lt;/div&gt;</code></pre>
 
             <p>
                 <strong>Why this works:</strong> Atlas only looks for controls inside the
                 <code>data-atlas</code> container. By wrapping the entire page, you can place
                 controls anywhere — in the top bar, sidebar, footer, or alongside the directory.
             </p>
+
+            <div class="tip">
+                <strong>Filter Display Attribute Summary:</strong>
+                <ul>
+                    <li><code>data-filter-radio="status"</code> — Radio buttons for the Status field</li>
+                    <li><code>data-filter-checkboxes="species,faction"</code> — Checkboxes for Species and Faction</li>
+                    <li><code>data-filter-dropdown="occupation"</code> — Dropdown for Occupation (moved via JavaScript)</li>
+                </ul>
+            </div>
 
         </div>
 
@@ -543,6 +658,7 @@
             <li><strong>Atlas provides layout classes</strong> — <code>.atlas-layout-grid</code> and <code>.atlas-layout-list</code> on the directory</li>
             <li><strong>Style member cards</strong> differently for grid vs list using these classes</li>
             <li><strong>For slide-out layouts</strong>, wrap the entire page in <code>data-atlas</code> so controls in the top bar are discovered</li>
+            <li><strong>Use <a href="/atlas-directory/docs/html-api.html#filter-display-options">Filter Display Options</a></strong> to control how each filter appears</li>
         </ul>
 
         <div class="tip">
