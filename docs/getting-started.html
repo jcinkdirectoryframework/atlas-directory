@@ -10,7 +10,7 @@
 
 <div class="docs-wrapper">
 
-    <!-- Sidebar -->
+    <!-- ─── Sidebar ─────────────────────────────────── -->
     <aside class="docs-sidebar">
         <a href="index.html" class="logo">Atlas</a>
         <span class="subtitle">HTML-driven directory engine</span>
@@ -20,15 +20,17 @@
         <a href="getting-started.html" class="active">Quick Start</a>
         <a href="html-api.html">HTML API</a>
 
-        <span class="nav-label">Guides</span>
-        <a href="architecture.html">Architecture</a>
-        <a href="css-customisation.html">CSS Customisation</a>
-
         <span class="nav-label">Installation</span>
         <a href="installation/jcink.html">JCink Setup</a>
 
         <span class="nav-label">Examples</span>
         <a href="examples/layout-examples.html">Layout Examples</a>
+
+        <span class="nav-label">Customisation</span>
+        <a href="css-customisation.html">CSS Customisation</a>
+
+        <span class="nav-label">For Developers</span>
+        <a href="architecture.html">Architecture</a>
 
         <hr>
         <a href="../index.html" class="external">← Live Demo</a>
@@ -72,6 +74,12 @@
         <h2>Step 1: Add HTML</h2>
 
         <p>Add the <code>data-atlas</code> attribute to your container, then add controls and members.</p>
+
+        <div class="tip">
+            <strong>Note:</strong> The field names in this example (name, species, occupation, etc.)
+            are just examples. You can name your fields anything that makes sense for your site —
+            "location," "interests," "rank," or any other custom data.
+        </div>
 
         <pre><code>&lt;div data-atlas&gt;
     &lt;!-- Search --&gt;
@@ -118,7 +126,7 @@
         <pre><code>&lt;link rel="stylesheet" href="path/to/atlas.css"&gt;</code></pre>
 
         <p>
-            Or copy the contents of <code>src/styles/atlas.css</code> into your own stylesheet.
+            Or copy the contents of <code>https://atlas-directory.netlify.app/atlas.css</code> into your own stylesheet.
             See <a href="css-customisation.html">CSS Customisation</a> for styling guidance.
         </p>
 
@@ -132,7 +140,7 @@
 
         <p><strong>Option B: Self-Host</strong></p>
         <pre><code>&lt;script type="module"&gt;
-    import Atlas from './dist/atlas.js';
+    import Atlas from 'PATH TO YOUR ATLAS JS FILE';
     new Atlas();
 &lt;/script&gt;</code></pre>
 

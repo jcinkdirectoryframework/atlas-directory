@@ -20,15 +20,17 @@
         <a href="getting-started.html">Quick Start</a>
         <a href="html-api.html">HTML API</a>
 
-        <span class="nav-label">Guides</span>
-        <a href="architecture.html" class="active">Architecture</a>
-        <a href="css-customisation.html">CSS Customisation</a>
-
         <span class="nav-label">Installation</span>
         <a href="installation/jcink.html">JCink Setup</a>
 
         <span class="nav-label">Examples</span>
         <a href="examples/layout-examples.html">Layout Examples</a>
+
+        <span class="nav-label">Customisation</span>
+        <a href="css-customisation.html">CSS Customisation</a>
+
+        <span class="nav-label">For Developers</span>
+        <a href="architecture.html" class="active">Architecture</a>
 
         <hr>
         <a href="../index.html" class="external">← Live Demo</a>
@@ -40,6 +42,13 @@
 
         <h1>Architecture</h1>
         <p class="page-subtitle">How Atlas works under the hood</p>
+
+        <div class="tip">
+            <strong>For Developers:</strong> This page is for those who want to understand the inner workings of Atlas.
+            If you just want to <strong>use</strong> Atlas, you can skip this and start with
+            <a href="../getting-started.html">Getting Started</a> or the
+            <a href="../installation/jcink.html">JCink Installation Guide</a>.
+        </div>
 
         <p>
             Atlas is built around an event-driven architecture with clear separation of responsibilities.
@@ -264,8 +273,8 @@ EVENTBUS (Central communication hub)
 │   ├── ResultCounter.js
 │   ├── SortGenerator.js
 │   └── LayoutManager.js
-├── adapters/                # Platform adapters
-│   └── JCinkAdapter.js
+├── adapters/                # Platform adapters (currently empty)
+│   └── JCinkAdapter.js      # (currently empty/unused)
 ├── models/                  # Data models (currently empty)
 ├── utils/                   # Utility functions
 │   └── memberGenerator.js  # Performance testing

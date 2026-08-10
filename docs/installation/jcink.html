@@ -12,26 +12,28 @@
 
     <!-- ─── Sidebar ─────────────────────────────────── -->
     <aside class="docs-sidebar">
-        <a href="../index.html" class="logo">Atlas</a>
+        <a href="index.html" class="logo">Atlas</a>
         <span class="subtitle">HTML-driven directory engine</span>
         <hr>
 
         <span class="nav-label">Getting Started</span>
-        <a href="../getting-started.html">Quick Start</a>
-        <a href="../html-api.html">HTML API</a>
-
-        <span class="nav-label">Guides</span>
-        <a href="../architecture.html">Architecture</a>
-        <a href="../css-customisation.html">CSS Customisation</a>
+        <a href="getting-started.html">Quick Start</a>
+        <a href="html-api.html">HTML API</a>
 
         <span class="nav-label">Installation</span>
-        <a href="jcink.html" class="active">JCink Setup</a>
+        <a href="installation/jcink.html" class="active">JCink Setup</a>
 
         <span class="nav-label">Examples</span>
-        <a href="../examples/layout-examples.html">Layout Examples</a>
+        <a href="examples/layout-examples.html">Layout Examples</a>
+
+        <span class="nav-label">Customisation</span>
+        <a href="css-customisation.html">CSS Customisation</a>
+
+        <span class="nav-label">For Developers</span>
+        <a href="architecture.html">Architecture</a>
 
         <hr>
-        <a href="../../index.html" class="external">← Live Demo</a>
+        <a href="../index.html" class="external">← Live Demo</a>
         <a href="https://github.com/jcinkdirectoryframework/atlas-directory" class="external">GitHub</a>
     </aside>
 
@@ -51,6 +53,106 @@
             <strong>Tip:</strong> If you're not comfortable editing templates, ask your forum administrator
             for help — the changes are simple but need to be placed in the correct templates.
         </div>
+
+        <hr>
+
+        <h2>Important: Understanding data-field and Controls</h2>
+
+        <p>
+            <strong>Read this before you start editing templates.</strong> It will save you time and prevent common mistakes.
+        </p>
+
+        <div class="tip">
+            <strong>Design Freedom:</strong> You can style your member cards and controls however you want.
+            Use any HTML structure, classes, or inline styles. The only requirement is that
+            the <code>data-</code> attributes are on the correct elements.
+        </div>
+
+        <p>
+            The <code>data-field</code> attribute is just a label for the type of data.
+            Atlas uses these labels to build filters and sort options.
+            <strong>You can name your fields anything</strong> — the examples use roleplay character fields
+            like "species" and "faceclaim." You might use "location," "interests," or any other custom data.
+        </p>
+
+        <h3>data-field — The Value Must Be Contained</h3>
+
+        <p>
+            <code>data-field</code> must be placed on the element that <strong>contains the actual value</strong>.
+            Labels, wrappers, and other display elements should <strong>not</strong> have <code>data-field</code>.
+        </p>
+
+        <h4>✅ Correct: data-field on the value element</h4>
+
+        <pre><code>&lt;div&gt;
+    &lt;strong&gt;Species:&lt;/strong&gt;
+    &lt;span data-field="species" data-sortable="true"&gt;Human&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+
+        <p>
+            <strong>Why this works:</strong> Atlas reads the value "Human" from the <code>span</code>.
+            The label "Species:" is ignored — it's just for display.
+        </p>
+
+        <h4>❌ Incorrect: data-field on a wrapper element</h4>
+
+        <pre><code>&lt;div data-field="species" data-sortable="true"&gt;
+    &lt;strong&gt;Species:&lt;/strong&gt;
+    &lt;span&gt;Human&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+
+        <div class="warning">
+            <strong>Warning:</strong> This will <strong>not</strong> work. Atlas will read the entire
+            <code>div</code> as the value, including the "Species:" label. Filters will show
+            "Species: Human" instead of just "Human".
+        </div>
+
+        <h3>Controls — Labels Go Outside Containers</h3>
+
+        <p>
+            <code>data-sort</code>, <code>data-filters</code>, and <code>data-chips</code> are
+            <strong>containers that Atlas fills with generated content</strong>.
+            Any content inside them will be <strong>overwritten</strong>.
+        </p>
+
+        <h4>✅ Correct: Labels outside the container</h4>
+
+        <pre><code>&lt;div&gt;
+    &lt;strong&gt;Sort by:&lt;/strong&gt;
+    &lt;div data-sort&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+        <h4>❌ Incorrect: Labels inside the container</h4>
+
+        <pre><code>&lt;div data-sort&gt;
+    &lt;strong&gt;Sort by:&lt;/strong&gt;
+&lt;/div&gt;</code></pre>
+
+        <div class="warning">
+            <strong>Warning:</strong> Content inside <code>data-sort</code>, <code>data-filters</code>,
+            and <code>data-chips</code> will be <strong>removed</strong> when Atlas generates the controls.
+            Always place labels <strong>outside</strong> these containers.
+        </div>
+
+        <h3>Key Points to Remember</h3>
+
+        <ul>
+            <li><code>data-field</code> goes on the element containing the <strong>value</strong>, not on a wrapper</li>
+            <li><code>data-sort</code>, <code>data-filters</code>, and <code>data-chips</code> are <strong>containers</strong> — Atlas replaces everything inside them</li>
+            <li>Labels must be placed <strong>outside</strong> these containers</li>
+            <li>You can style your member cards and controls however you want</li>
+            <li><strong>Fields are filterable by default</strong> — use <code>data-filterable="false"</code> to opt out</li>
+        </ul>
+
+        <p>
+            For a complete reference of all available attributes, see the
+            <a href="../html-api.html">HTML API Reference</a>.
+        </p>
+
+        <p>
+            For different ways to arrange your directory, see the
+            <a href="../examples/layout-examples.html">Layout Examples</a>.
+        </p>
 
         <hr>
 
@@ -103,7 +205,7 @@
         <p>Add this to your <strong>Member List Header</strong> template:</p>
 
         <pre><code>&lt;!-- CSS — link to the Atlas core styles --&gt;
-&lt;link rel="stylesheet" href="https://yourforum.jcink.net/uploads/atlas/atlas.css"&gt;
+&lt;link rel="stylesheet" href="YOUR ATLAS CSS FILE HERE"&gt;
 
 &lt;!-- HTML — your Atlas directory --&gt;
 &lt;div data-atlas&gt;
@@ -122,7 +224,7 @@
 
 &lt;!-- JavaScript — import and initialise Atlas --&gt;
 &lt;script type="module"&gt;
-    import Atlas from 'https://yourforum.jcink.net/uploads/atlas/src/core/Atlas.js';
+    import Atlas from 'YOUR ATLAS JS FILE HERE';
     new Atlas();
 &lt;/script&gt;</code></pre>
 
@@ -139,6 +241,12 @@
             In your JCink ACP, navigate to: <strong>Manage Templates → Member List</strong>
         </p>
 
+        <div class="tip">
+            <strong>Before you start:</strong> Back up your existing templates first!
+            If you've already customised your Member List Header and Row templates, save a copy
+            of the current code before replacing it.
+        </div>
+
         <p>You'll need to edit two templates:</p>
         <ul>
             <li><strong>Member List Header</strong> — The top of the member list</li>
@@ -154,7 +262,7 @@
             This sets up the Atlas container, controls, and directory wrapper.
         </p>
 
-        <pre><code>&lt;!-- CSS — link to Atlas styles (adjust path as needed) --&gt;
+        <pre><code>&lt;!-- CSS — link to Atlas styles (use your own link if you are self-hosting) --&gt;
 &lt;link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css"&gt;
 
 &lt;div data-atlas&gt;
@@ -182,7 +290,7 @@
 
 &lt;/div&gt;
 
-&lt;!-- JavaScript — import and initialise Atlas --&gt;
+&lt;!-- JavaScript — import and initialise Atlas (use your own link if you are self-hosting) --&gt;
 &lt;script type="module"&gt;
     import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
     new Atlas();
@@ -196,6 +304,8 @@
             Replace the contents of your <strong>Member List Row</strong> template with this code.
             This defines how each member card is displayed.
         </p>
+
+        <h3>Full Example (with Labels)</h3>
 
         <pre><code>&lt;article data-member&gt;
 
@@ -233,16 +343,16 @@
 
     &lt;!-- Faction — Filterable &amp; Sortable --&gt;
     &lt;div&gt;
-        &lt;strong&gt;Faction:&lt;/strong&gt;
-        &lt;span data-field="faction" data-sortable="true"&gt;
+        &lt;strong&gt;Affiliation:&lt;/strong&gt;
+        &lt;span data-field="affiliation" data-sortable="true"&gt;
             &lt;!-- |field_#| --&gt;
         &lt;/span&gt;
     &lt;/div&gt;
 
     &lt;!-- Homeworld — Filterable &amp; Sortable --&gt;
     &lt;div&gt;
-        &lt;strong&gt;Homeworld:&lt;/strong&gt;
-        &lt;span data-field="homeworld" data-sortable="true"&gt;
+        &lt;strong&gt;Hometown:&lt;/strong&gt;
+        &lt;span data-field="hometown" data-searchable="true" data-sortable="true" data-filterable="false"&gt;
             &lt;!-- |field_#| --&gt;
         &lt;/span&gt;
     &lt;/div&gt;
@@ -255,31 +365,53 @@
         &lt;/span&gt;
     &lt;/div&gt;
 
+    &lt;!-- Author — Filterable &amp; Sortable --&gt;
+    &lt;div&gt;
+        &lt;strong&gt;Author:&lt;/strong&gt;
+        &lt;span data-field="author" data-sortable="true"&gt;
+            &lt;!-- |field_#| --&gt;
+        &lt;/span&gt;
+    &lt;/div&gt;
+
 &lt;/article&gt;</code></pre>
 
-        <hr>
-
-        <h2>Important: Understanding data-field and Controls</h2>
+        <h3>Compact Example (No Labels)</h3>
 
         <p>
-            Before you start customising your member cards, it's important to understand how
-            <code>data-field</code> and control containers work. This applies to <strong>all</strong>
-            Atlas installations, not just JCink.
+            If you prefer a more compact layout without labels, here's a simpler version:
         </p>
 
-        <p>
-            <a href="../html-api.html#understanding-data-field-and-controls">→ Read the full explanation in the HTML API Reference</a>
-        </p>
+        <pre><code>&lt;article data-member&gt;
+    &lt;div data-field="name" data-searchable="true" data-sortable="true" data-filterable="false"&gt;
+        &lt;!-- |name| --&gt;
+    &lt;/div&gt;
+    &lt;div data-field="faceclaim" data-searchable="true" data-sortable="true" data-filterable="false"&gt;
+        &lt;!-- |field_#| --&gt;
+    &lt;/div&gt;
+    &lt;div data-field="species" data-sortable="true"&gt;
+        &lt;!-- |field_#| --&gt;
+    &lt;/div&gt;
+    &lt;div data-field="occupation" data-searchable="true" data-sortable="true"&gt;
+        &lt;!-- |field_#| --&gt;
+    &lt;/div&gt;
+    &lt;div data-field="affiliation" data-sortable="true"&gt;
+        &lt;!-- |field_#| --&gt;
+    &lt;/div&gt;
+    &lt;div data-field="hometown" data-searchable="true" data-sortable="true" data-filterable="false"&gt;
+        &lt;!-- |field_#| --&gt;
+    &lt;/div&gt;
+    &lt;div data-field="status" data-sortable="true"&gt;
+        &lt;!-- |field_#| --&gt;
+    &lt;/div&gt;
+    &lt;div data-field="author" data-sortable="true"&gt;
+        &lt;!-- |field_#| --&gt;
+    &lt;/div&gt;
+&lt;/article&gt;</code></pre>
 
-        <p>
-            <strong>Key points:</strong>
-        </p>
-        <ul>
-            <li><code>data-field</code> goes on the element containing the <strong>value</strong>, not on a wrapper</li>
-            <li><code>data-sort</code>, <code>data-filters</code>, and <code>data-chips</code> are <strong>containers</strong> — Atlas replaces everything inside them</li>
-            <li>Labels must be placed <strong>outside</strong> these containers</li>
-            <li>You can style your member cards and controls however you want</li>
-        </ul>
+        <div class="tip">
+            <strong>Tip:</strong> You can choose either format — or create your own. The only rule is:
+            <code>data-field</code> goes on the element that contains the value.
+        </div>
 
         <hr>
 
@@ -287,19 +419,8 @@
 
         <p>
             Replace each <code>&lt;!-- |field_#| --&gt;</code> placeholder with your actual JCink
-            field variables. Here's how to find them:
+            field variables.
         </p>
-
-        <table>
-            <tr><th>Semantic Field</th><th>JCink Variable</th><th>Description</th></tr>
-            <tr><td><code>name</code></td><td><code>&lt;!-- |name| --&gt;</code></td><td>Member's display name (already available in JCink)</td></tr>
-            <tr><td><code>faceclaim</code></td><td><code>&lt;!-- |field_1| --&gt;</code></td><td>Face claim (actor name)</td></tr>
-            <tr><td><code>species</code></td><td><code>&lt;!-- |field_2| --&gt;</code></td><td>Species (e.g., Human, Togruta)</td></tr>
-            <tr><td><code>occupation</code></td><td><code>&lt;!-- |field_3| --&gt;</code></td><td>Occupation (e.g., Bounty Hunter, Jedi)</td></tr>
-            <tr><td><code>faction</code></td><td><code>&lt;!-- |field_4| --&gt;</code></td><td>Faction (e.g., Mandalorian, Rebellion)</td></tr>
-            <tr><td><code>homeworld</code></td><td><code>&lt;!-- |field_5| --&gt;</code></td><td>Homeworld (e.g., Aq Vetina, Shili)</td></tr>
-            <tr><td><code>status</code></td><td><code>&lt;!-- |field_6| --&gt;</code></td><td>Status (e.g., Active, Inactive, Unknown)</td></tr>
-        </table>
 
         <p>
             The field numbers (<code>field_1</code>, <code>field_2</code>, etc.) correspond to
@@ -311,6 +432,86 @@
             <strong>Tip:</strong> You can use any semantic field names you like —
             Atlas doesn't care what you call them. Just make sure the <code>data-field</code>
             attribute matches what you use in your HTML.
+        </div>
+
+        <hr>
+
+        <h2>Step 5: Add Custom CSS (Optional)</h2>
+
+        <p>
+            Atlas provides minimal core CSS. To make your directory look polished, you'll want to add custom styles.
+        </p>
+
+        <h3>Where to Add Your CSS</h3>
+
+        <p>
+            In JCink, you have two options:
+        </p>
+
+        <ul>
+            <li>
+                <strong>Option A: Add to your forum's global CSS</strong> — Go to your JCink ACP →
+                <strong>Skins & Templates → Style Sheets</strong> and add your custom styles into the right stylesheet for your skin.
+                This applies the styles to your entire forum.
+            </li>
+            <li>
+                <strong>Option B: Add to the Member List Header</strong> — If you only want the styles to apply
+                to your member list, you can add a <code>&lt;style&gt;</code> block directly in the
+                Member List Header template.
+            </li>
+        </ul>
+
+        <div class="tip">
+            <strong>Tip:</strong> If you're using Option A (global CSS) and want to completely replace the
+            default Atlas styles, you can remove the <code>atlas.min.css</code> link from your Member List Header
+            and copy the contents into your global CSS instead. You can find and copy the full CSS file <a href="https://atlas-directory.netlify.app/atlas.css">here</a>.
+        </div>
+
+        <p>
+            See the <a href="../css-customisation.html">CSS Customisation Guide</a> for styling guidance
+            and ready-to-use CSS examples.
+        </p>
+
+        <hr>
+
+        <h2>Step 6: Test Your Installation</h2>
+
+        <p>
+            After saving your templates, it's time to verify that Atlas is working correctly.
+        </p>
+
+        <h3>Quick Test</h3>
+
+        <ol>
+            <li><strong>Visit your member list page</strong> — For example, your forum's member list URL:
+                <code>https://yourforum.jcink.net/index.php?act=Members&max_results=1000</code></li>
+            <li><strong>Check for the search bar</strong> — You should see a search input field at the top</li>
+            <li><strong>Check for filters</strong> — You should see filter options for your fields (Species, Affiliation, Status, etc.)</li>
+            <li><strong>Check for sort buttons</strong> — You should see sort options (Name, Species, Occupation, etc.)</li>
+            <li><strong>Check member cards</strong> — Your members should appear in a grid or list layout</li>
+            <li><strong>Test functionality</strong>:
+                <ul>
+                    <li>Try searching for a member name</li>
+                    <li>Try clicking a filter option</li>
+                    <li>Try clicking a sort button</li>
+                    <li>Check that filter chips appear when filters are active</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>If Something Isn't Working</h3>
+
+        <ul>
+            <li><strong>Open your browser's console</strong> (F12 → Console tab) and check for errors</li>
+            <li><strong>Check that the CDN links are correct</strong> — the CSS and JavaScript should load</li>
+            <li><strong>Check that <code>&lt;% MEMBERLIST_ROWS %&gt;</code></strong> is in your Member List Header</li>
+            <li><strong>Check that your Member List Row</strong> template has the correct field variables</li>
+            <li><strong>Make sure you have at least one member</strong> with data in your custom fields</li>
+        </ul>
+
+        <div class="tip">
+            <strong>Tip:</strong> If you're having issues, check the <a href="#troubleshooting">Troubleshooting</a>
+            section below.
         </div>
 
         <hr>
@@ -327,7 +528,6 @@
         <h3>Filters don't appear</h3>
         <ul>
             <li>Ensure <code>&lt;div data-filters&gt;&lt;/div&gt;</code> is in your Member List Header</li>
-            <li>Check that at least one field has <code>data-filterable="true"</code> (or omitted, since true is default)</li>
         </ul>
 
         <h3>Search doesn't work</h3>
