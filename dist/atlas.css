@@ -10,13 +10,17 @@
  * https://github.com/jcinkdirectoryframework/atlas-directory
  *
  * This is the minimal CSS required for Atlas to function.
+ * It is deliberately theme-agnostic — all colours use currentColor
+ * so they adapt to your site's theme.
+ *
  * It provides:
  * - Loading state (prevent flicker)
  * - Visibility toggles
  * - Layout container classes (grid/list)
- * - Focus states (accessibility)
+ * - Focus states (accessibility) — uses currentColor
  * - Reduced motion support (accessibility)
  * - Generic mobile optimisations (touch targets, iOS zoom prevention)
+ * - Filter display options (dropdowns, checkboxes, radio buttons) — uses currentColor
  *
  * All visual styling (buttons, chips, filters, member cards, etc.)
  * should be provided by the user.
@@ -25,7 +29,7 @@
  * should be provided by the user in their own CSS.
  */
 
-/* ─── Loading State ────────────────────────────────── */
+/* Loading State */
 
 /* Hide directory while Atlas is loading */
 [data-atlas-loading] [data-directory] {
@@ -39,7 +43,7 @@
     transition: opacity 0.2s ease;
 }
 
-/* ─── Visibility ──────────────────────────────────── */
+/* Visibility */
 
 /* Hidden members — supports both [hidden] and [data-hidden] */
 [data-member][hidden],
@@ -47,7 +51,7 @@
     display: none !important;
 }
 
-/* ─── Layout Containers ───────────────────────────── */
+/* Layout Containers */
 
 /* Grid layout (default) — generic responsive */
 [data-directory].atlas-layout-grid {
@@ -78,45 +82,48 @@
     gap: 0.5rem;
 }
 
-/* ─── Focus States (Accessibility) ────────────────── */
+/* Focus States (Accessibility) — Theme-Aware */
 
-/* Keyboard-only focus indicator */
+/* Keyboard-only focus indicator — uses current text colour */
 [data-atlas] button:focus-visible,
 [data-atlas] .atlas-chip:focus-visible,
-[data-atlas] [data-search]:focus-visible {
-    outline: 2px solid #2563eb;
+[data-atlas] [data-search]:focus-visible,
+[data-atlas] select:focus-visible,
+[data-atlas] input[type="checkbox"]:focus-visible,
+[data-atlas] input[type="radio"]:focus-visible {
+    outline: 2px solid currentColor;
     outline-offset: 2px;
 }
 
 /* Focus ring for filter buttons */
 [data-filter-options] button:focus-visible {
-    outline: 2px solid #2563eb;
+    outline: 2px solid currentColor;
     outline-offset: 2px;
     border-radius: 4px;
 }
 
 /* Focus ring for sort buttons */
 [data-sort] button:focus-visible {
-    outline: 2px solid #2563eb;
+    outline: 2px solid currentColor;
     outline-offset: 2px;
     border-radius: 4px;
 }
 
 /* Focus ring for chips */
 .atlas-chip:focus-visible {
-    outline: 2px solid #2563eb;
+    outline: 2px solid currentColor;
     outline-offset: 2px;
     border-radius: 4px;
 }
 
 /* Focus ring for Clear All button */
 .atlas-clear-all:focus-visible {
-    outline: 2px solid #2563eb;
+    outline: 2px solid currentColor;
     outline-offset: 2px;
     border-radius: 4px;
 }
 
-/* ─── Reduced Motion (Accessibility) ──────────────── */
+/* Reduced Motion (Accessibility) */
 
 @media (prefers-reduced-motion: reduce) {
 
@@ -143,12 +150,13 @@
 
 }
 
-/* ─── Generic Mobile Optimisations ────────────────── */
+/* Generic Mobile Optimisations */
 
 /* Ensure all interactive elements have minimum tap target size */
 [data-atlas] button,
 [data-atlas] .atlas-chip,
-[data-atlas] [data-search] {
+[data-atlas] [data-search],
+[data-atlas] select {
     min-height: 44px;
     min-width: 44px;
 }
@@ -176,7 +184,64 @@
     min-height: 44px;
 }
 
-/* ─── Generic Mobile Controls Stacking ────────────── */
+/* Filter Display Options — Theme-Aware */
+
+/* Dropdown filters — uses currentColor for border and focus */
+[data-filter-select] {
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 6px;
+    background: transparent;
+    font-size: 0.9rem;
+    font-family: inherit;
+    min-width: 140px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    color: currentColor;
+}
+
+[data-filter-select]:hover {
+    border-color: currentColor;
+    opacity: 0.7;
+}
+
+[data-filter-select]:focus {
+    outline: none;
+    border-color: currentColor;
+    box-shadow: 0 0 0 3px rgba(128, 128, 128, 0.15);
+}
+
+/* Checkbox and Radio filter options — uses currentColor for accent */
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.2rem 0;
+    padding: 0.15rem 0;
+}
+
+.filter-option input[type="checkbox"],
+.filter-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: currentColor;
+    flex-shrink: 0;
+}
+
+.filter-option label {
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: currentColor;
+    font-weight: 400;
+    opacity: 0.7;
+}
+
+.filter-option label:hover {
+    opacity: 1;
+}
+
+/* Generic Mobile Controls Stacking */
 
 /* On small screens, filters stack vertically */
 @media (max-width: 640px) {
@@ -245,9 +310,27 @@
         font-size: 16px; /* Prevents iOS zoom on focus */
         padding: 0.4rem 0.8rem;
     }
+
+    /* Dropdown on mobile */
+    [data-filter-select] {
+        font-size: 0.85rem;
+        min-width: auto;
+        width: 100%;
+    }
+
+    /* Checkbox/Radio options on mobile */
+    .filter-option {
+        padding: 0.1rem 0;
+    }
+
+    .filter-option input[type="checkbox"],
+    .filter-option input[type="radio"] {
+        width: 20px;
+        height: 20px;
+    }
 }
 
-/* ─── Prevent iOS Zoom on Focus ────────────────────── */
+/* Prevent iOS Zoom on Focus */
 
 /* Inputs should be at least 16px font size to prevent iOS zoom */
 [data-search] {

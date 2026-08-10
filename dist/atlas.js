@@ -11,12 +11,11 @@
  *
  * https://github.com/jcinkdirectoryframework/atlas-directory
  *
- * ─── This is a bundled, self-contained version of Atlas ───
+ * This is a bundled, self-contained version of Atlas.
  * All code is included in this single file — no external imports.
  */
 
-// ─── Member Class ─────────────────────────────────────
-
+// Member Class
 class Member {
     #id;
     #element;
@@ -120,8 +119,7 @@ class Member {
     }
 }
 
-// ─── MemberCollection Class ──────────────────────────
-
+// MemberCollection Class
 class MemberCollection {
     #members = new Map();
     #allFieldNames = null;
@@ -286,8 +284,7 @@ class MemberCollection {
     }
 }
 
-// ─── Registry Class ──────────────────────────────────
-
+// Registry Class
 class Registry {
     #root;
     #directory = null;
@@ -381,8 +378,7 @@ class Registry {
     }
 }
 
-// ─── EventBus Class ──────────────────────────────────
-
+// EventBus Class
 class EventBus {
     #subscribers = new Map();
     #debug = false;
@@ -519,8 +515,7 @@ class EventBus {
     }
 }
 
-// ─── Store Class ─────────────────────────────────────
-
+// Store Class
 class Store {
     #state = {
         filters: {},
@@ -713,8 +708,167 @@ class Store {
     }
 }
 
-// ─── Renderer Class ──────────────────────────────────
+// URLManager Class
+class URLManager {
+    #store = null;
+    #events = null;
+    #updateTimeout = null;
+    #isRestoring = false;
 
+    constructor({ store, events }) {
+        if (!store) throw new Error('URLManager requires a Store');
+        if (!events) throw new Error('URLManager requires an EventBus');
+
+        this.#store = store;
+        this.#events = events;
+        this.#restoreFromURL();
+        this.#subscribeToEvents();
+    }
+
+    #subscribeToEvents() {
+        this.#events.subscribe('store:filtersChanged', () => {
+            this.#updateURL();
+        });
+        this.#events.subscribe('store:searchChanged', () => {
+            this.#updateURL();
+        });
+        this.#events.subscribe('store:sortChanged', () => {
+            this.#updateURL();
+        });
+    }
+
+    #restoreFromURL() {
+        this.#isRestoring = true;
+        const params = new URLSearchParams(window.location.search);
+        const reserved = ['act', 'max_results', 'sort_key', 'sort_order', 'page'];
+        const filterParams = {};
+
+        for (const [key, value] of params) {
+            if (!reserved.includes(key) && value && value.trim()) {
+                if (filterParams[key]) {
+                    if (Array.isArray(filterParams[key])) {
+                        filterParams[key].push(value);
+                    } else {
+                        filterParams[key] = [filterParams[key], value];
+                    }
+                } else {
+                    filterParams[key] = value;
+                }
+            }
+        }
+
+        const filters = {};
+        for (const [field, value] of Object.entries(filterParams)) {
+            if (Array.isArray(value)) {
+                filters[field] = value;
+            } else {
+                filters[field] = [value];
+            }
+        }
+
+        if (Object.keys(filters).length > 0) {
+            for (const [field, values] of Object.entries(filters)) {
+                for (const value of values) {
+                    this.#store.toggleFilter(field, value);
+                }
+            }
+        }
+
+        const sortKey = params.get('sort_key');
+        const sortOrder = params.get('sort_order');
+        if (sortKey && sortKey !== 'name') {
+            const direction = sortOrder === 'asc' ? 'asc' : 'desc';
+            this.#store.setSort(sortKey, direction);
+        }
+
+        this.#isRestoring = false;
+    }
+
+    #updateURL() {
+        if (this.#isRestoring) return;
+        if (this.#updateTimeout) {
+            clearTimeout(this.#updateTimeout);
+        }
+        this.#updateTimeout = setTimeout(() => {
+            this.#updateTimeout = null;
+            this.#doUpdateURL();
+        }, 100);
+    }
+
+    #doUpdateURL() {
+        const params = new URLSearchParams();
+        const filters = this.#store.filters;
+
+        for (const [field, values] of Object.entries(filters)) {
+            if (values && values.length > 0) {
+                for (const value of values) {
+                    params.append(field, value);
+                }
+            }
+        }
+
+        const sort = this.#store.sort;
+        if (sort && sort.field) {
+            params.set('sort_key', sort.field);
+            params.set('sort_order', sort.direction);
+        }
+
+        const currentParams = new URLSearchParams(window.location.search);
+        const preserve = ['act', 'max_results'];
+        for (const key of preserve) {
+            if (currentParams.has(key)) {
+                params.set(key, currentParams.get(key));
+            }
+        }
+
+        const queryString = params.toString();
+        const newURL = queryString
+            ? window.location.pathname + '?' + queryString + window.location.hash
+            : window.location.pathname + window.location.hash;
+
+        window.history.pushState({}, '', newURL);
+    }
+
+    getParam(key) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(key);
+    }
+
+    hasParam(key) {
+        const params = new URLSearchParams(window.location.search);
+        return params.has(key);
+    }
+}
+
+// JCinkAdapter Class
+class JCinkAdapter {
+    static isMemberList() {
+        const url = window.location.href;
+        return url.includes('act=Members');
+    }
+
+    static ensureMaxResults() {
+        if (!this.isMemberList()) return;
+        const url = new URL(window.location.href);
+        const params = url.searchParams;
+
+        if (params.has('max_results')) {
+            const currentValue = params.get('max_results');
+            if (currentValue === '1000') return;
+            params.set('max_results', '1000');
+        } else {
+            params.set('max_results', '1000');
+        }
+
+        window.location.replace(url.toString());
+    }
+
+    static apply() {
+        this.ensureMaxResults();
+    }
+}
+
+// Renderer Class
 class Renderer {
     #registry = null;
     #memberCollection = null;
@@ -1206,14 +1360,20 @@ class Renderer {
     }
 }
 
-// ─── FilterGenerator Module ─────────────────────────
-
+// FilterGenerator Module
 class FilterGenerator {
     #container;
     #memberCollection;
     #store;
     #events;
     #fieldFilterMap = new Map();
+    #displayOptions = {
+        radio: [],
+        checkboxes: [],
+        buttons: [],
+        dropdown: []
+    };
+    #displayTypeOrder = [];
 
     constructor(container, memberCollection, store, events) {
         if (!container) throw new Error('FilterGenerator requires a container element');
@@ -1226,10 +1386,86 @@ class FilterGenerator {
         this.#store = store;
         this.#events = events;
 
+        this.#readDisplayOptions();
         this.#generate();
         this.#events.subscribe('store:filtersChanged', () => {
             this.syncWithStore();
         });
+    }
+
+    #readDisplayOptions() {
+        const parseList = (attr) => {
+            if (attr && attr.trim()) {
+                return attr.split(',').map(s => s.trim()).filter(s => s);
+            }
+            return [];
+        };
+
+        const radio = parseList(this.#container.dataset.filterRadio);
+        const checkboxes = parseList(this.#container.dataset.filterCheckboxes);
+        const buttons = parseList(this.#container.dataset.filterButtons);
+        const dropdown = parseList(this.#container.dataset.filterDropdown);
+
+        this.#displayOptions = { radio, checkboxes, buttons, dropdown };
+
+        this.#displayTypeOrder = [];
+        const datasetKeys = Object.keys(this.#container.dataset);
+        const attributeMap = {
+            filterRadio: 'radio',
+            filterCheckboxes: 'checkboxes',
+            filterButtons: 'buttons',
+            filterDropdown: 'dropdown'
+        };
+
+        for (const key of datasetKeys) {
+            if (attributeMap[key]) {
+                const type = attributeMap[key];
+                const fields = this.#displayOptions[type] || [];
+                if (fields.length > 0 && !this.#displayTypeOrder.includes(type)) {
+                    this.#displayTypeOrder.push(type);
+                }
+            }
+        }
+
+        const defaultOrder = ['radio', 'checkboxes', 'buttons', 'dropdown'];
+        for (const type of defaultOrder) {
+            const fields = this.#displayOptions[type] || [];
+            if (fields.length > 0 && !this.#displayTypeOrder.includes(type)) {
+                this.#displayTypeOrder.push(type);
+            }
+        }
+    }
+
+    #getDisplayType(fieldName) {
+        if (this.#displayOptions.radio.includes(fieldName)) return 'radio';
+        if (this.#displayOptions.checkboxes.includes(fieldName)) return 'checkboxes';
+        if (this.#displayOptions.buttons.includes(fieldName)) return 'buttons';
+        if (this.#displayOptions.dropdown.includes(fieldName)) return 'dropdown';
+        return 'buttons';
+    }
+
+    #getDisplayOrder(filterableFields) {
+        const orderedFields = [];
+        const processedFields = new Set();
+
+        for (const type of this.#displayTypeOrder) {
+            const fields = this.#displayOptions[type] || [];
+            for (const field of fields) {
+                if (filterableFields.includes(field) && !processedFields.has(field)) {
+                    orderedFields.push({ field, type });
+                    processedFields.add(field);
+                }
+            }
+        }
+
+        for (const field of filterableFields) {
+            if (!processedFields.has(field)) {
+                orderedFields.push({ field, type: 'buttons' });
+                processedFields.add(field);
+            }
+        }
+
+        return orderedFields;
     }
 
     #generate() {
@@ -1239,22 +1475,18 @@ class FilterGenerator {
             this.#container.innerHTML = '<p>No filterable fields found.</p>';
             return;
         }
-        for (const fieldName of filterableFields) {
-            this.#createFilterForField(fieldName);
+
+        const displayOrder = this.#getDisplayOrder(filterableFields);
+        for (const { field, type } of displayOrder) {
+            this.#createFilterForField(field, type);
         }
         this.syncWithStore();
     }
 
-    #createFilterForField(fieldName) {
-        // Get unique raw values (preserving original casing)
+    #createFilterForField(fieldName, displayType) {
         const rawValues = this.#memberCollection.getUniqueValues(fieldName);
+        if (rawValues.length === 0) return;
 
-        // Skip fields with no values
-        if (rawValues.length === 0) {
-            return;
-        }
-
-        // Build a map of normalized → raw (using the first occurrence)
         const displayMap = new Map();
         const allMembers = this.#memberCollection.getAll();
 
@@ -1268,13 +1500,8 @@ class FilterGenerator {
             }
         }
 
-        // Get sorted list of normalized keys
         const sortedKeys = Array.from(displayMap.keys()).sort((a, b) => a.localeCompare(b));
-
-        // If no values after normalisation, skip
-        if (sortedKeys.length === 0) {
-            return;
-        }
+        if (sortedKeys.length === 0) return;
 
         const group = document.createElement('div');
         group.dataset.filter = '';
@@ -1286,6 +1513,25 @@ class FilterGenerator {
         label.textContent = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
         group.appendChild(label);
 
+        switch (displayType) {
+            case 'dropdown':
+                this.#createDropdownFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+            case 'checkboxes':
+                this.#createCheckboxFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+            case 'radio':
+                this.#createRadioFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+            default:
+                this.#createButtonFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+        }
+
+        this.#container.appendChild(group);
+    }
+
+    #createButtonFilter(fieldName, group, displayMap, sortedKeys) {
         const optionsContainer = document.createElement('div');
         optionsContainer.dataset.filterOptions = '';
         optionsContainer.setAttribute('role', 'toolbar');
@@ -1302,13 +1548,10 @@ class FilterGenerator {
         optionsContainer.appendChild(allButton);
 
         const valueButtons = [];
-
         for (const normalizedKey of sortedKeys) {
             const displayValue = displayMap.get(normalizedKey);
             const button = document.createElement('button');
-            // Store the normalized value for filtering (case-insensitive)
             button.dataset.value = normalizedKey;
-            // Display the raw value (preserving original casing)
             button.textContent = displayValue;
             button.type = 'button';
             button.setAttribute('role', 'button');
@@ -1319,19 +1562,188 @@ class FilterGenerator {
         }
 
         group.appendChild(optionsContainer);
-        this.#container.appendChild(group);
-
         this.#fieldFilterMap.set(fieldName, {
             container: group,
             allButton: allButton,
             valueButtons: valueButtons,
+            type: 'buttons',
             displayMap: displayMap
         });
-
-        this.#attachEvents(fieldName, allButton, valueButtons);
+        this.#attachButtonEvents(fieldName, allButton, valueButtons);
     }
 
-    #attachEvents(fieldName, allButton, valueButtons) {
+    #createDropdownFilter(fieldName, group, displayMap, sortedKeys) {
+        const select = document.createElement('select');
+        select.dataset.filterSelect = '';
+        select.setAttribute('aria-label', `Filter by ${fieldName}`);
+
+        const allOption = document.createElement('option');
+        allOption.value = 'all';
+        allOption.textContent = 'Show All';
+        select.appendChild(allOption);
+
+        for (const normalizedKey of sortedKeys) {
+            const displayValue = displayMap.get(normalizedKey);
+            const option = document.createElement('option');
+            option.value = normalizedKey;
+            option.textContent = displayValue;
+            select.appendChild(option);
+        }
+
+        group.appendChild(select);
+
+        select.addEventListener('change', () => {
+            const value = select.value;
+            if (value === 'all') {
+                this.#store.clearFieldFilters(fieldName);
+            } else {
+                this.#store.clearFieldFilters(fieldName);
+                this.#store.toggleFilter(fieldName, value);
+            }
+        });
+
+        this.#fieldFilterMap.set(fieldName, {
+            container: group,
+            element: select,
+            type: 'dropdown',
+            displayMap: displayMap
+        });
+    }
+
+    #createCheckboxFilter(fieldName, group, displayMap, sortedKeys) {
+        const optionsContainer = document.createElement('div');
+        optionsContainer.dataset.filterOptions = '';
+        optionsContainer.setAttribute('role', 'group');
+        optionsContainer.setAttribute('aria-label', `${fieldName} filter options`);
+
+        const allWrapper = document.createElement('div');
+        allWrapper.className = 'filter-option';
+        const allCheckbox = document.createElement('input');
+        allCheckbox.type = 'checkbox';
+        allCheckbox.id = `${fieldName}-filter-all`;
+        allCheckbox.checked = true;
+        allCheckbox.value = 'all';
+        allCheckbox.setAttribute('aria-label', `Show all ${fieldName} values`);
+        const allLabel = document.createElement('label');
+        allLabel.htmlFor = `${fieldName}-filter-all`;
+        allLabel.textContent = 'Show All';
+        allWrapper.appendChild(allCheckbox);
+        allWrapper.appendChild(allLabel);
+        optionsContainer.appendChild(allWrapper);
+
+        const valueCheckboxes = [];
+
+        for (const normalizedKey of sortedKeys) {
+            const displayValue = displayMap.get(normalizedKey);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'filter-option';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `${fieldName}-filter-${normalizedKey.replace(/[^a-z0-9]/g, '')}`;
+            checkbox.value = normalizedKey;
+            checkbox.setAttribute('aria-label', `Filter by ${fieldName}: ${displayValue}`);
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = displayValue;
+            wrapper.appendChild(checkbox);
+            wrapper.appendChild(label);
+            optionsContainer.appendChild(wrapper);
+            valueCheckboxes.push(checkbox);
+
+            checkbox.addEventListener('change', () => {
+                allCheckbox.checked = false;
+                const checkedBoxes = optionsContainer.querySelectorAll('input[type="checkbox"]:checked:not([value="all"])');
+                if (checkedBoxes.length === 0) {
+                    allCheckbox.checked = true;
+                    this.#store.clearFieldFilters(fieldName);
+                } else {
+                    this.#store.clearFieldFilters(fieldName);
+                    for (const cb of checkedBoxes) {
+                        this.#store.toggleFilter(fieldName, cb.value);
+                    }
+                }
+            });
+        }
+
+        allCheckbox.addEventListener('change', () => {
+            if (allCheckbox.checked) {
+                for (const cb of valueCheckboxes) {
+                    cb.checked = false;
+                }
+                this.#store.clearFieldFilters(fieldName);
+            }
+        });
+
+        group.appendChild(optionsContainer);
+
+        this.#fieldFilterMap.set(fieldName, {
+            container: group,
+            element: optionsContainer,
+            type: 'checkboxes',
+            displayMap: displayMap,
+            allCheckbox: allCheckbox,
+            valueCheckboxes: valueCheckboxes
+        });
+    }
+
+    #createRadioFilter(fieldName, group, displayMap, sortedKeys) {
+        const optionsContainer = document.createElement('div');
+        optionsContainer.dataset.filterOptions = '';
+        optionsContainer.setAttribute('role', 'radiogroup');
+        optionsContainer.setAttribute('aria-label', `${fieldName} filter options`);
+
+        const allWrapper = document.createElement('div');
+        allWrapper.className = 'filter-option';
+        const allRadio = document.createElement('input');
+        allRadio.type = 'radio';
+        allRadio.name = `${fieldName}-filter`;
+        allRadio.id = `${fieldName}-filter-all`;
+        allRadio.checked = true;
+        allRadio.value = 'all';
+        allRadio.setAttribute('aria-label', `Show all ${fieldName} values`);
+        const allLabel = document.createElement('label');
+        allLabel.htmlFor = `${fieldName}-filter-all`;
+        allLabel.textContent = 'Show All';
+        allWrapper.appendChild(allRadio);
+        allWrapper.appendChild(allLabel);
+        optionsContainer.appendChild(allWrapper);
+
+        for (const normalizedKey of sortedKeys) {
+            const displayValue = displayMap.get(normalizedKey);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'filter-option';
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = `${fieldName}-filter`;
+            radio.id = `${fieldName}-filter-${normalizedKey.replace(/[^a-z0-9]/g, '')}`;
+            radio.value = normalizedKey;
+            radio.setAttribute('aria-label', `Filter by ${fieldName}: ${displayValue}`);
+            const label = document.createElement('label');
+            label.htmlFor = radio.id;
+            label.textContent = displayValue;
+            wrapper.appendChild(radio);
+            wrapper.appendChild(label);
+            optionsContainer.appendChild(wrapper);
+
+            radio.addEventListener('change', () => {
+                if (radio.checked) {
+                    this.#store.clearFieldFilters(fieldName);
+                    this.#store.toggleFilter(fieldName, radio.value);
+                }
+            });
+        }
+
+        group.appendChild(optionsContainer);
+
+        this.#fieldFilterMap.set(fieldName, {
+            container: group,
+            element: optionsContainer,
+            type: 'radio',
+            displayMap: displayMap
+        });
+    }
+
+    #attachButtonEvents(fieldName, allButton, valueButtons) {
         allButton.addEventListener('click', () => {
             this.#handleAllClick(fieldName);
         });
@@ -1359,45 +1771,27 @@ class FilterGenerator {
 
     #handleAllClick(fieldName) {
         this.#store.clearFieldFilters(fieldName);
-        this.#updateAllButtonState(fieldName);
         const fieldData = this.#fieldFilterMap.get(fieldName);
-        if (fieldData) {
+        if (fieldData && fieldData.type === 'buttons' && fieldData.valueButtons) {
             for (const button of fieldData.valueButtons) {
                 button.classList.remove('active');
                 button.setAttribute('aria-pressed', 'false');
             }
+            fieldData.allButton.classList.add('active');
+            fieldData.allButton.setAttribute('aria-pressed', 'true');
+            fieldData.allButton.focus();
         }
-        fieldData.allButton.focus();
     }
 
     #handleValueSelect(fieldName, value) {
-        if (this.#store.isFilterActive(fieldName, value)) {
-            return;
-        }
+        if (this.#store.isFilterActive(fieldName, value)) return;
         this.#store.toggleFilter(fieldName, value);
         this.#updateAllButtonState(fieldName);
     }
 
-    #updateButtonState(fieldName, value, isActive) {
-        const fieldData = this.#fieldFilterMap.get(fieldName);
-        if (!fieldData) return;
-        for (const button of fieldData.valueButtons) {
-            if (button.dataset.value === value) {
-                if (isActive) {
-                    button.classList.add('active');
-                    button.setAttribute('aria-pressed', 'true');
-                } else {
-                    button.classList.remove('active');
-                    button.setAttribute('aria-pressed', 'false');
-                }
-                break;
-            }
-        }
-    }
-
     #updateAllButtonState(fieldName) {
         const fieldData = this.#fieldFilterMap.get(fieldName);
-        if (!fieldData) return;
+        if (!fieldData || fieldData.type !== 'buttons') return;
         const hasActiveFilters = this.#store.hasFieldFilters(fieldName);
         if (hasActiveFilters) {
             fieldData.allButton.classList.remove('active');
@@ -1411,29 +1805,55 @@ class FilterGenerator {
     syncWithStore() {
         const filters = this.#store.filters;
         for (const [fieldName, fieldData] of this.#fieldFilterMap) {
-            for (const button of fieldData.valueButtons) {
-                button.classList.remove('active');
-                button.setAttribute('aria-pressed', 'false');
-            }
             const activeValues = filters[fieldName] || [];
-            for (const button of fieldData.valueButtons) {
-                if (activeValues.includes(button.dataset.value)) {
-                    button.classList.add('active');
-                    button.setAttribute('aria-pressed', 'true');
-                }
+
+            switch (fieldData.type) {
+                case 'buttons':
+                    for (const button of fieldData.valueButtons) {
+                        button.classList.remove('active');
+                        button.setAttribute('aria-pressed', 'false');
+                    }
+                    for (const button of fieldData.valueButtons) {
+                        if (activeValues.includes(button.dataset.value)) {
+                            button.classList.add('active');
+                            button.setAttribute('aria-pressed', 'true');
+                        }
+                    }
+                    this.#updateAllButtonState(fieldName);
+                    break;
+                case 'dropdown':
+                    if (activeValues.length > 0) {
+                        fieldData.element.value = activeValues[0];
+                    } else {
+                        fieldData.element.value = 'all';
+                    }
+                    break;
+                case 'checkboxes':
+                    for (const cb of fieldData.valueCheckboxes) {
+                        cb.checked = activeValues.includes(cb.value);
+                    }
+                    fieldData.allCheckbox.checked = activeValues.length === 0;
+                    break;
+                case 'radio':
+                    const radios = fieldData.element.querySelectorAll('input[type="radio"]');
+                    for (const radio of radios) {
+                        if (radio.value === 'all') {
+                            radio.checked = activeValues.length === 0;
+                        } else {
+                            radio.checked = activeValues.includes(radio.value);
+                        }
+                    }
+                    break;
             }
-            this.#updateAllButtonState(fieldName);
         }
     }
 
     get container() { return this.#container; }
     get fieldFilterMap() { return this.#fieldFilterMap; }
-
     refresh() { this.#generate(); }
 }
 
-// ─── FilterChips Module ──────────────────────────────
-
+// FilterChips Module
 class FilterChips {
     #container;
     #store;
@@ -1486,11 +1906,9 @@ class FilterChips {
             const fieldInfo = this.#fieldFilterMap.get(fieldName);
             if (!fieldInfo) continue;
 
-            // Get the display map to show the raw value
             const displayMap = fieldInfo.displayMap || new Map();
 
             for (const value of values) {
-                // Get the display value from the map, or use the normalized value if not found
                 const displayValue = displayMap.get(value) || value;
 
                 const chip = document.createElement('span');
@@ -1608,8 +2026,7 @@ class FilterChips {
     get container() { return this.#container; }
 }
 
-// ─── ResultCounter Module ────────────────────────────
-
+// ResultCounter Module
 class ResultCounter {
     #container;
     #memberCollection;
@@ -1686,8 +2103,7 @@ class ResultCounter {
     get container() { return this.#container; }
 }
 
-// ─── SortGenerator Module ────────────────────────────
-
+// SortGenerator Module
 class SortGenerator {
     #container;
     #memberCollection;
@@ -1809,8 +2225,7 @@ class SortGenerator {
     refresh() { this.#generate(); }
 }
 
-// ─── LayoutManager Module ────────────────────────────
-
+// LayoutManager Module
 class LayoutManager {
     #container;
     #directory;
@@ -1919,24 +2334,26 @@ class LayoutManager {
     get directory() { return this.#directory; }
 }
 
-// ─── Main Atlas Class ─────────────────────────────────
-
-export default class Atlas {
-
+// Main Atlas Class
+class Atlas {
     #registry = null;
     #memberCollection = null;
     #store = null;
     #events = null;
     #renderer = null;
+    #urlManager = null;
     #modules = {};
 
     constructor(options = {}) {
         this.options = {
             root: '[data-atlas]',
             debug: false,
+            showCredit: true,
             ...options
         };
         this.root = this.#findRoot();
+
+        JCinkAdapter.apply();
         this.#initialise();
     }
 
@@ -1966,8 +2383,16 @@ export default class Atlas {
             store: this.#store,
             events: this.#events
         });
+        this.#urlManager = new URLManager({
+            store: this.#store,
+            events: this.#events
+        });
         this.#createModules();
+        if (this.options.showCredit) {
+            this.#addCreditLine();
+        }
         this.#debug();
+        this.#consoleCredit();
     }
 
     #createMemberCollection() {
@@ -2072,6 +2497,81 @@ export default class Atlas {
         return fallback || null;
     }
 
+    #addCreditLine() {
+        if (document.querySelector('.atlas-credit')) return;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .atlas-credit {
+                text-align: center;
+                font-size: 0.8rem;
+                color: currentColor;
+                opacity: 0.7;
+                padding: 1rem 0;
+                margin-top: 2rem;
+                border-top: 1px solid currentColor;
+                border-top-color: rgba(128,128,128,0.2);
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+            .atlas-credit a {
+                color: currentColor;
+                text-decoration: underline;
+                text-underline-offset: 2px;
+                text-decoration-thickness: 1px;
+                text-decoration-color: rgba(128,128,128,0.3);
+            }
+            .atlas-credit a:hover {
+                opacity: 0.7;
+                text-decoration-color: currentColor;
+            }
+            .atlas-credit strong {
+                color: currentColor;
+                font-weight: 700;
+            }
+            .atlas-credit .divider {
+                margin: 0 0.5rem;
+                opacity: 0.3;
+            }
+            @media (prefers-color-scheme: dark) {
+                .atlas-credit {
+                    border-top-color: rgba(255,255,255,0.12);
+                }
+                .atlas-credit a {
+                    text-decoration-color: rgba(255,255,255,0.2);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        requestAnimationFrame(() => {
+            const credit = document.createElement('div');
+            credit.className = 'atlas-credit';
+            credit.innerHTML = `
+                <span>⚡ Powered by <a href="https://jcinkdirectoryframework.github.io/atlas-directory/" target="_blank">Atlas</a></span>
+                <span class="divider">·</span>
+                <span>Built by <strong>Maeve</strong> ❤️ for the JCink community</span>
+            `;
+
+            const atlasRoot = document.querySelector('[data-atlas]');
+            if (atlasRoot) {
+                atlasRoot.appendChild(credit);
+            } else {
+                document.body.appendChild(credit);
+            }
+        });
+    }
+
+    #consoleCredit() {
+        const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        console.log(
+            '%c⚡ Atlas %c A dependency-free, HTML-driven directory engine',
+            'background:#dc2626; color:white; padding:4px 8px; border-radius:4px 0 0 4px; font-weight:bold;',
+            isDark ? 'background:#2d3748; color:#e2e8f0; padding:4px 8px; border-radius:0 4px 4px 0;' : 'background:#1a1a2e; color:#e2e8f0; padding:4px 8px; border-radius:0 4px 4px 0;'
+        );
+        console.log('  🔗 https://jcinkdirectoryframework.github.io/atlas-directory/');
+        console.log('  ❤️ Built by Maeve for the JCink community');
+    }
+
     #debug() {
         if (!this.options.debug) return;
         console.group('Atlas');
@@ -2102,11 +2602,11 @@ export default class Atlas {
     get store() { return this.#store; }
     get events() { return this.#events; }
     get renderer() { return this.#renderer; }
+    get urlManager() { return this.#urlManager; }
     get modules() { return { ...this.#modules }; }
 }
 
-// ─── Named Exports ────────────────────────────────────
-
+// Named Exports
 export { Atlas };
 export { Member };
 export { MemberCollection };
@@ -2114,6 +2614,8 @@ export { Registry };
 export { EventBus };
 export { Store };
 export { Renderer };
+export { URLManager };
+export { JCinkAdapter };
 export { FilterGenerator };
 export { FilterChips };
 export { ResultCounter };
