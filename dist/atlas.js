@@ -2606,18 +2606,24 @@ class Atlas {
     get modules() { return { ...this.#modules }; }
 }
 
-// Named Exports
-export { Atlas };
-export { Member };
-export { MemberCollection };
-export { Registry };
-export { EventBus };
-export { Store };
-export { Renderer };
-export { URLManager };
-export { JCinkAdapter };
-export { FilterGenerator };
-export { FilterChips };
-export { ResultCounter };
-export { SortGenerator };
-export { LayoutManager };
+// ─── Exports ──────────────────────────────────────────
+
+// Default export — the main Atlas class
+export default Atlas;
+
+// Named exports for advanced use
+export {
+    Member,
+    MemberCollection,
+    Registry,
+    EventBus,
+    Store,
+    Renderer,
+    URLManager,
+    JCinkAdapter,
+    FilterGenerator,
+    FilterChips,
+    ResultCounter,
+    SortGenerator,
+    LayoutManager
+};
