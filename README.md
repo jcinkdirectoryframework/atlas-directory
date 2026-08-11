@@ -30,10 +30,10 @@ Atlas transforms static HTML member lists into interactive, searchable directori
 
 The quickest way to get started — no files to upload!
 
-<link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css">
+<link rel="stylesheet" href="https://jcinkdirectoryframework.github.io/atlas-directory/dist/atlas.min.css">
 
 <script type="module">
-    import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
+    import Atlas from 'https://jcinkdirectoryframework.github.io/atlas-directory/dist/atlas.min.js';
     new Atlas();
 </script>
 
@@ -77,7 +77,7 @@ The quickest way to get started — no files to upload!
 Atlas provides minimal core CSS for functionality. You can customise everything else.
 
 Option A: CDN (Recommended)
-<link rel="stylesheet" href="https://atlas-directory.netlify.app/atlas.min.css">
+<link rel="stylesheet" href="https://jcinkdirectoryframework.github.io/atlas-directory/dist/atlas.min.css">
 
 Option B: Self-Host
 <link rel="stylesheet" href="src/styles/atlas.css">
@@ -88,7 +88,7 @@ For custom styling, see the CSS Customisation section in docs/html-api.md.
 
 Option A: CDN (Recommended)
 <script type="module">
-    import Atlas from 'https://atlas-directory.netlify.app/atlas.min.js';
+    import Atlas from 'https://jcinkdirectoryframework.github.io/atlas-directory/dist/atlas.min.js';
     new Atlas();
 </script>
 
