@@ -241,40 +241,69 @@ export default class FilterChips {
      * when filters are removed via chips.
      */
     #updateFilterGeneratorUI(fieldName) {
+    const fieldInfo = this.#fieldFilterMap.get(fieldName);
+    if (!fieldInfo) return;
 
-        const fieldInfo = this.#fieldFilterMap.get(fieldName);
+    const activeValues = this.#store.filters[fieldName] || [];
 
-        if (!fieldInfo) {
-            return;
-        }
-
-        // Find the all button in the FilterGenerator's DOM
-        const allButton = fieldInfo.allButton;
-
-        if (allButton) {
-            const hasActiveFilters = this.#store.hasFieldFilters(fieldName);
-            if (hasActiveFilters) {
-                allButton.classList.remove('active');
-                allButton.setAttribute('aria-pressed', 'false');
-            } else {
-                allButton.classList.add('active');
-                allButton.setAttribute('aria-pressed', 'true');
+    // Handle different filter types
+    switch (fieldInfo.type) {
+        case 'buttons':
+            // Update "All" button
+            const allButton = fieldInfo.allButton;
+            if (allButton) {
+                const hasActiveFilters = this.#store.hasFieldFilters(fieldName);
+                if (hasActiveFilters) {
+                    allButton.classList.remove('active');
+                    allButton.setAttribute('aria-pressed', 'false');
+                } else {
+                    allButton.classList.add('active');
+                    allButton.setAttribute('aria-pressed', 'true');
+                }
             }
-        }
-
-        // Update value buttons
-        const activeValues = this.#store.filters[fieldName] || [];
-        for (const button of fieldInfo.valueButtons) {
-            if (activeValues.includes(button.dataset.value)) {
-                button.classList.add('active');
-                button.setAttribute('aria-pressed', 'true');
-            } else {
-                button.classList.remove('active');
-                button.setAttribute('aria-pressed', 'false');
+            // Update value buttons
+            for (const button of fieldInfo.valueButtons || []) {
+                if (activeValues.includes(button.dataset.value)) {
+                    button.classList.add('active');
+                    button.setAttribute('aria-pressed', 'true');
+                } else {
+                    button.classList.remove('active');
+                    button.setAttribute('aria-pressed', 'false');
+                }
             }
-        }
+            break;
 
+        case 'dropdown':
+            if (fieldInfo.element && fieldInfo.element.tagName === 'SELECT') {
+                if (activeValues.length > 0) {
+                    fieldInfo.element.value = activeValues[0];
+                } else {
+                    fieldInfo.element.value = 'all';
+                }
+            }
+            break;
+
+        case 'checkboxes':
+            for (const cb of fieldInfo.valueCheckboxes || []) {
+                cb.checked = activeValues.includes(cb.value);
+            }
+            if (fieldInfo.allCheckbox) {
+                fieldInfo.allCheckbox.checked = activeValues.length === 0;
+            }
+            break;
+
+        case 'radio':
+            const radios = fieldInfo.element ? fieldInfo.element.querySelectorAll('input[type="radio"]') : [];
+            for (const radio of radios) {
+                if (radio.value === 'all') {
+                    radio.checked = activeValues.length === 0;
+                } else {
+                    radio.checked = activeValues.includes(radio.value);
+                }
+            }
+            break;
     }
+}
 
     /**
      * Get the container element.
