@@ -105,7 +105,7 @@ class Member {
         if (!normalizedQuery) return true;
         for (const [fieldName, field] of this.#fields) {
             if (!field.searchable) continue;
-            if (field.normalized.startsWith(normalizedQuery)) return true;
+            if (field.normalized.includes(normalizedQuery)) return true;
         }
         return false;
     }
