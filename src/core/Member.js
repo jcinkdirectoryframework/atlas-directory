@@ -220,7 +220,7 @@ export default class Member {
      * Check if the member matches a search query.
      *
      * Searches only searchable fields (opt-in with data-searchable="true").
-     * Uses "starts with" matching (case-insensitive).
+     * Uses "includes" matching (case-insensitive).
      *
      * @param {string} query - The search query
      * @returns {boolean} True if the query matches any searchable field
@@ -237,7 +237,7 @@ export default class Member {
             if (!field.searchable) {
                 continue;
             }
-            if (field.normalized.startsWith(normalizedQuery)) {
+            if (field.normalized.includes(normalizedQuery)) {
                 return true;
             }
         }
