@@ -167,7 +167,12 @@
     console.log("Atlas loaded");
 
     new Atlas({
-        debug: true
+        debug: true,
+    hiddenGroups: {
+        'faction': {
+            'Empire': 'Empire'
+        }
+    }
     });
 
     console.log("Atlas created");
