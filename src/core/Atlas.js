@@ -144,6 +144,9 @@ export default class Atlas {
         // 10. Console credit (always shown, subtle)
         this.#consoleCredit();
 
+        // Store reference to this instance on the root element for debugging
+        this.root._atlasInstance = this;
+
     }
 
     /**
