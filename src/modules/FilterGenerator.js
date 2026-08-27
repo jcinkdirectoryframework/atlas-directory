@@ -74,6 +74,8 @@ export default class FilterGenerator {
         this.#events = events;
         this.#hiddenGroupsConfig = options.hiddenGroups || {};
 
+        console.debug('FilterGenerator: hiddenGroupsConfig received:', this.#hiddenGroupsConfig);
+
         // ─── Read display options from container ──────
 
         this.#readDisplayOptions();
@@ -217,7 +219,9 @@ export default class FilterGenerator {
      * Get hidden groups for a specific field from configuration.
      */
     #getHiddenGroupsForField(fieldName) {
-        return this.#hiddenGroupsConfig[fieldName] || null;
+        const result = this.#hiddenGroupsConfig[fieldName] || null;
+        console.debug(`FilterGenerator: getHiddenGroupsForField("${fieldName}") =`, result);
+        return result;
     }
 
     /**
@@ -255,6 +259,8 @@ export default class FilterGenerator {
      */
     #createFilterForField(fieldName, displayType) {
 
+        console.debug(`FilterGenerator: createFilterForField("${fieldName}")`);
+
         // Get unique raw values (preserving original casing)
         const rawValues = this.#memberCollection.getUniqueValues(fieldName);
 
@@ -290,8 +296,17 @@ export default class FilterGenerator {
         const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
         const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
 
-        // Filter out hidden group values from the regular list
-        const filteredKeys = sortedKeys.filter(key => !hiddenGroupValues.includes(key));
+        console.debug(`FilterGenerator: hiddenGroups =`, hiddenGroups);
+        console.debug(`FilterGenerator: hiddenGroupValues =`, hiddenGroupValues);
+        console.debug(`FilterGenerator: sortedKeys =`, sortedKeys);
+
+        // Filter out hidden group values from the regular list (case-insensitive)
+        const filteredKeys = sortedKeys.filter(key => {
+            // Check if this key (lowercase) matches any hidden group value (lowercase)
+            return !hiddenGroupValues.some(hidden => hidden.toLowerCase() === key);
+        });
+
+        console.debug(`FilterGenerator: filteredKeys =`, filteredKeys);
 
         // Create filter group container
         const group = document.createElement('div');
@@ -312,13 +327,17 @@ export default class FilterGenerator {
         // 2. Create a hidden groups section with toggle buttons
         if (hiddenGroups && Object.keys(hiddenGroups).length > 0) {
 
-            // Regular buttons (without hidden groups)
+            console.debug(`FilterGenerator: Creating hidden groups section for "${fieldName}"`);
+
+            // Regular buttons (without hidden groups) — using filteredKeys
             this.#createButtonFilter(fieldName, group, displayMap, filteredKeys);
 
             // Hidden groups section (with toggle buttons)
             this.#createHiddenGroupsSection(fieldName, hiddenGroups, group);
 
         } else {
+
+            console.debug(`FilterGenerator: Creating regular filter for "${fieldName}" with display type "${displayType}"`);
 
             // No hidden groups — normal behaviour
             switch (displayType) {
