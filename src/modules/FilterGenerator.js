@@ -13,6 +13,7 @@
  * - Update Store when filters change
  * - Accessibility: ARIA attributes, keyboard navigation
  * - Case-insensitive: Groups values by normalized (lowercase) form
+ * - Hidden groups: Groups hidden by default with toggle buttons
  *
  * Deliberately does NOT:
  * - Manage application state (delegates to Store)
@@ -35,6 +36,9 @@ export default class FilterGenerator {
         dropdown: []
     };
     #displayTypeOrder = [];
+    #hiddenGroupsConfig = {};
+    #hiddenGroupVisibility = {};
+    #hiddenGroupButtons = {};
 
     /**
      * Create a FilterGenerator.
@@ -43,8 +47,10 @@ export default class FilterGenerator {
      * @param {MemberCollection} memberCollection - The member collection
      * @param {Store} store - The application store
      * @param {EventBus} events - The EventBus instance
+     * @param {Object} options - Optional configuration
+     * @param {Object} options.hiddenGroups - { fieldName: { groupValue: 'Display Label', ... } }
      */
-    constructor(container, memberCollection, store, events) {
+    constructor(container, memberCollection, store, events, options = {}) {
 
         if (!container) {
             throw new Error('FilterGenerator requires a container element');
@@ -66,6 +72,7 @@ export default class FilterGenerator {
         this.#memberCollection = memberCollection;
         this.#store = store;
         this.#events = events;
+        this.#hiddenGroupsConfig = options.hiddenGroups || {};
 
         // ─── Read display options from container ──────
 
@@ -79,6 +86,7 @@ export default class FilterGenerator {
 
         this.#events.subscribe('store:filtersChanged', () => {
             this.syncWithStore();
+            this.#syncHiddenGroupsWithStore();
         });
 
     }
@@ -206,6 +214,13 @@ export default class FilterGenerator {
     }
 
     /**
+     * Get hidden groups for a specific field from configuration.
+     */
+    #getHiddenGroupsForField(fieldName) {
+        return this.#hiddenGroupsConfig[fieldName] || null;
+    }
+
+    /**
      * Generate filter interfaces for all filterable fields.
      */
     #generate() {
@@ -270,6 +285,14 @@ export default class FilterGenerator {
             return;
         }
 
+        // ─── Hidden groups logic ──────────────────────────
+
+        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
+        const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
+
+        // Filter out hidden group values from the regular list
+        const filteredKeys = sortedKeys.filter(key => !hiddenGroupValues.includes(key));
+
         // Create filter group container
         const group = document.createElement('div');
         group.dataset.filter = '';
@@ -282,20 +305,37 @@ export default class FilterGenerator {
         label.textContent = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
         group.appendChild(label);
 
-        // Create appropriate UI based on display type
-        switch (displayType) {
-            case 'dropdown':
-                this.#createDropdownFilter(fieldName, group, displayMap, sortedKeys);
-                break;
-            case 'checkboxes':
-                this.#createCheckboxFilter(fieldName, group, displayMap, sortedKeys);
-                break;
-            case 'radio':
-                this.#createRadioFilter(fieldName, group, displayMap, sortedKeys);
-                break;
-            default:
-                this.#createButtonFilter(fieldName, group, displayMap, sortedKeys);
-                break;
+        // ─── Create UI ──────────────────────────────────────
+
+        // If this field has hidden groups, we need to:
+        // 1. Create regular buttons using filteredKeys (hidden values removed)
+        // 2. Create a hidden groups section with toggle buttons
+        if (hiddenGroups && Object.keys(hiddenGroups).length > 0) {
+
+            // Regular buttons (without hidden groups)
+            this.#createButtonFilter(fieldName, group, displayMap, filteredKeys);
+
+            // Hidden groups section (with toggle buttons)
+            this.#createHiddenGroupsSection(fieldName, hiddenGroups, group);
+
+        } else {
+
+            // No hidden groups — normal behaviour
+            switch (displayType) {
+                case 'dropdown':
+                    this.#createDropdownFilter(fieldName, group, displayMap, sortedKeys);
+                    break;
+                case 'checkboxes':
+                    this.#createCheckboxFilter(fieldName, group, displayMap, sortedKeys);
+                    break;
+                case 'radio':
+                    this.#createRadioFilter(fieldName, group, displayMap, sortedKeys);
+                    break;
+                default:
+                    this.#createButtonFilter(fieldName, group, displayMap, sortedKeys);
+                    break;
+            }
+
         }
 
         this.#container.appendChild(group);
@@ -561,6 +601,172 @@ export default class FilterGenerator {
     }
 
     /**
+     * Create the hidden groups section within a filter group.
+     */
+    #createHiddenGroupsSection(fieldName, hiddenGroups, parentContainer) {
+
+        // Separator
+        const separator = document.createElement('hr');
+        separator.className = 'hidden-groups-separator';
+        parentContainer.appendChild(separator);
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'hidden-groups-header';
+        header.textContent = 'HIDDEN GROUPS';
+        parentContainer.appendChild(header);
+
+        // Button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'hidden-groups-buttons';
+        buttonContainer.dataset.filterOptions = '';
+        buttonContainer.setAttribute('role', 'toolbar');
+        buttonContainer.setAttribute('aria-label', `${fieldName} hidden groups`);
+
+        // Initialise tracking for this field
+        if (!this.#hiddenGroupVisibility[fieldName]) {
+            this.#hiddenGroupVisibility[fieldName] = {};
+        }
+        if (!this.#hiddenGroupButtons[fieldName]) {
+            this.#hiddenGroupButtons[fieldName] = {};
+        }
+
+        // Create a toggle button for each hidden group
+        for (const [groupValue, displayLabel] of Object.entries(hiddenGroups)) {
+
+            const button = document.createElement('button');
+            button.dataset.value = groupValue;
+            button.dataset.hiddenGroup = 'true';
+            button.textContent = `Show ${displayLabel}`;
+            button.type = 'button';
+            button.setAttribute('role', 'button');
+            button.setAttribute('aria-pressed', 'false');
+            button.setAttribute('aria-label', `Toggle ${displayLabel} group`);
+
+            // Store state (hidden by default)
+            this.#hiddenGroupVisibility[fieldName][groupValue] = false;
+            this.#hiddenGroupButtons[fieldName][groupValue] = button;
+
+            // Click handler
+            button.addEventListener('click', () => {
+                this.#toggleHiddenGroup(fieldName, groupValue);
+            });
+
+            // Keyboard support
+            button.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.#toggleHiddenGroup(fieldName, groupValue);
+                }
+            });
+
+            buttonContainer.appendChild(button);
+
+        }
+
+        parentContainer.appendChild(buttonContainer);
+
+        // Apply default hidden state (ensure hidden groups are not active in Store)
+        this.#applyDefaultHiddenState(fieldName);
+
+    }
+
+    /**
+     * Apply default hidden state to hidden groups.
+     */
+    #applyDefaultHiddenState(fieldName) {
+
+        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
+        if (!hiddenGroups) return;
+
+        for (const groupValue of Object.keys(hiddenGroups)) {
+            if (this.#store.isFilterActive(fieldName, groupValue)) {
+                this.#store.toggleFilter(fieldName, groupValue);
+            }
+        }
+
+        // Trigger a Store update to hide members in these groups
+        this.#events.publish('store:filtersChanged', {
+            filters: this.#store.filters,
+            source: 'FilterGenerator:defaultHidden'
+        });
+
+    }
+
+    /**
+     * Toggle a hidden group.
+     */
+    #toggleHiddenGroup(fieldName, groupValue) {
+
+        const isVisible = this.#hiddenGroupVisibility[fieldName][groupValue];
+        const newVisibility = !isVisible;
+        this.#hiddenGroupVisibility[fieldName][groupValue] = newVisibility;
+
+        // Update Store
+        if (newVisibility) {
+            // Show: add to filters
+            if (!this.#store.isFilterActive(fieldName, groupValue)) {
+                this.#store.toggleFilter(fieldName, groupValue);
+            }
+        } else {
+            // Hide: remove from filters
+            if (this.#store.isFilterActive(fieldName, groupValue)) {
+                this.#store.toggleFilter(fieldName, groupValue);
+            }
+        }
+
+        // Update button text and ARIA state
+        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
+        const displayLabel = hiddenGroups[groupValue];
+        const button = this.#hiddenGroupButtons[fieldName][groupValue];
+        if (button) {
+            button.textContent = newVisibility
+                ? `Hide ${displayLabel}`
+                : `Show ${displayLabel}`;
+            button.setAttribute('aria-pressed', newVisibility ? 'true' : 'false');
+        }
+
+        // Update the "All" button state for this field
+        this.#updateAllButtonState(fieldName);
+
+        // Trigger Store update
+        this.#events.publish('store:filtersChanged', {
+            filters: this.#store.filters,
+            source: 'FilterGenerator:toggleHiddenGroup'
+        });
+
+    }
+
+    /**
+     * Synchronize hidden group buttons with the Store state.
+     */
+    #syncHiddenGroupsWithStore() {
+
+        const filters = this.#store.filters;
+
+        for (const [fieldName, hiddenGroups] of Object.entries(this.#hiddenGroupsConfig)) {
+            if (!this.#hiddenGroupVisibility[fieldName]) continue;
+
+            for (const [groupValue, displayLabel] of Object.entries(hiddenGroups)) {
+                const isActive = filters[fieldName] && filters[fieldName].includes(groupValue);
+
+                // Update visibility state
+                this.#hiddenGroupVisibility[fieldName][groupValue] = isActive;
+
+                // Update button text
+                const button = this.#hiddenGroupButtons[fieldName]?.[groupValue];
+                if (button) {
+                    button.textContent = isActive
+                        ? `Hide ${displayLabel}`
+                        : `Show ${displayLabel}`;
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                }
+            }
+        }
+
+    }
+
+    /**
      * Attach events to button-based filters.
      */
     #attachButtonEvents(fieldName, allButton, valueButtons) {
@@ -582,6 +788,12 @@ export default class FilterGenerator {
         for (const button of valueButtons) {
             button.addEventListener('click', () => {
                 const value = button.dataset.value;
+                // Skip if this is a hidden group value (shouldn't happen, but safety check)
+                const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
+                const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
+                if (hiddenGroupValues.includes(value)) {
+                    return;
+                }
                 this.#handleValueSelect(fieldName, value);
             });
 
@@ -589,6 +801,11 @@ export default class FilterGenerator {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     const value = button.dataset.value;
+                    const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
+                    const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
+                    if (hiddenGroupValues.includes(value)) {
+                        return;
+                    }
                     this.#handleValueSelect(fieldName, value);
                 }
             });
@@ -598,21 +815,47 @@ export default class FilterGenerator {
 
     /**
      * Handle "All" button click.
+     *
+     * Clears regular filters but preserves hidden group filters.
      */
     #handleAllClick(fieldName) {
 
-        this.#store.clearFieldFilters(fieldName);
+        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
+        const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
 
+        // Get current filters for this field
+        const currentFilters = this.#store.filters[fieldName] || [];
+
+        // Keep only hidden group values
+        const filteredValues = currentFilters.filter(value => hiddenGroupValues.includes(value));
+
+        if (filteredValues.length > 0) {
+            this.#store.filters[fieldName] = filteredValues;
+        } else {
+            delete this.#store.filters[fieldName];
+        }
+
+        // Update UI
         const fieldData = this.#fieldFilterMap.get(fieldName);
         if (fieldData && fieldData.type === 'buttons' && fieldData.valueButtons) {
             for (const button of fieldData.valueButtons) {
-                button.classList.remove('active');
-                button.setAttribute('aria-pressed', 'false');
+                const value = button.dataset.value;
+                // Only reset regular buttons (not hidden groups)
+                if (!hiddenGroupValues.includes(value)) {
+                    button.classList.remove('active');
+                    button.setAttribute('aria-pressed', 'false');
+                }
             }
             fieldData.allButton.classList.add('active');
             fieldData.allButton.setAttribute('aria-pressed', 'true');
             fieldData.allButton.focus();
         }
+
+        // Trigger Store update
+        this.#events.publish('store:filtersChanged', {
+            filters: this.#store.filters,
+            source: 'FilterGenerator:allClicked'
+        });
 
     }
 
@@ -634,6 +877,9 @@ export default class FilterGenerator {
 
     /**
      * Update the "All" button state for a field.
+     *
+     * "All" is active only when NO regular (non-hidden) filters are active.
+     * Hidden groups do NOT affect the "All" button state.
      */
     #updateAllButtonState(fieldName) {
 
@@ -643,9 +889,13 @@ export default class FilterGenerator {
             return;
         }
 
-        const hasActiveFilters = this.#store.hasFieldFilters(fieldName);
+        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
+        const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
 
-        if (hasActiveFilters) {
+        const filters = this.#store.filters[fieldName] || [];
+        const hasRegularFilters = filters.some(value => !hiddenGroupValues.includes(value));
+
+        if (hasRegularFilters) {
             fieldData.allButton.classList.remove('active');
             fieldData.allButton.setAttribute('aria-pressed', 'false');
         } else {
@@ -668,12 +918,23 @@ export default class FilterGenerator {
 
             switch (fieldData.type) {
 
-                case 'buttons':
+                case 'buttons': {
+                    const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
+                    const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
+
+                    // Reset regular buttons
                     for (const button of fieldData.valueButtons) {
+                        if (hiddenGroupValues.includes(button.dataset.value)) {
+                            continue;
+                        }
                         button.classList.remove('active');
                         button.setAttribute('aria-pressed', 'false');
                     }
+                    // Activate regular buttons that are active in Store
                     for (const button of fieldData.valueButtons) {
+                        if (hiddenGroupValues.includes(button.dataset.value)) {
+                            continue;
+                        }
                         if (activeValues.includes(button.dataset.value)) {
                             button.classList.add('active');
                             button.setAttribute('aria-pressed', 'true');
@@ -681,6 +942,7 @@ export default class FilterGenerator {
                     }
                     this.#updateAllButtonState(fieldName);
                     break;
+                }
 
                 case 'dropdown':
                     if (activeValues.length > 0) {
@@ -711,6 +973,9 @@ export default class FilterGenerator {
             }
 
         }
+
+        // Also sync hidden group buttons
+        this.#syncHiddenGroupsWithStore();
 
     }
 
