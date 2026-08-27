@@ -50,8 +50,6 @@ export default class Atlas {
      * @param {string} options.root - CSS selector for the Atlas root (default: '[data-atlas]')
      * @param {boolean} options.debug - Enable debug logging (default: false)
      * @param {boolean} options.showCredit - Show credit line in footer (default: true)
-     * @param {Object} options.hiddenGroups - Hidden groups configuration
-     *   Example: { 'status': { 'archived': 'Archived', 'inactive': 'Inactive' } }
      */
     constructor(options = {}) {
 
@@ -59,7 +57,6 @@ export default class Atlas {
             root: '[data-atlas]',
             debug: false,
             showCredit: true,
-            hiddenGroups: {},
             ...options
         };
 
@@ -144,9 +141,6 @@ export default class Atlas {
         // 10. Console credit (always shown, subtle)
         this.#consoleCredit();
 
-        // Store reference to this instance on the root element for debugging
-        this.root._atlasInstance = this;
-
     }
 
     /**
@@ -187,17 +181,14 @@ export default class Atlas {
      */
     #createModules() {
 
-        // Filter Generator (with display options support and hidden groups)
+        // Filter Generator (with display options support)
         const filtersContainer = this.#registry.filtersContainer;
         if (filtersContainer) {
             this.#modules.filterGenerator = new FilterGenerator(
                 filtersContainer,
                 this.#memberCollection,
                 this.#store,
-                this.#events,
-                {
-                    hiddenGroups: this.options.hiddenGroups || {}
-                }
+                this.#events
             );
         } else if (this.options.debug) {
             console.warn('Atlas: No [data-filters] container found. Filters will not be displayed.');
@@ -420,12 +411,6 @@ export default class Atlas {
         const layoutManager = this.#modules.layoutManager;
         if (layoutManager) {
             console.info(`Current layout: ${layoutManager.layout}`);
-        }
-
-        // Hidden groups debug info
-        const hiddenGroups = this.options.hiddenGroups;
-        if (hiddenGroups && Object.keys(hiddenGroups).length > 0) {
-            console.info('Hidden groups:', hiddenGroups);
         }
 
         // Detailed member data
