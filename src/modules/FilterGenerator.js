@@ -13,7 +13,6 @@
  * - Update Store when filters change
  * - Accessibility: ARIA attributes, keyboard navigation
  * - Case-insensitive: Groups values by normalized (lowercase) form
- * - Hidden groups: Groups hidden by default with toggle buttons
  *
  * Deliberately does NOT:
  * - Manage application state (delegates to Store)
@@ -36,9 +35,6 @@ export default class FilterGenerator {
         dropdown: []
     };
     #displayTypeOrder = [];
-    #hiddenGroupsConfig = {};
-    #hiddenGroupVisibility = {};
-    #hiddenGroupButtons = {};
 
     /**
      * Create a FilterGenerator.
@@ -47,10 +43,8 @@ export default class FilterGenerator {
      * @param {MemberCollection} memberCollection - The member collection
      * @param {Store} store - The application store
      * @param {EventBus} events - The EventBus instance
-     * @param {Object} options - Optional configuration
-     * @param {Object} options.hiddenGroups - { fieldName: { groupValue: 'Display Label', ... } }
      */
-    constructor(container, memberCollection, store, events, options = {}) {
+    constructor(container, memberCollection, store, events) {
 
         if (!container) {
             throw new Error('FilterGenerator requires a container element');
@@ -72,7 +66,6 @@ export default class FilterGenerator {
         this.#memberCollection = memberCollection;
         this.#store = store;
         this.#events = events;
-        this.#hiddenGroupsConfig = options.hiddenGroups || {};
 
         // ─── Read display options from container ──────
 
@@ -86,13 +79,19 @@ export default class FilterGenerator {
 
         this.#events.subscribe('store:filtersChanged', () => {
             this.syncWithStore();
-            this.#syncHiddenGroupsWithStore();
         });
 
     }
 
     /**
      * Read display options from the container attributes.
+     *
+     * The order of attributes on the element controls the display order:
+     * - The first attribute encountered sets the first display type
+     * - The second attribute encountered sets the second display type
+     * - etc.
+     *
+     * Within each attribute, the order of fields determines their order.
      */
     #readDisplayOptions() {
 
@@ -103,16 +102,23 @@ export default class FilterGenerator {
             return [];
         };
 
+        // Parse each attribute
         const radio = parseList(this.#container.dataset.filterRadio);
         const checkboxes = parseList(this.#container.dataset.filterCheckboxes);
         const buttons = parseList(this.#container.dataset.filterButtons);
         const dropdown = parseList(this.#container.dataset.filterDropdown);
 
+        // Store display options
         this.#displayOptions = { radio, checkboxes, buttons, dropdown };
+
+        // ─── Build display type order based on attribute order ───
 
         this.#displayTypeOrder = [];
 
+        // Get the dataset keys in the order they appear on the element
         const datasetKeys = Object.keys(this.#container.dataset);
+
+        // Map dataset keys to display types
         const attributeMap = {
             filterRadio: 'radio',
             filterCheckboxes: 'checkboxes',
@@ -120,6 +126,7 @@ export default class FilterGenerator {
             filterDropdown: 'dropdown'
         };
 
+        // Process attributes in the order they appear on the element
         for (const key of datasetKeys) {
             if (attributeMap[key]) {
                 const type = attributeMap[key];
@@ -130,6 +137,7 @@ export default class FilterGenerator {
             }
         }
 
+        // If any type is missing from the order, add it at the end in default order
         const defaultOrder = ['radio', 'checkboxes', 'buttons', 'dropdown'];
         for (const type of defaultOrder) {
             const fields = this.#displayOptions[type] || [];
@@ -161,18 +169,20 @@ export default class FilterGenerator {
             return 'dropdown';
         }
 
-        return 'buttons';
+        return 'buttons'; // default
 
     }
 
     /**
      * Get the display order for all filterable fields.
+     * Returns an array of { fieldName, displayType } in display order.
      */
     #getDisplayOrder(filterableFields) {
 
         const orderedFields = [];
         const processedFields = new Set();
 
+        // 1. Process each display type in attribute order
         for (const type of this.#displayTypeOrder) {
             const fields = this.#displayOptions[type] || [];
             for (const field of fields) {
@@ -183,6 +193,7 @@ export default class FilterGenerator {
             }
         }
 
+        // 2. Add remaining fields (not specified) as buttons in DOM order
         for (const field of filterableFields) {
             if (!processedFields.has(field)) {
                 orderedFields.push({ field, type: 'buttons' });
@@ -195,19 +206,13 @@ export default class FilterGenerator {
     }
 
     /**
-     * Get hidden groups for a specific field from configuration.
-     */
-    #getHiddenGroupsForField(fieldName) {
-        return this.#hiddenGroupsConfig[fieldName] || null;
-    }
-
-    /**
      * Generate filter interfaces for all filterable fields.
      */
     #generate() {
 
         console.debug('FilterGenerator: Generating filters...');
 
+        // Clear the container
         this.#container.innerHTML = '';
 
         const filterableFields = this.#memberCollection.getFilterableFields();
@@ -217,12 +222,15 @@ export default class FilterGenerator {
             return;
         }
 
+        // Get the display order
         const displayOrder = this.#getDisplayOrder(filterableFields);
 
+        // Generate filters in the correct order
         for (const { field, type } of displayOrder) {
             this.#createFilterForField(field, type);
         }
 
+        // Apply existing filter state to the UI
         this.syncWithStore();
 
     }
@@ -232,12 +240,15 @@ export default class FilterGenerator {
      */
     #createFilterForField(fieldName, displayType) {
 
+        // Get unique raw values (preserving original casing)
         const rawValues = this.#memberCollection.getUniqueValues(fieldName);
 
+        // Skip fields with no values
         if (rawValues.length === 0) {
             return;
         }
 
+        // Build a map of normalized → raw (using the first occurrence)
         const displayMap = new Map();
         const allMembers = this.#memberCollection.getAll();
 
@@ -251,50 +262,40 @@ export default class FilterGenerator {
             }
         }
 
+        // Get sorted list of normalized keys
         const sortedKeys = Array.from(displayMap.keys()).sort((a, b) => a.localeCompare(b));
 
+        // If no values after normalisation, skip
         if (sortedKeys.length === 0) {
             return;
         }
 
-        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
-        const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
-
-        const filteredKeys = sortedKeys.filter(key => !hiddenGroupValues.includes(key));
-
-        console.debug(`FilterGenerator: "${fieldName}" sortedKeys:`, sortedKeys);
-        console.debug(`FilterGenerator: "${fieldName}" filteredKeys:`, filteredKeys);
-        console.debug(`FilterGenerator: "${fieldName}" hiddenGroups:`, hiddenGroups);
-
+        // Create filter group container
         const group = document.createElement('div');
         group.dataset.filter = '';
         group.dataset.field = fieldName;
         group.setAttribute('role', 'group');
         group.setAttribute('aria-label', `Filter by ${fieldName}`);
 
+        // Create label
         const label = document.createElement('label');
         label.textContent = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
         group.appendChild(label);
 
-        if (hiddenGroups && Object.keys(hiddenGroups).length > 0) {
-            console.debug(`FilterGenerator: Creating hidden groups section for "${fieldName}"`);
-            this.#createButtonFilter(fieldName, group, displayMap, filteredKeys);
-            this.#createHiddenGroupsSection(fieldName, hiddenGroups, group);
-        } else {
-            switch (displayType) {
-                case 'dropdown':
-                    this.#createDropdownFilter(fieldName, group, displayMap, sortedKeys);
-                    break;
-                case 'checkboxes':
-                    this.#createCheckboxFilter(fieldName, group, displayMap, sortedKeys);
-                    break;
-                case 'radio':
-                    this.#createRadioFilter(fieldName, group, displayMap, sortedKeys);
-                    break;
-                default:
-                    this.#createButtonFilter(fieldName, group, displayMap, sortedKeys);
-                    break;
-            }
+        // Create appropriate UI based on display type
+        switch (displayType) {
+            case 'dropdown':
+                this.#createDropdownFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+            case 'checkboxes':
+                this.#createCheckboxFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+            case 'radio':
+                this.#createRadioFilter(fieldName, group, displayMap, sortedKeys);
+                break;
+            default:
+                this.#createButtonFilter(fieldName, group, displayMap, sortedKeys);
+                break;
         }
 
         this.#container.appendChild(group);
@@ -311,6 +312,7 @@ export default class FilterGenerator {
         optionsContainer.setAttribute('role', 'toolbar');
         optionsContainer.setAttribute('aria-label', `${fieldName} filter options`);
 
+        // Create "All" button (always first)
         const allButton = document.createElement('button');
         allButton.dataset.value = 'all';
         allButton.textContent = 'All';
@@ -321,6 +323,7 @@ export default class FilterGenerator {
         allButton.setAttribute('aria-label', `Show all ${fieldName} values`);
         optionsContainer.appendChild(allButton);
 
+        // Create buttons for each unique value
         const valueButtons = [];
 
         for (const normalizedKey of sortedKeys) {
@@ -338,6 +341,7 @@ export default class FilterGenerator {
 
         group.appendChild(optionsContainer);
 
+        // Store references
         this.#fieldFilterMap.set(fieldName, {
             container: group,
             allButton: allButton,
@@ -346,6 +350,7 @@ export default class FilterGenerator {
             displayMap: displayMap
         });
 
+        // Attach events
         this.#attachButtonEvents(fieldName, allButton, valueButtons);
 
     }
@@ -359,11 +364,13 @@ export default class FilterGenerator {
         select.dataset.filterSelect = '';
         select.setAttribute('aria-label', `Filter by ${fieldName}`);
 
+        // All option
         const allOption = document.createElement('option');
         allOption.value = 'all';
         allOption.textContent = 'Show All';
         select.appendChild(allOption);
 
+        // Value options
         for (const normalizedKey of sortedKeys) {
             const displayValue = displayMap.get(normalizedKey);
             const option = document.createElement('option');
@@ -374,6 +381,7 @@ export default class FilterGenerator {
 
         group.appendChild(select);
 
+        // Event listener
         select.addEventListener('change', () => {
             const value = select.value;
             if (value === 'all') {
@@ -384,6 +392,7 @@ export default class FilterGenerator {
             }
         });
 
+        // Store reference
         this.#fieldFilterMap.set(fieldName, {
             container: group,
             element: select,
@@ -403,6 +412,7 @@ export default class FilterGenerator {
         optionsContainer.setAttribute('role', 'group');
         optionsContainer.setAttribute('aria-label', `${fieldName} filter options`);
 
+        // All checkbox
         const allWrapper = document.createElement('div');
         allWrapper.className = 'filter-option';
         const allCheckbox = document.createElement('input');
@@ -418,6 +428,7 @@ export default class FilterGenerator {
         allWrapper.appendChild(allLabel);
         optionsContainer.appendChild(allWrapper);
 
+        // Value checkboxes
         const valueCheckboxes = [];
 
         for (const normalizedKey of sortedKeys) {
@@ -437,13 +448,19 @@ export default class FilterGenerator {
             optionsContainer.appendChild(wrapper);
             valueCheckboxes.push(checkbox);
 
+            // Event listener for individual checkboxes
             checkbox.addEventListener('change', () => {
+                // Uncheck "All" if any value is checked/unchecked
                 allCheckbox.checked = false;
+
+                // Check if any values are selected
                 const checkedBoxes = optionsContainer.querySelectorAll('input[type="checkbox"]:checked:not([value="all"])');
                 if (checkedBoxes.length === 0) {
+                    // If nothing is checked, check "All"
                     allCheckbox.checked = true;
                     this.#store.clearFieldFilters(fieldName);
                 } else {
+                    // Apply selected filters
                     this.#store.clearFieldFilters(fieldName);
                     for (const cb of checkedBoxes) {
                         this.#store.toggleFilter(fieldName, cb.value);
@@ -452,8 +469,10 @@ export default class FilterGenerator {
             });
         }
 
+        // "All" checkbox event
         allCheckbox.addEventListener('change', () => {
             if (allCheckbox.checked) {
+                // Uncheck all value checkboxes
                 for (const cb of valueCheckboxes) {
                     cb.checked = false;
                 }
@@ -463,6 +482,7 @@ export default class FilterGenerator {
 
         group.appendChild(optionsContainer);
 
+        // Store reference
         this.#fieldFilterMap.set(fieldName, {
             container: group,
             element: optionsContainer,
@@ -484,6 +504,7 @@ export default class FilterGenerator {
         optionsContainer.setAttribute('role', 'radiogroup');
         optionsContainer.setAttribute('aria-label', `${fieldName} filter options`);
 
+        // All radio
         const allWrapper = document.createElement('div');
         allWrapper.className = 'filter-option';
         const allRadio = document.createElement('input');
@@ -500,6 +521,7 @@ export default class FilterGenerator {
         allWrapper.appendChild(allLabel);
         optionsContainer.appendChild(allWrapper);
 
+        // Value radios
         for (const normalizedKey of sortedKeys) {
             const displayValue = displayMap.get(normalizedKey);
             const wrapper = document.createElement('div');
@@ -517,6 +539,7 @@ export default class FilterGenerator {
             wrapper.appendChild(label);
             optionsContainer.appendChild(wrapper);
 
+            // Event listener
             radio.addEventListener('change', () => {
                 if (radio.checked) {
                     this.#store.clearFieldFilters(fieldName);
@@ -527,6 +550,7 @@ export default class FilterGenerator {
 
         group.appendChild(optionsContainer);
 
+        // Store reference
         this.#fieldFilterMap.set(fieldName, {
             container: group,
             element: optionsContainer,
@@ -537,162 +561,16 @@ export default class FilterGenerator {
     }
 
     /**
-     * Create the hidden groups section within a filter group.
-     */
-    #createHiddenGroupsSection(fieldName, hiddenGroups, parentContainer) {
-
-        const separator = document.createElement('hr');
-        separator.className = 'hidden-groups-separator';
-        parentContainer.appendChild(separator);
-
-        const header = document.createElement('div');
-        header.className = 'hidden-groups-header';
-        header.textContent = 'HIDDEN GROUPS';
-        parentContainer.appendChild(header);
-
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'hidden-groups-buttons';
-        buttonContainer.dataset.filterOptions = '';
-        buttonContainer.setAttribute('role', 'toolbar');
-        buttonContainer.setAttribute('aria-label', `${fieldName} hidden groups`);
-
-        if (!this.#hiddenGroupVisibility[fieldName]) {
-            this.#hiddenGroupVisibility[fieldName] = {};
-        }
-        if (!this.#hiddenGroupButtons[fieldName]) {
-            this.#hiddenGroupButtons[fieldName] = {};
-        }
-
-        for (const [groupValue, displayLabel] of Object.entries(hiddenGroups)) {
-
-            const button = document.createElement('button');
-            button.dataset.value = groupValue;
-            button.dataset.hiddenGroup = 'true';
-            button.textContent = `Show ${displayLabel}`;
-            button.type = 'button';
-            button.setAttribute('role', 'button');
-            button.setAttribute('aria-pressed', 'false');
-            button.setAttribute('aria-label', `Toggle ${displayLabel} group`);
-
-            this.#hiddenGroupVisibility[fieldName][groupValue] = false;
-            this.#hiddenGroupButtons[fieldName][groupValue] = button;
-
-            button.addEventListener('click', () => {
-                this.#toggleHiddenGroup(fieldName, groupValue);
-            });
-
-            button.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.#toggleHiddenGroup(fieldName, groupValue);
-                }
-            });
-
-            buttonContainer.appendChild(button);
-
-        }
-
-        parentContainer.appendChild(buttonContainer);
-
-        this.#applyDefaultHiddenState(fieldName);
-
-    }
-
-    /**
-     * Apply default hidden state to hidden groups.
-     */
-    #applyDefaultHiddenState(fieldName) {
-
-        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
-        if (!hiddenGroups) return;
-
-        for (const groupValue of Object.keys(hiddenGroups)) {
-            if (this.#store.isFilterActive(fieldName, groupValue)) {
-                this.#store.toggleFilter(fieldName, groupValue);
-            }
-        }
-
-        this.#events.publish('store:filtersChanged', {
-            filters: this.#store.filters,
-            source: 'FilterGenerator:defaultHidden'
-        });
-
-    }
-
-    /**
-     * Toggle a hidden group.
-     */
-    #toggleHiddenGroup(fieldName, groupValue) {
-
-        const isVisible = this.#hiddenGroupVisibility[fieldName][groupValue];
-        const newVisibility = !isVisible;
-        this.#hiddenGroupVisibility[fieldName][groupValue] = newVisibility;
-
-        if (newVisibility) {
-            if (!this.#store.isFilterActive(fieldName, groupValue)) {
-                this.#store.toggleFilter(fieldName, groupValue);
-            }
-        } else {
-            if (this.#store.isFilterActive(fieldName, groupValue)) {
-                this.#store.toggleFilter(fieldName, groupValue);
-            }
-        }
-
-        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
-        const displayLabel = hiddenGroups[groupValue];
-        const button = this.#hiddenGroupButtons[fieldName][groupValue];
-        if (button) {
-            button.textContent = newVisibility
-                ? `Hide ${displayLabel}`
-                : `Show ${displayLabel}`;
-            button.setAttribute('aria-pressed', newVisibility ? 'true' : 'false');
-        }
-
-        this.#updateAllButtonState(fieldName);
-
-        this.#events.publish('store:filtersChanged', {
-            filters: this.#store.filters,
-            source: 'FilterGenerator:toggleHiddenGroup'
-        });
-
-    }
-
-    /**
-     * Synchronize hidden group buttons with the Store state.
-     */
-    #syncHiddenGroupsWithStore() {
-
-        const filters = this.#store.filters;
-
-        for (const [fieldName, hiddenGroups] of Object.entries(this.#hiddenGroupsConfig)) {
-            if (!this.#hiddenGroupVisibility[fieldName]) continue;
-
-            for (const [groupValue, displayLabel] of Object.entries(hiddenGroups)) {
-                const isActive = filters[fieldName] && filters[fieldName].includes(groupValue);
-
-                this.#hiddenGroupVisibility[fieldName][groupValue] = isActive;
-
-                const button = this.#hiddenGroupButtons[fieldName]?.[groupValue];
-                if (button) {
-                    button.textContent = isActive
-                        ? `Hide ${displayLabel}`
-                        : `Show ${displayLabel}`;
-                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-                }
-            }
-        }
-
-    }
-
-    /**
      * Attach events to button-based filters.
      */
     #attachButtonEvents(fieldName, allButton, valueButtons) {
 
+        // "All" button clears all filters for this field
         allButton.addEventListener('click', () => {
             this.#handleAllClick(fieldName);
         });
 
+        // Keyboard support for Enter/Space on "All" button
         allButton.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -700,14 +578,10 @@ export default class FilterGenerator {
             }
         });
 
+        // Value buttons
         for (const button of valueButtons) {
             button.addEventListener('click', () => {
                 const value = button.dataset.value;
-                const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
-                const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
-                if (hiddenGroupValues.includes(value)) {
-                    return;
-                }
                 this.#handleValueSelect(fieldName, value);
             });
 
@@ -715,11 +589,6 @@ export default class FilterGenerator {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     const value = button.dataset.value;
-                    const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
-                    const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
-                    if (hiddenGroupValues.includes(value)) {
-                        return;
-                    }
                     this.#handleValueSelect(fieldName, value);
                 }
             });
@@ -732,36 +601,18 @@ export default class FilterGenerator {
      */
     #handleAllClick(fieldName) {
 
-        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
-        const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
-
-        const currentFilters = this.#store.filters[fieldName] || [];
-        const filteredValues = currentFilters.filter(value => hiddenGroupValues.includes(value));
-
-        if (filteredValues.length > 0) {
-            this.#store.filters[fieldName] = filteredValues;
-        } else {
-            delete this.#store.filters[fieldName];
-        }
+        this.#store.clearFieldFilters(fieldName);
 
         const fieldData = this.#fieldFilterMap.get(fieldName);
         if (fieldData && fieldData.type === 'buttons' && fieldData.valueButtons) {
             for (const button of fieldData.valueButtons) {
-                const value = button.dataset.value;
-                if (!hiddenGroupValues.includes(value)) {
-                    button.classList.remove('active');
-                    button.setAttribute('aria-pressed', 'false');
-                }
+                button.classList.remove('active');
+                button.setAttribute('aria-pressed', 'false');
             }
             fieldData.allButton.classList.add('active');
             fieldData.allButton.setAttribute('aria-pressed', 'true');
             fieldData.allButton.focus();
         }
-
-        this.#events.publish('store:filtersChanged', {
-            filters: this.#store.filters,
-            source: 'FilterGenerator:allClicked'
-        });
 
     }
 
@@ -775,6 +626,8 @@ export default class FilterGenerator {
         }
 
         this.#store.toggleFilter(fieldName, value);
+
+        // Update the "All" button state for this field
         this.#updateAllButtonState(fieldName);
 
     }
@@ -790,13 +643,9 @@ export default class FilterGenerator {
             return;
         }
 
-        const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
-        const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
+        const hasActiveFilters = this.#store.hasFieldFilters(fieldName);
 
-        const filters = this.#store.filters[fieldName] || [];
-        const hasRegularFilters = filters.some(value => !hiddenGroupValues.includes(value));
-
-        if (hasRegularFilters) {
+        if (hasActiveFilters) {
             fieldData.allButton.classList.remove('active');
             fieldData.allButton.setAttribute('aria-pressed', 'false');
         } else {
@@ -819,21 +668,12 @@ export default class FilterGenerator {
 
             switch (fieldData.type) {
 
-                case 'buttons': {
-                    const hiddenGroups = this.#getHiddenGroupsForField(fieldName);
-                    const hiddenGroupValues = hiddenGroups ? Object.keys(hiddenGroups) : [];
-
+                case 'buttons':
                     for (const button of fieldData.valueButtons) {
-                        if (hiddenGroupValues.includes(button.dataset.value)) {
-                            continue;
-                        }
                         button.classList.remove('active');
                         button.setAttribute('aria-pressed', 'false');
                     }
                     for (const button of fieldData.valueButtons) {
-                        if (hiddenGroupValues.includes(button.dataset.value)) {
-                            continue;
-                        }
                         if (activeValues.includes(button.dataset.value)) {
                             button.classList.add('active');
                             button.setAttribute('aria-pressed', 'true');
@@ -841,7 +681,6 @@ export default class FilterGenerator {
                     }
                     this.#updateAllButtonState(fieldName);
                     break;
-                }
 
                 case 'dropdown':
                     if (activeValues.length > 0) {
@@ -858,7 +697,7 @@ export default class FilterGenerator {
                     fieldData.allCheckbox.checked = activeValues.length === 0;
                     break;
 
-                case 'radio': {
+                case 'radio':
                     const radios = fieldData.element.querySelectorAll('input[type="radio"]');
                     for (const radio of radios) {
                         if (radio.value === 'all') {
@@ -868,13 +707,10 @@ export default class FilterGenerator {
                         }
                     }
                     break;
-                }
 
             }
 
         }
-
-        this.#syncHiddenGroupsWithStore();
 
     }
 
