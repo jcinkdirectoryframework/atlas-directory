@@ -111,16 +111,19 @@ export default class Renderer {
 
         // When filters change
         this.#events.subscribe('store:filtersChanged', () => {
+            console.debug('Renderer: Received store:filtersChanged event');
             this.#onStateChange();
         });
 
         // When search changes
         this.#events.subscribe('store:searchChanged', () => {
+            console.debug('Renderer: Received store:searchChanged event');
             this.#onStateChange();
         });
 
         // When sort changes
         this.#events.subscribe('store:sortChanged', () => {
+            console.debug('Renderer: Received store:sortChanged event');
             this.#onStateChange();
         });
 
@@ -137,6 +140,7 @@ export default class Renderer {
         }
 
         this.#pendingRender = requestAnimationFrame(() => {
+            console.debug('Renderer: Performing update...');
             this.#applyFiltersAndSearch();
             this.render();
             this.#pendingRender = null;
@@ -159,18 +163,23 @@ export default class Renderer {
         // Start with all members
         let filtered = this.#memberCollection.getAll();
 
-        // ─── Apply filters (uses optimised Set lookups) ───
+        // ─── Apply filters ────────────────────────────────
         const activeFields = Object.keys(filters).filter(
             fieldName => filters[fieldName] && filters[fieldName].length > 0
         );
+
+        console.debug('Renderer: Applying filters:', filters);
+        console.debug('Renderer: Active fields:', activeFields);
 
         if (activeFields.length > 0) {
             // Use cached results if available
             const cached = this.#store.getCachedFilterResults(this.#memberCollection);
             if (cached !== null) {
                 filtered = cached;
+                console.debug('Renderer: Using cached filter results:', filtered.length);
             } else {
                 filtered = this.#memberCollection.applyFilters(filters);
+                console.debug('Renderer: Applied filters, result:', filtered.length);
                 // Cache the results
                 this.#store.setCachedFilterResults(this.#memberCollection, filtered);
             }
@@ -186,12 +195,16 @@ export default class Renderer {
                 }
             }
             filtered = searchResults;
+            console.debug('Renderer: After search:', filtered.length);
         }
 
         // ─── Apply sort ──────────────────────────────────
         if (sort && sort.field) {
             filtered = this.#sortMembers(filtered, sort.field, sort.direction);
+            console.debug('Renderer: After sort:', filtered.length);
         }
+
+        console.debug('Renderer: Final filtered members:', filtered.map(m => m.id));
 
         this.#filteredMembers = filtered;
 
@@ -246,6 +259,8 @@ export default class Renderer {
 
         const totalMembers = this.#filteredMembers.length;
 
+        console.debug('Renderer: Rendering', totalMembers, 'members');
+
         // ─── Determine rendering strategy ──────────────
         const useLazy = this.#shouldUseLazyRendering();
 
@@ -275,6 +290,8 @@ export default class Renderer {
         const directory = this.#registry.directory;
         const members = this.#filteredMembers;
 
+        console.debug('Renderer: renderAll() called');
+
         // Ensure directory has list role (accessibility)
         directory.setAttribute('role', 'list');
 
@@ -297,6 +314,7 @@ export default class Renderer {
 
         // Store visible members for reference
         this.#visibleMembers = [...members];
+        console.debug('Renderer: Visible members:', this.#visibleMembers.map(m => m.id));
 
     }
 
@@ -737,6 +755,8 @@ export default class Renderer {
 
         const total = this.#memberCollection.size;
         const visible = this.#visibleMembers.length;
+
+        console.debug('Renderer: Updating result counter — total:', total, 'visible:', visible);
 
         // Clear the container
         container.innerHTML = '';
